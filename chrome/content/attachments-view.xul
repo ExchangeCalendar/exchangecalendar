@@ -87,10 +87,13 @@
 			disable-on-readonly="true"
 			removable="true"
 			command="exchWebService_addAttachmentDialog"
-			oncommand="tmpAttachment.addAttachmentDialog();" 
 			hidden="true"/>
 	</toolbarpalette>
-     <toolbar id="event-toolbar" defaultset="button-save,button-attendees,button-privacy,button-url,exchWebService-add-attachment-button,button-delete"> 
+
+	// Add exchangecalendar attachment button
+	// Note: defaultset needs to be synced with common-central/calendar/base/content/dialogs/calendar-event-dialog.xul
+     <toolbar id="event-toolbar"
+		defaultset="button-saveandclose,button-attendees,button-privacy,button-url,exchWebService-add-attachment-button,button-delete" >
      </toolbar> 
  
 

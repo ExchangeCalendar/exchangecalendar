@@ -239,32 +239,38 @@ exchAttachments.prototype = {
 		var args = this._window.arguments[0];
 		var item = args.calendarEvent;
 
-		//this.globalFunctions.LOG("  -- onLoad 2 ("+this.globalFunctions.STACKshort()+")");
 		this.attachmentListboxVisible = false;
 
 		if ((item.calendar) && (item.calendar.type == "exchangecalendar")) {
 			this.globalFunctions.LOG("  -- It is an Exchange Calendar event:"+item.title);
 
-			
-			try {
-				// Hide Lightning URL button 
-				this._document.getElementById("button-url").hidden = true;
-				this._document.getElementById("event-toolbar").setAttribute("currentset", "button-save,button-attendees,button-privacy,button-url,exchWebService-add-attachment-button,button-delete");
-				this._document.getElementById("exchWebService-add-attachment-button").hidden = false;
-				if(this._document.getElementById("options-attachments-menuitem")){
+			let eventToolbar = this._document.getElementById("event-toolbar");
+
+			// If add url button was enabled, hidde it and show exchangecalendar attachment
+			this._document.getElementById("button-url").hidden = true;
+
+			let currentSet = eventToolbar.getAttribute("currentset");
+			if (currentSet.indexOf("button-url") === 1
+					&& currentSet.indexOf("exchWebService-add-attachment-button") === -1) {
+				currentSet = currentSet + "exchWebService-add-attachment-button";
+			}
+
+			this._document.getElementById("exchWebService-add-attachment-button").hidden = false;
+
+			if (this._document.getElementById("options-attachments-menuitem")) {
 				this._document.getElementById("options-attachments-menuitem").setAttribute("label", this._document.getElementById("exchWebService-add-attachment-button").getAttribute("label"));
 				this._document.getElementById("options-attachments-menuitem").setAttribute("command", "exchWebService_addAttachmentDialog");
-				}
 			}
-			catch (ex) {this.globalFunctions.LOG("  -- Could not add exchange attachment buttons:"+ex.toString());}
 
 			// calendar-event-dialog (hide existing attachment view)
-			try {
-				this._document.getElementById("event-grid-attachment-row").setAttribute("collapsed", "true");
-			}
-			catch (ex) {}
+			this._document.getElementById("event-grid-attachment-row").collapsed = true;
 
 			this.addAttachmentsFromItem(item);
+		} else {
+			this._document.getElementById("button-url").hidden = false;
+			this._document.getElementById("exchWebService-add-attachment-button").hidden = true;
+
+			this._document.getElementById("event-grid-attachment-row").collapsed = false ;
 		}
 	},
 
@@ -584,6 +590,6 @@ exchAttachments.prototype = {
 }
 
 var tmpAttachment = new exchAttachments(document, window);
-window.addEventListener("load", function _onLoad() { window.removeEventListener("load",arguments.callee,false); tmpAttachment.onLoad(); }, true);
+window.addEventListener("load", function _onLoad() { tmpAttachment.onLoad(); }, false);
 
 
