@@ -109,9 +109,8 @@ function ExchangeRequest(aArgument, aCbOk, aCbError, aListener)
 	this.exchangeBadCertListener2 = Cc["@1st-setup.nl/exchange/badcertlistener2;1"]
 		.getService(Ci.mivExchangeBadCertListener2);
 
-	this.observerService = Cc["@mozilla.org/observer-service;1"]
-		.getService(Ci.nsIObserverService);
-	this.observerService.addObserver(this, "http-on-modify-request", true);
+	this.observerService = Cc["@mozilla.org/observer-service;1"]  
+	                          .getService(Ci.nsIObserverService); this.observerService.addObserver(this, "http-on-modify-request", true);
 
 	this.timeZones = Cc["@1st-setup.nl/exchange/timezones;1"]
 		.getService(Ci.mivExchangeTimeZones);
@@ -1059,9 +1058,9 @@ ExchangeRequest.prototype = {
 						+ this.currentUrl + ". Aborting this request.");
 				}
 				else {
-					this.fail(this.ER_ERROR_HTTP_ERROR4XX, "HTTP Client error "
-						+ xmlReq.status + ": " +errMsg +"\nURL:" + this.currentUrl
-						+ "\n" + xmlReq.responseText.substr(0,300)+"\n\n");
+
+		 				this.fail(this.ER_ERROR_HTTP_ERROR4XX, "HTTP Client error "+xmlReq.status+": "+errMsg+"\nURL:"+this.currentUrl+"\n"+xmlReq.responseText.substr(0,300)+"\n\n");
+
 				}
 
 				return true;
