@@ -75,20 +75,20 @@ exchangeEventDialog.prototype = {
 				aItem.mileage = this._document.getElementById("exchWebService-mileage-count").value;
 				aItem.billingInformation = this._document.getElementById("exchWebService-billingInformation-count").value;
 				aItem.companies = this._document.getElementById("exchWebService-companies-count").value;
+			}
 
-				// Copy content from HTML editor
-				try{
-					if (this.newItem) {
-						aItem.bodyType = "HTML";
-						aItem.body = this._document.getElementById("exchWebService-body-editor").content;
-						this.newItem = false;
-					}
-					else if (aItem.bodyType === "HTML") {
-						aItem.body = this._document.getElementById("exchWebService-body-editor").content;
-					}
-				} catch(err) {
-					dump("Error saving content\n");
+			// Copy content from HTML editor
+			try{
+				if (this.newItem) {
+					aItem.bodyType = "HTML";
+					aItem.body = this._document.getElementById("exchWebService-body-editor").content;
+					this.newItem = false;
 				}
+				else if (aItem.bodyType === "HTML") {
+					aItem.body = this._document.getElementById("exchWebService-body-editor").content;
+				}
+			} catch(err) {
+				dump("Error saving content\n");
 			}
 		}
 
@@ -114,43 +114,21 @@ exchangeEventDialog.prototype = {
 	},
 
 	/*
-	 * This function is used to add extra informations for Exchange tasks
+	 * Adds HTML editor for exchangecalendar items
+	 * Adds extra informations for Exchange tasks
+	 *
 	 * As the same dialog is used for non-Exchange tasks and for events, this function
-	 * remove too these details when necessary.
+	 * removes too these details when necessary.
 	 */
 	updateScreen: function _updateScreen(aItem, aCalendar)
 	{
 		var item = aItem;
 
-		// If not an event and calendar type is exchangeCalendar, add Exchange task extra informations
-		if (!cal.isEvent(item)
-			&& aCalendar.type === "exchangecalendar") {
+		if (aCalendar.type === "exchangecalendar") {
 
-			// Set and display task owner
-
-			var ownerLabel = this._document.getElementById("exchWebService-owner-label");
-			if (ownerLabel) {
-				ownerLabel.setAttribute("collapsed", "false");
-				ownerLabel.value = item.owner;
-			}
-
-			// Set and display Exchange task details
-
-			this._document.getElementById("exchWebService-details-separator").hidden = false;
-			this._document.getElementById("exchWebService-details-row1").collapsed = false;
-			this._document.getElementById("exchWebService-details-row2").collapsed = false;
-			this._document.getElementById("exchWebService-details-row3").collapsed = false;
-
-			if (item.className) {
-				this._document.getElementById("exchWebService-totalWork-count").value = item.totalWork;
-				this._document.getElementById("exchWebService-actualWork-count").value = item.actualWork;
-				this._document.getElementById("exchWebService-mileage-count").value = item.mileage;
-				this._document.getElementById("exchWebService-billingInformation-count").value = item.billingInformation;
-				this._document.getElementById("exchWebService-companies-count").value = item.companies;
-			}
+			// For all item type, enable HTML editor
 
 			// Set HTML content editor
-
 			let itemBodyEditor = this._document.getElementById("exchWebService-body-editor");
 
 			// Try to read directly item body, otherwise fallback to item description property
@@ -178,37 +156,66 @@ exchangeEventDialog.prototype = {
 				itemBodyEditor.setAttribute("scrollbars","yes");
 			}
 
-			// Remove some standard inputs
+			// If not an event, add Exchange task extra informations
+			if (!cal.isEvent(item)) {
 
-			this._document.getElementById("event-grid-location-row").hidden = true;
+				// Set and display task owner
 
-			this._document.getElementById("reminder-none-separator").hidden = true;
-			this._document.getElementById("reminder-0minutes-menuitem").hidden = true;
-			this._document.getElementById("reminder-5minutes-menuitem").hidden = true;
-			this._document.getElementById("reminder-15minutes-menuitem").hidden = true;
-			this._document.getElementById("reminder-30minutes-menuitem").hidden = true;
-			this._document.getElementById("reminder-minutes-separator").hidden = true;
-			this._document.getElementById("reminder-1hour-menuitem").hidden = true;
-			this._document.getElementById("reminder-2hours-menuitem").hidden = true;
-			this._document.getElementById("reminder-12hours-menuitem").hidden = true;
-			this._document.getElementById("reminder-hours-separator").hidden = true;
-			this._document.getElementById("reminder-1day-menuitem").hidden = true;
-			this._document.getElementById("reminder-2days-menuitem").hidden = true;
-			this._document.getElementById("reminder-1week-menuitem").hidden = true;
+				var ownerLabel = this._document.getElementById("exchWebService-owner-label");
+				if (ownerLabel) {
+					ownerLabel.setAttribute("collapsed", "false");
+					ownerLabel.value = item.owner;
+				}
 
-			this._document.getElementById("timezone-starttime").hidden = true;
-			this._document.getElementById("timezone-endtime").hidden = true;
+				// Set and display Exchange task details
 
-			// Manage repeat for Exchange tasks
+				this._document.getElementById("exchWebService-details-separator").hidden = false;
+				this._document.getElementById("exchWebService-details-row1").collapsed = false;
+				this._document.getElementById("exchWebService-details-row2").collapsed = false;
+				this._document.getElementById("exchWebService-details-row3").collapsed = false;
 
-			if (this._document.getElementById("item-repeat")) {
-				this._document.getElementById("item-repeat").addEventListener("command", function() { self.updateRepeat(); }, false);
+				if (item.className) {
+					this._document.getElementById("exchWebService-totalWork-count").value = item.totalWork;
+					this._document.getElementById("exchWebService-actualWork-count").value = item.actualWork;
+					this._document.getElementById("exchWebService-mileage-count").value = item.mileage;
+					this._document.getElementById("exchWebService-billingInformation-count").value = item.billingInformation;
+					this._document.getElementById("exchWebService-companies-count").value = item.companies;
+				}
+
+				// Remove some standard inputs
+
+				this._document.getElementById("event-grid-location-row").hidden = true;
+
+				this._document.getElementById("reminder-none-separator").hidden = true;
+				this._document.getElementById("reminder-0minutes-menuitem").hidden = true;
+				this._document.getElementById("reminder-5minutes-menuitem").hidden = true;
+				this._document.getElementById("reminder-15minutes-menuitem").hidden = true;
+				this._document.getElementById("reminder-30minutes-menuitem").hidden = true;
+				this._document.getElementById("reminder-minutes-separator").hidden = true;
+				this._document.getElementById("reminder-1hour-menuitem").hidden = true;
+				this._document.getElementById("reminder-2hours-menuitem").hidden = true;
+				this._document.getElementById("reminder-12hours-menuitem").hidden = true;
+				this._document.getElementById("reminder-hours-separator").hidden = true;
+				this._document.getElementById("reminder-1day-menuitem").hidden = true;
+				this._document.getElementById("reminder-2days-menuitem").hidden = true;
+				this._document.getElementById("reminder-1week-menuitem").hidden = true;
+
+				this._document.getElementById("timezone-starttime").hidden = true;
+				this._document.getElementById("timezone-endtime").hidden = true;
+
+				// Manage repeat for Exchange tasks
+
+				if (this._document.getElementById("item-repeat")) {
+					this._document.getElementById("item-repeat").addEventListener("command", function() { self.updateRepeat(); }, false);
+				}
+
+				this.updateRepeat();
 			}
-
-			this.updateRepeat();
 		}
+
 		// For events and other calendar type, hidde back all Exchange task details, display back standard items
-		else {
+		if (cal.isEvent(item)
+			|| cal.type !== "exchangecalendar") {
 
 			// Hide Exchange task details
 
@@ -220,10 +227,6 @@ exchangeEventDialog.prototype = {
 			this._document.getElementById("exchWebService-details-row1").collapsed = true;
 			this._document.getElementById("exchWebService-details-row2").collapsed = true;
 			this._document.getElementById("exchWebService-details-row3").collapsed = true;
-
-			// HTML Task content editor
-			this._document.getElementById("item-description").hidden = false;
-			this._document.getElementById("exchWebService-body-editor").hidden = true;
 
 			// Reset standard form
 			this._document.getElementById("event-grid-location-row").hidden = false;
@@ -247,6 +250,13 @@ exchangeEventDialog.prototype = {
 			// Reset timezone start/end time
 			this._document.getElementById("timezone-starttime").hidden = false;
 			this._document.getElementById("timezone-endtime").hidden = false;
+		}
+
+		// Reset content editor when not exchangecalendar items
+		if (aCalendar.type !== "exchangecalendar") {
+			// Hidde HTML content editor
+			this._document.getElementById("item-description").hidden = false;
+			this._document.getElementById("exchWebService-body-editor").hidden = true;
 		}
 	},
 
