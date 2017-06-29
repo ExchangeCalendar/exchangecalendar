@@ -30,7 +30,7 @@ You can also search your contacts folder and the Exchange Global Address List (R
 
 You can view, delete, create and update calendar and task/todo items. And manage "Out of Office" settings.
 
-Dutch, French, English, German, Swedish and Japanese localizations.
+Dutch, English, French, German, Italian, Japanese, Russian, Swedish and Turkish localizations.
 
 Some of the icons and images used are from the Fugue Icons Collection made by Yusuke Kamiyamane (http://p.yusukekamiyamane.com/)</em:description>
     <em:creator>Ericsson (exchangecalendar@ericsson.com)</em:creator>
@@ -42,6 +42,8 @@ Some of the icons and images used are from the Fugue Icons Collection made by Yu
     <em:translator>Björn Töpper (de)</em:translator>
     <em:translator>Hiroshi Miura (ja-JP)</em:translator>
     <em:translator>Alexey Sinitsyn (ru)</em:translator>
+    <em:translator>Engin Özkan (tr)</em:translator>
+    <em:translator>Alessandro Menti (it)</em:translator>
     <em:homepageURL>http://www.1st-setup.nl/wordpress/?page_id=133</em:homepageURL>
     <em:iconURL>chrome://exchangecalendar-common/skin/images/lightningexchangecalendar.png</em:iconURL>
     <em:type>2</em:type> <!-- type: extension -->
@@ -56,7 +58,7 @@ Some of the icons and images used are from the Fugue Icons Collection made by Yu
 You can view, delete, create and update calendar and task/todo items. And manage "Out of Office" settings.
 You can read and use contacts and global addres list contacts for address autcompletion.
 
-Dutch, French, English, German, Swedish and Japanese localizations.
+Dutch, English, French, German, Italian, Japanese, Russian, Swedish and Turkish localizations.
 
 Some of the icons and images used are from the Fugue Icons Collection made by Yusuke Kamiyamane (http://p.yusukekamiyamane.com/)</em:description>
 		</Description>
@@ -120,6 +122,21 @@ Sommige van de iconen en plaatjes komen uit de Fugue Icons collectie gemaakt doo
 Голландский, французский, английский, немецкий, шведский, японский и русский вариант национальных языковых переводов этого приложения присутствуют тут.
 
 Некоторые значки и изображения используются из коллекции Fugue Icons созданной Юсукэ Камияманэ (http://p.yusukekamiyamane.com/)</em:description>
+		</Description>
+	</em:localized>
+	  
+	<em:localized>
+		<Description>
+			<em:locale>tr</em:locale>
+			<em:name>Exchange EWS Sağlayıcısı</em:name>
+			<em:description>Lightning içinde, Takvim, Görevler ve Kişileri Microsoft Exchange 2007/2010/2013 EWS sunucunuzla eşitlemenizi sağlar.
+
+Takvim ve Görev-Yapılacaklarınızdaki maddeleri görebilir ve silebilir, yeni maddeler yaratabilir ya da maddeleri güncelleyebilirsiniz. "İşyeri Dışında" ayarlarınızı da denetleyebilirsiniz.
+Kişilerinizdeki ve Genel Adres Listesindeki kişileri görebilir ve automatik adres tamamlamada kullanabilirsiniz.
+				
+Flemenkçe, İngilizce, Fransızca, Almanca, İtalyanca, Japonca, Rusça, İsveççe ve Türkçe yerelleştirmeleri vardır.
+
+Bazı ikon ve imgeler, Yusuke Kamiyamane tarafından yapılmış olan Fugue Icons Collection'dan alınıp kullanılmıştır. (http://p.yusukekamiyamane.com/)</em:description>
 		</Description>
 	</em:localized>
 
