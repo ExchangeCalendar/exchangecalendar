@@ -50,6 +50,8 @@ locale exchangecalendar de locale/exchangecalendar/de/
 locale exchangecalendar ja-JP locale/exchangecalendar/ja-JP/
 locale exchangecalendar sv locale/exchangecalendar/sv/
 locale exchangecalendar ru locale/exchangecalendar/ru/
+locale exchangecalendar it locale/exchangecalendar/it/
+locale exchangecalendar tr locale/exchangecalendar/tr/
 
 manifest interfaces/exchangeCalendar/mivExchangeCalendar.manifest
 
