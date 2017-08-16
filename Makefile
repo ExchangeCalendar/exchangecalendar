@@ -6,7 +6,7 @@ beautify:
 	find -name "*.js" -exec js-beautify --jslint-happy --indent-with-tabs --operator-position after-newline --replace {} \;
 
 build:
-	sed -i 's/\(\s\)*<em:version>[^<]*\?<\/em:version>/\1<em:version>$(version)<\/em:version>/' install.rdf
+	sed -i 's/\(\s*\)<em:version>[^<]*\?<\/em:version>/\1<em:version>$(version)<\/em:version>/' install.rdf
 	cat defaults/preferences/update_disable.txt > defaults/preferences/update.js
 	zip -r exchangecalendar-v"$(version)".xpi -x $(excludefromxpi) -- . 
 
