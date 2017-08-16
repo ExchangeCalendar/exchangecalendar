@@ -80,8 +80,8 @@ That's a bit strange, we know, but it's like the original code has been written.
 As current code indentation is really bad and as we are humans, if you edit a
 file, please first use formatters to automatically have better code indentation:
 
-* For Javascript files, you can use js-beautify (from `jsbeautifier` Debian package):
-`js-beautify --jslint-happy --indent-with-tabs --operator-position after-newline --replace codefile.js`
+* For Javascript files, you can use js-beautify (from `jsbeautifier` Debian package or js-beautify npm package):
+`js-beautify --jslint-happy --indent-with-tabs --operator-position after-newline --brace-style end-expand --replace codefile.js`
 * For XML files, you can use xmlllint (from `libxml2-utils` Debian pacakge):
 `xmllint --format --output codefile.xml codefile.xml`
 
