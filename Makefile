@@ -3,7 +3,7 @@ excludefromxpi = \*.git \*.xpi \*.sh update\*.txt Makefile VERSION
 
 beautify:
 	find \( -name "*.xml" -o -name "*.rdf" \) -exec xmllint --format --output {} {} \;
-	find -name "*.js" -exec js-beautify --jslint-happy --indent-with-tabs --operator-position after-newline --replace {} \;
+	find -name "*.js" -exec js-beautify --jslint-happy --indent-with-tabs --operator-position after-newline --brace-style end-expand --replace {} \;
 
 build:
 	sed -i 's/\(\s*\)<em:version>[^<]*\?<\/em:version>/\1<em:version>$(version)<\/em:version>/' install.rdf
