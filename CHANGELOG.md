@@ -1,6 +1,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [4.0.0-beta5] - 2017-**-**
+### Added
+
+### Changed
+- Use Makefile instead of custom build shell
+- Update install.rdf, README with new community
+- Builds now will disable automatic update checker to avoid issue with new forks
+
+### Fixed
+
 ## [4.0.0-beta4] - 2017-07-03
 ### Added
 - Turkish localization #43, #44, #46
@@ -28,7 +38,21 @@ All notable changes to this project will be documented in this file.
 
 ## [4.0.0-beta2] - 2017-06-10
 ### Fixed
-- Opening and working with Attachment dialog #12
+- Event/Item editor dialog:
+  - Default toolbar now uses "Save and close" button as in vanilla Lightning #9
+  - Attendees dialog is now managed by Lightning directly
+  - Opening and working with Attachment dialog #12
+
+### Known bugs
+- Event/Item editor dialog:
+  - Some times, the HTML editor for task content is freezed and nothing can be edited.
+  A workaround is to close the task and open it again.
+
+
+## [4.0.0-beta1] - 2017-05-29
+First pre-release under new project and community.
+
+This release should primarily address issues with Thunderbird 52 and Lightning 5.4.
 
 ## [3.9.0] - unknown release date
 - Stable Release
