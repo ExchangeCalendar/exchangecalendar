@@ -17,7 +17,7 @@ This extension requires:
   * Lightning extension corresponding to the Thunderbird release
   * The Exchange server has to provide an Exchange Web Service
 
-This extension was developped by its original author (Michel Verbraak) for
+This extension was developed by its original author (Michel Verbraak) for
 Exchange 2007, 2010 and 2013.
 
 Now, ExchangeCalendar community try to keep this extension working, but can't
@@ -31,12 +31,12 @@ This add-on is open source and based on the work of many
 This project is a community driven effort to keep maintained and uptodate
 the "Exchange EWS Provider" extension created by Michel Verbraak.
 
-Currently, the community is really small and have too few developpers to
+Currently, the community is really small and have too few developers to
 give any warranty on the future. Please help us to continue this project.
 
-### Provide feedbak, report issue
+### Provide feedback, report issue
 
-You are welcome to provide feedbak on our github project:
+You are welcome to provide feedback on our github project:
 https://github.com/ExchangeCalendar/exchangecalendar
 
 Please note that the project is built only for latest stable Thunderbird release
@@ -75,7 +75,7 @@ To help us to maintain the code, we will be thankful to follow these guidelines:
 * For Javascript files, use tabulations to indent your code
 * For XML files, use spaces
 
-That's a bit strange, we know, but its like the original code has been written.
+That's a bit strange, we know, but it's like the original code has been written.
 
 As current code indentation is really bad and as we are humans, if you edit a
 file, please first use formatters to automatically have better code indentation:

@@ -45,7 +45,7 @@ All notable changes to this project will be documented in this file.
 
 ### Known bugs
 - Event/Item editor dialog:
-  - Some times, the HTML editor for task content is freezed and nothing can be edited.
+  - Some times, the HTML editor for task content is frozen and nothing can be edited.
   A workaround is to close the task and open it again.
 
 

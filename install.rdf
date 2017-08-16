@@ -43,13 +43,13 @@ This extension requires:
   * Lightning extension corresponding to the Thunderbird release
   * The Exchange server has to provide an Exchange Web Service
 
-This extension was developped by its original author (Michel Verbraak) for
+This extension was developed by its original author (Michel Verbraak) for
 Exchange 2007, 2010 and 2013.
 
 Now, ExchangeCalendar community try to keep this extension working, but can't
 provide any guarantee on which versions are supported.
 
-You are welcome to provide feedbak on our github project:
+You are welcome to provide feedback on our github project:
 https://github.com/ExchangeCalendar/exchangecalendar
 
 Some of the icons and images used are from the Fugue Icons Collection made by Yusuke Kamiyamane (http://p.yusukekamiyamane.com/)
