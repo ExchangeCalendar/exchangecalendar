@@ -2,7 +2,7 @@
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
   <Description about="urn:mozilla:install-manifest">
     <em:id>exchangecalendar@ExchangeCalendar</em:id>
- <em:version>4.0.0-beta5</em:version>
+    <em:version>4.0.0-beta5</em:version>
     <em:targetApplication>
       <Description>
         <!-- Thunderbird -->
