@@ -20,8 +20,8 @@ This extension requires:
 This extension was developed by its original author (Michel Verbraak) for
 Exchange 2007, 2010 and 2013.
 
-Now, ExchangeCalendar community try to keep this extension working, but can't
-provide any guarantee on which versions are supported.
+The ExchangeCalendar community is now maintaining this extension. Support is
+best effort and cannot be guaranteed. Contributions are welcome.
 
 ## Contributing
 
