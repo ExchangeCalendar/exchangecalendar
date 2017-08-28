@@ -44,6 +44,7 @@ overlay chrome://messenger/content/folderProps.xul  chrome://exchangecalendar/co
 overlay chrome://messenger/content/messenger.xul chrome://exchangecalendar/content/rtews-overlay.xul
 
 locale exchangecalendar nl locale/exchangecalendar/nl/
+locale exchangecalendar en locale/exchangecalendar/en/
 locale exchangecalendar en-US locale/exchangecalendar/en-US/
 locale exchangecalendar fr-FR locale/exchangecalendar/fr-FR/
 locale exchangecalendar de locale/exchangecalendar/de/

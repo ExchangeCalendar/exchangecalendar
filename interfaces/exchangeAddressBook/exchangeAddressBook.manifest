@@ -11,6 +11,7 @@ manifest exchangeAbFolderDirectory/exchangeAbFolderDirectory.manifest
 manifest exchangeAbRootDirectory/exchangeAbRootDirectory.manifest
 
 locale exchangecontacts nl    locale/exchangecontacts/nl/
+locale exchangecontacts en    locale/exchangecontacts/en/
 locale exchangecontacts en-US locale/exchangecontacts/en-US/
 locale exchangecontacts fr-FR locale/exchangecontacts/fr-FR/
 locale exchangecontacts de    locale/exchangecontacts/de/
