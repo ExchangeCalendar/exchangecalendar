@@ -86,40 +86,8 @@ requests instead of big ones modifying big parts of the code.
 
 ### Translate
 
-Currently, community is modifying manually translations.
-We are looking to use standard translation tools to easier translate application.
-
-#### Manually translate
-
-To manually translate the add-on with a new localization `ab-CD`, you have to:
-
-1. Get the project code (see section above)
-2. Copy the current `en-US` localization:
-`cp -a locale/exchangecalendar/en-US locale/exchangecalendar/ab-CD`
-3. Edit every `.dtd` files with your translations
-4. (first time only): modify, or ask to modify, the `chrome.manifest` file to
-enable your localization by adding this line:
-`locale exchangecalendar ab-CD locale/exchangecalendar/ab-CD/`
-5. Edit the `install.rdf` file to add the main project description before the
-last `</Description>` text:
-```rdf
-    <em:localized>
-        <Description>
-            <em:locale>ab-CD</em:locale>
-            <em:name>Exchange Calendar</em:name>
-            <em:description>
-Your localized project description.
-            </em:description>
-        </Description>
-    </em:localized>
-```
-
-For last two steps, don't worry, we will be happy to do it for you, just ask it.
-
-#### Automatically translate
-
-We are looking for a way to give translators easier tools to do their work.
-It will certainly work with a web service and standardized GNU gettext tools.
+You are welcome to provide translation updates on our Transifex project:
+https://www.transifex.com/ExchangeCalendar/exchangecalendar
 
 ## License
 
