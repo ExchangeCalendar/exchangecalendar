@@ -68,22 +68,21 @@ Debian):
 sudo apt install git-core zip
 ```
 
-### Modify code
+### Patch the code
 
-To help us to maintain the code, we will be thankful to follow these guidelines:
+To help us to maintain the code, we will be thankful to follow these main
+guidelines:
 
-* For Javascript files, use tabulations to indent your code
-* For XML files, use spaces
+* Use indentation with 4 spaces
+* Avoid too long lines, try to break long lines into smaller ones
+* Avoid to write "spaghetti" code with too many if/else imbrications
+* Try to keep code simple to help us maintain it on long term
 
-That's a bit strange, we know, but it's like the original code has been written.
+When your patches are ready, you are welcome to do pull requests on our
+repository.
 
-As current code indentation is really bad and as we are humans, if you edit a
-file, please first use formatters to automatically have better code indentation:
-
-* For Javascript files, you can use js-beautify (from `jsbeautifier` Debian package or js-beautify npm package):
-`js-beautify --jslint-happy --indent-with-tabs --operator-position after-newline --brace-style end-expand --replace codefile.js`
-* For XML files, you can use xmlllint (from `libxml2-utils` Debian pacakge):
-`xmllint --format --output codefile.xml codefile.xml`
+Please help us to review your code by making multiple small pull
+requests instead of big ones modifying big parts of the code.
 
 ### Translate
 
