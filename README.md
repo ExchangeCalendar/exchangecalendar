@@ -36,7 +36,7 @@ give any warranty on the future. Please help us to continue this project.
 
 ### Provide feedback, report issue
 
-You are welcome to provide feedback on our github project:
+You are welcome to provide feedback on our Github project:
 https://github.com/ExchangeCalendar/exchangecalendar
 
 Please note that the project is built only for latest stable Thunderbird release
