@@ -1,40 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
-
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
   <Description about="urn:mozilla:install-manifest">
-    <em:id>exchangecalendar@extensions.1st-setup.nl</em:id>
-    <em:version>4.0.0-beta4</em:version>
+    <em:id>exchangecalendar@ExchangeCalendar</em:id>
+    <em:version>4.0.0-beta5</em:version>
     <em:targetApplication>
       <Description>
-      	<!-- Thunderbird -->
+        <!-- Thunderbird -->
         <em:id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</em:id>
-        <em:minVersion>12.0</em:minVersion>
+        <em:minVersion>52.*</em:minVersion>
         <em:maxVersion>52.*</em:maxVersion>
       </Description>
     </em:targetApplication>
-
     <em:targetApplication>
       <Description>
-          <!-- Seamonkey -->
+        <!-- Seamonkey -->
         <em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
-        <em:minVersion>2.6</em:minVersion>
-        <em:maxVersion>2.46.*</em:maxVersion>
+        <em:minVersion>2.49.*</em:minVersion>
+        <em:maxVersion>2.49.*</em:maxVersion>
       </Description>
     </em:targetApplication>
-
-    <em:name>Exchange EWS Provider</em:name>
-    <em:description>Allows you to sync calendars, tasks, and contacts with your Microsoft Exchange 2007/2010/2013 EWS server from within Lightning.
-
-You can view, delete, create, and update calendar and task/todo items, and manage "out of office" settings.
-You can read and use contacts and global address list contacts for address autocompletion.
-
-Dutch, French, English, German, Swedish, Japanese, Russian, Italian and Turkish localizations.
-
-Some of the icons and images used are from the Fugue Icons Collection made by Yusuke Kamiyamane (http://p.yusukekamiyamane.com/)</em:description>
-    <em:creator>Ericsson (exchangecalendar@ericsson.com)</em:creator>
-    <em:developer>Michel Verbraak</em:developer>
+    <em:name>Exchange Calendar</em:name>
+    <em:creator>Michel Verbraak</em:creator>
+    <em:developer>ExchangeCalendar community</em:developer>
     <em:translator>Michel Verbraak (nl)</em:translator>
     <em:translator>Michel Verbraak (en-US)</em:translator>
     <em:translator>Dominique Fillon (fr-FR)</em:translator>
@@ -44,115 +31,28 @@ Some of the icons and images used are from the Fugue Icons Collection made by Yu
     <em:translator>Alexey Sinitsyn (ru)</em:translator>
     <em:translator>Alessandro Menti (it-IT)</em:translator>
     <em:translator>Engin Özkan (tr)</em:translator>
-    <em:homepageURL>http://www.1st-setup.nl/wordpress/?page_id=133</em:homepageURL>
-    <em:iconURL>chrome://exchangecalendar-common/skin/images/lightningexchangecalendar.png</em:iconURL>
-    <em:type>2</em:type> <!-- type: extension -->
-    <em:unpack>true</em:unpack>
+    <em:description>
+Exchange Calendar extension can:
+  * Synchronize calendars, tasks, and contacts with a Microsoft Exchange server.
+  * Create, edit and update events and tasks.
+  * Display contacts from your address books and the global address list
+    (they are only readable, they are usable with address autocompletion)
+  * Manage the Exchange « out of office » feature
 
-	<em:localized>
-		<Description>
-			<em:locale>en-US</em:locale>
-			<em:name>Exchange EWS Provider</em:name>
-			<em:description>Allows you to sync calendars, tasks, and contacts with your Microsoft Exchange 2007/2010/2013 EWS server from within Lightning.
+This extension requires:
+  * Lightning extension corresponding to the Thunderbird release
+  * The Exchange server has to provide an Exchange Web Service
 
-You can view, delete, create, and update calendar and task/todo items, and manage "out of office" settings.
-You can read and use contacts and global address list contacts for address autocompletion.
+This extension was developed by its original author (Michel Verbraak) for
+Exchange 2007, 2010 and 2013.
 
-Dutch, French, English, German, Swedish, Japanese, Russian, Italian and Turkish localizations.
+Now, ExchangeCalendar community try to keep this extension working, but can't
+provide any guarantee on which versions are supported.
 
-Some of the icons and images used are from the Fugue Icons Collection made by Yusuke Kamiyamane (http://p.yusukekamiyamane.com/)</em:description>
-		</Description>
-	</em:localized>
+You are welcome to provide feedback on our github project:
+https://github.com/ExchangeCalendar/exchangecalendar
 
-    <em:localized>
-        <Description>
-            <em:locale>de</em:locale>
-                <em:name>Exchange EWS Provider</em:name>
-                <em:description>Ermöglicht es Ihnen Kalender, Aufgaben und Kontakte mit einem Microsoft Exchange 2007/2010/2013 EWS Server aus Lightning heraus zu synchronisieren.
-
-Sie können diese Kalender- und Aufgabeneinträge betrachten, löschen, erstellen und aktualisieren. Sie können die "Out of Office"-Einstellungen verwalten.
-Sie können Kontakte und globale Adresslisten lesen und für die Autovervollständigung der Adressen nutzen.
-
-Übersetzungen in Niederländisch, Französisch, Deutsch, Schwedisch, Japanisch, Russisch, Italienisch und Türkisch.
-
-Einige der Icons und die Bilder werden aus der Fugue Icons Collection erstellt von Yusuke Kamiyamane (http://p.yusukekamiyamane.com/) genutzt.
-               </em:description>
-        </Description>
-    </em:localized>
-
-	<em:localized>
-		<Description>
-			<em:locale>nl</em:locale>
-			<em:name>Exchange EWS Provider</em:name>
-			<em:description>Verzorgt de toegang tot een Microsoft Exchange 2007/2010/2013 EWS server binnen lightning.
-Op dit moment kan men agenda en taken items bekijken, wijzigen, maken en verwijderen. En Out of Office instellen.
-Tevens kan je je persoonlijke contacten en die in de Global Addres List lezen, bekijken en gebruiken in adres autocompletion.
-
-Je kunt ook de Exchange (EWS) instellingen aanpassen.
-
-In het Nederlands, Frans, Engels, Duits, Zweeds en Japans vertaald.
-
-Sommige van de iconen en plaatjes komen uit de Fugue Icons collectie gemaakt door Yusuke Kamiyamane (http://p.yusukekamiyamane.com/)</em:description>
-		</Description>
-	</em:localized>
-
-	<em:localized>
-		<Description>
-			<em:locale>ja-JP</em:locale>
-			<em:name>Exchange EWS Provider</em:name>
-			<em:description>予定表と仕事について、lightningで、マイクロソフト Exchange 2007/2010/2013 EWSサーバと同期できるようにします。
-
-予定表・仕事ややることリストの、閲覧や削除、作成と更新が可能です。「外出中」の管理も可能です。
-
-オランダ語やフランス語、英語、ドイツ語、そして日本語の地域化が提供されます。
-
-使用されている一部のアイコンやイメージは、Yusuke Kamiyamane (http://p.yusukekamiyamane.com/)さんの、the Fugue Icons Collectionから取られました。</em:description>
-		</Description>
-	</em:localized>
-
-	<em:localized>
-		<Description>
-			<em:locale>ru</em:locale>
-			<em:name>Exchange EWS Provider</em:name>
-			<em:description>Позволяет вам синхронизировать календарь, задачи и контакты с вашим Microsoft Exchange 2007/2010/2013 EWS сервером из Lightning дополнения.
-
-Вы можете просматривать, удалять, создавать, обновлять элементы календаря и задач. И управлять настройками "Заместителя".
-Вы можете читать и использовать контакты и глобальный список контактов для вставки адресов в письма автозавершением.
-
-Голландский, французский, английский, немецкий, шведский, японский и русский вариант национальных языковых переводов этого приложения присутствуют тут.
-
-Некоторые значки и изображения используются из коллекции Fugue Icons созданной Юсукэ Камияманэ (http://p.yusukekamiyamane.com/)</em:description>
-		</Description>
-	</em:localized>
-
-	<em:localized>
-		<Description>
-			<em:locale>it-IT</em:locale>
-			<em:name>Provider Exchange EWS</em:name>
-			<em:description>Consente di sincronizzare i propri Calendario, Attività e Contatti con un server Microsoft Exchange 2007/2010/2013 EWS da Lightning.
-
-È possibile visualizzare, eliminare, creare e aggiornare elementi del Calendario e Attività/Da fare e gestire le opzioni Fuori sede.
-È possibile leggere e utilizzare i propri contatti e i contatti della Global Address List per l'autocompletamento degli indirizzi.
-
-Localizzato in olandese, francese, inglese, tedesco, svedese, giapponese e italiano.
-
-Alcune delle icone e immagini utilizzate sono state tratte dalla Fugue Icons Collection di Yusuke Kamiyamane (http://p.yusukekamiyamane.com/)</em:description>
-		</Description>
-	</em:localized>
-	  	  
-	<em:localized>
-		<Description>
-			<em:locale>tr</em:locale>
-			<em:name>Exchange EWS Sağlayıcısı</em:name>
-			<em:description>Lightning içinde, Takvim, Görevler ve Kişileri Microsoft Exchange 2007/2010/2013 EWS sunucunuzla eşitlemenizi sağlar.
-
-Takvim ve Görev-Yapılacaklarınızdaki maddeleri görebilir ve silebilir, yeni maddeler yaratabilir ya da maddeleri güncelleyebilirsiniz. "İşyeri Dışında" ayarlarınızı da denetleyebilirsiniz.
-Kişilerinizdeki ve Genel Adres Listesindeki kişileri görebilir ve automatik adres tamamlamada kullanabilirsiniz.
-				
-Almanca, Flemenkçe, Fransızca, İngilizce, İsveççe, İtalyanca, Japonca, Rusça, ve Türkçe yerelleştirmeleri vardır.
-
-Bazı ikon ve imgeler, Yusuke Kamiyamane tarafından yapılmış olan Fugue Icons Collection'dan alınıp kullanılmıştır. (http://p.yusukekamiyamane.com/)</em:description>
-		</Description>
-	</em:localized>
-	</Description>
+Some of the icons and images used are from the Fugue Icons Collection made by Yusuke Kamiyamane (http://p.yusukekamiyamane.com/)
+    </em:description>
+  </Description>
 </RDF>
