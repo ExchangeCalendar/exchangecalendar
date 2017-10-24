@@ -51,190 +51,191 @@ Cu.import("resource://exchangecalendar/soapFunctions.js");
 
 var EXPORTED_SYMBOLS = ["erGetFolderPermissionRequest"];
 
-function erGetFolderPermissionRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
+function erGetFolderPermissionRequest(aArgument, aCbOk, aCbError, aListener) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	var self = this;
+    var self = this;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
-	this.parent.debug = false;
-	this.argument = aArgument;
-	
-	this.serverUrl = aArgument.serverUrl;
-	this.folderID = aArgument.folderID;
-	this.folderBase = aArgument.folderBase;
-	this.changeKey = aArgument.changeKey;
-	this.listener = aListener;
+    this.parent.debug = false;
+    this.argument = aArgument;
 
-/*	while ((aArgument.folderPath.length > 0) && (aArgument.folderPath.indexOf("/") == 0)) {
-		aArgument.folderPath = aArgument.folderPath.substr(1);
-	}*/
+    this.serverUrl = aArgument.serverUrl;
+    this.folderID = aArgument.folderID;
+    this.folderBase = aArgument.folderBase;
+    this.changeKey = aArgument.changeKey;
+    this.listener = aListener;
 
-	this.isRunning = true;
-	this.execute();
+    /*	while ((aArgument.folderPath.length > 0) && (aArgument.folderPath.indexOf("/") == 0)) {
+    		aArgument.folderPath = aArgument.folderPath.substr(1);
+    	}*/
+
+    this.isRunning = true;
+    this.execute();
 }
 
 erGetFolderPermissionRequest.prototype = {
 
-	execute: function _execute()
-	{
-		//exchWebService.commonFunctions.LOG("erGetFolderPermissionRequest.execute 1");
+    execute: function _execute() {
+        //exchWebService.commonFunctions.LOG("erGetFolderPermissionRequest.execute 1");
 
-		var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:GetFolder xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:GetFolder xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
 
-		var fs = req.addChildTag("FolderShape", "nsMessages", null);
-		fs.addChildTag("BaseShape", "nsTypes", "IdOnly");
-		var ap = fs.addChildTag("AdditionalProperties", "nsTypes", null);
-		ap.addChildTag("FieldURI", "nsTypes",  null).setAttribute("FieldURI","folder:PermissionSet");
-		ap.addChildTag("FieldURI", "nsTypes",  null).setAttribute("FieldURI","folder:DisplayName"); 
-	 
-		var parentFolder = makeParentFolderIds2("FolderIds", this.argument);
-		req.addChildTagObject(parentFolder);
-		parentFolder = null;
+        var fs = req.addChildTag("FolderShape", "nsMessages", null);
+        fs.addChildTag("BaseShape", "nsTypes", "IdOnly");
+        var ap = fs.addChildTag("AdditionalProperties", "nsTypes", null);
+        ap.addChildTag("FieldURI", "nsTypes", null).setAttribute("FieldURI", "folder:PermissionSet");
+        ap.addChildTag("FieldURI", "nsTypes", null).setAttribute("FieldURI", "folder:DisplayName");
 
-		//exchWebService.commonFunctions.LOG(" ++ xml2jxon ++:"+this.parent.makeSoapMessage(req));
+        var parentFolder = makeParentFolderIds2("FolderIds", this.argument);
+        req.addChildTagObject(parentFolder);
+        parentFolder = null;
 
-		//exchWebService.commonFunctions.LOG("erGetFolderPermissionRequest.execute:"+String(this.parent.makeSoapMessage(req)));
-		this.parent.xml2jxon = true;
-		this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-		req = null;
+        //exchWebService.commonFunctions.LOG(" ++ xml2jxon ++:"+this.parent.makeSoapMessage(req));
 
-	},
+        //exchWebService.commonFunctions.LOG("erGetFolderPermissionRequest.execute:"+String(this.parent.makeSoapMessage(req)));
+        this.parent.xml2jxon = true;
+        this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
+        req = null;
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-		 exchWebService.commonFunctions.LOG("erGetFolderPermissionRequest.onSendOk:"+String(aResp));
-		// Get FolderID and ChangeKey
-		var aError = false;
-		var aCode = 0;
-		var aMsg = "";
-		var aResult = undefined;
-	 
-		var rm = aResp.XPath("/s:Envelope/s:Body/m:GetFolderResponse/m:ResponseMessages/m:GetFolderResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']");
-		var delegatees = [] ;
-		var permissions = [];
-		var folderID;
-		var changeKey;
-		var folderName;
-			
-		if (rm.length > 0) {
-			var Folder = rm[0].XPath("/m:Folders/t:Folder");
-		 
-			if (Folder.length > 0) {
-				
-				 folderID = Folder[0].getAttributeByTag("t:FolderId", "Id");
-				 changeKey = Folder[0].getAttributeByTag("t:FolderId", "ChangeKey");
-				 folderName = Folder[0].getTagValue("t:DisplayName");
- 		
- 				//Get Permissions
- 				var permission = Folder[0].XPath("/t:PermissionSet/t:Permissions/t:Permission"); 
- 				
- 				for ( var i = 0; i < permission.length; i++ ){
-	 				var userId = permission[i].XPath("/t:UserId"); 				
-	 				var email = userId[0].getTagValue("t:PrimarySmtpAddress");
-	 				var sid = userId[0].getTagValue("t:SID");
-	 				var displayName = userId[0].getTagValue("t:DisplayName");
-	 				
-	 				if ( email === undefined ){
-	 					displayName = userId[0].getTagValue("t:DistinguishedUser");
-	 					email = displayName; 
-	 					sid = null;
-	 				} 
-	 				
-	 				var canCreateItems = permission[i].getTagValue("t:CanCreateItems");
-	 				var canCreateSubFolders = permission[i].getTagValue("t:CanCreateSubFolders");
-	 				var isFolderOwner = permission[i].getTagValue("t:IsFolderOwner");
-	 				var isFolderVisible = permission[i].getTagValue("t:IsFolderVisible");
-	 				var isFolderContact = permission[i].getTagValue("t:IsFolderContact");
-	 				var editItems = permission[i].getTagValue("t:EditItems");
-	 				var deleteItems = permission[i].getTagValue("t:DeleteItems");
-	 				var readItems = permission[i].getTagValue("t:ReadItems");
-	 				var permissionLevel = permission[i].getTagValue("t:PermissionLevel");
-	 				
-	 				 
-	 				var perm = {  			   
-	 	 					  canCreateItems : canCreateItems,
-	 	 	 				  canCreateSubFolders : canCreateSubFolders,
-	 	 	 				  isFolderOwner : isFolderOwner,
-	 	 	 				  isFolderVisible : isFolderVisible,
-	 	 	 				  isFolderContact : isFolderContact,
-	 	 	 				  editItems : editItems,
-	 	 	 				  deleteItems : deleteItems,
-	 	 	 				  readItems : readItems,
-	 	 	 				  permissionLevel : permissionLevel, };
-	 				
-	 				var  user = {
-		 					 name : displayName ,
-		 					 emailId : email ,
-		 					 sid : sid, 
-	 	 	 				 permissionLevel : permissionLevel, 
-		 					 permissions : {  			   
-		 	 					  canCreateItems : canCreateItems,
-		 	 	 				  canCreateSubFolders : canCreateSubFolders,
-		 	 	 				  isFolderOwner : isFolderOwner,
-		 	 	 				  isFolderVisible : isFolderVisible,
-		 	 	 				  isFolderContact : isFolderContact,
-		 	 	 				  editItems : editItems,
-		 	 	 				  deleteItems : deleteItems,
-		 	 	 				  readItems : readItems,} , };
-	 				
-	 				delegatees.push(user);
-	 				permissions.push(perm);
-	 				user=null;
-	 				perm=null;
- 				} 
- 				
- 				
- 				
- 			}
-			else {
-				aMsg = "Did not find any Folder parts.";
-				aCode = this.parent.ER_ERROR_FINDFOLDER_FOLDERID_DETAILS;
-				aError = true;
-			}
-			
-			Folder = null;
-		}
-		else {
-			aMsg = this.parent.getSoapErrorMsg(aResp);
-			if (aMsg) {
-				aCode = this.parent.ER_ERROR_FINDFOLDER_FOLDERID_DETAILS;
-				aError = true;
-			}
-			else {
-				aCode = this.parent.ER_ERROR_SOAP_RESPONSECODE_NOTFOUND;
-				aError = true;
-				aMsg = "Wrong response received.";
-			}
-		}
- 
-		rm = null;
+    },
 
-		if (aError) {
-			this.onSendError(aExchangeRequest, aCode, aMsg);
-		}
-		else {
-			if (this.mCbOk) {
- 				this.mCbOk(this,folderID,changeKey,folderName,delegatees,permissions);  
-			}
-			this.isRunning = false;
-		}
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        exchWebService.commonFunctions.LOG("erGetFolderPermissionRequest.onSendOk:" + String(aResp));
+        // Get FolderID and ChangeKey
+        var aError = false;
+        var aCode = 0;
+        var aMsg = "";
+        var aResult = undefined;
 
-	},
+        var rm = aResp.XPath("/s:Envelope/s:Body/m:GetFolderResponse/m:ResponseMessages/m:GetFolderResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']");
+        var delegatees = [];
+        var permissions = [];
+        var folderID;
+        var changeKey;
+        var folderName;
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+        if (rm.length > 0) {
+            var Folder = rm[0].XPath("/m:Folders/t:Folder");
+
+            if (Folder.length > 0) {
+
+                folderID = Folder[0].getAttributeByTag("t:FolderId", "Id");
+                changeKey = Folder[0].getAttributeByTag("t:FolderId", "ChangeKey");
+                folderName = Folder[0].getTagValue("t:DisplayName");
+
+                //Get Permissions
+                var permission = Folder[0].XPath("/t:PermissionSet/t:Permissions/t:Permission");
+
+                for (var i = 0; i < permission.length; i++) {
+                    var userId = permission[i].XPath("/t:UserId");
+                    var email = userId[0].getTagValue("t:PrimarySmtpAddress");
+                    var sid = userId[0].getTagValue("t:SID");
+                    var displayName = userId[0].getTagValue("t:DisplayName");
+
+                    if (email === undefined) {
+                        displayName = userId[0].getTagValue("t:DistinguishedUser");
+                        email = displayName;
+                        sid = null;
+                    }
+
+                    var canCreateItems = permission[i].getTagValue("t:CanCreateItems");
+                    var canCreateSubFolders = permission[i].getTagValue("t:CanCreateSubFolders");
+                    var isFolderOwner = permission[i].getTagValue("t:IsFolderOwner");
+                    var isFolderVisible = permission[i].getTagValue("t:IsFolderVisible");
+                    var isFolderContact = permission[i].getTagValue("t:IsFolderContact");
+                    var editItems = permission[i].getTagValue("t:EditItems");
+                    var deleteItems = permission[i].getTagValue("t:DeleteItems");
+                    var readItems = permission[i].getTagValue("t:ReadItems");
+                    var permissionLevel = permission[i].getTagValue("t:PermissionLevel");
+
+
+                    var perm = {
+                        canCreateItems: canCreateItems,
+                        canCreateSubFolders: canCreateSubFolders,
+                        isFolderOwner: isFolderOwner,
+                        isFolderVisible: isFolderVisible,
+                        isFolderContact: isFolderContact,
+                        editItems: editItems,
+                        deleteItems: deleteItems,
+                        readItems: readItems,
+                        permissionLevel: permissionLevel,
+                    };
+
+                    var user = {
+                        name: displayName,
+                        emailId: email,
+                        sid: sid,
+                        permissionLevel: permissionLevel,
+                        permissions: {
+                            canCreateItems: canCreateItems,
+                            canCreateSubFolders: canCreateSubFolders,
+                            isFolderOwner: isFolderOwner,
+                            isFolderVisible: isFolderVisible,
+                            isFolderContact: isFolderContact,
+                            editItems: editItems,
+                            deleteItems: deleteItems,
+                            readItems: readItems,
+                        },
+                    };
+
+                    delegatees.push(user);
+                    permissions.push(perm);
+                    user = null;
+                    perm = null;
+                }
+
+
+
+            }
+            else {
+                aMsg = "Did not find any Folder parts.";
+                aCode = this.parent.ER_ERROR_FINDFOLDER_FOLDERID_DETAILS;
+                aError = true;
+            }
+
+            Folder = null;
+        }
+        else {
+            aMsg = this.parent.getSoapErrorMsg(aResp);
+            if (aMsg) {
+                aCode = this.parent.ER_ERROR_FINDFOLDER_FOLDERID_DETAILS;
+                aError = true;
+            }
+            else {
+                aCode = this.parent.ER_ERROR_SOAP_RESPONSECODE_NOTFOUND;
+                aError = true;
+                aMsg = "Wrong response received.";
+            }
+        }
+
+        rm = null;
+
+        if (aError) {
+            this.onSendError(aExchangeRequest, aCode, aMsg);
+        }
+        else {
+            if (this.mCbOk) {
+                this.mCbOk(this, folderID, changeKey, folderName, delegatees, permissions);
+            }
+            this.isRunning = false;
+        }
+
+    },
+
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
-
-

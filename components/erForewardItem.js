@@ -51,111 +51,108 @@ Cu.import("resource://interfaces/xml2json/xml2json.js");
 
 var EXPORTED_SYMBOLS = ["erForewardItemRequest"];
 
-function erForewardItemRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
+function erForewardItemRequest(aArgument, aCbOk, aCbError, aListener) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	var self = this;
+    var self = this;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
-	this.argument = aArgument;
-	this.serverUrl = aArgument.serverUrl;
-	this.listener = aListener;
-	this.mailbox = aArgument.mailbox;
+    this.argument = aArgument;
+    this.serverUrl = aArgument.serverUrl;
+    this.listener = aListener;
+    this.mailbox = aArgument.mailbox;
 
-	this.isRunning = true;
-	this.execute();
+    this.isRunning = true;
+    this.execute();
 }
 
 erForewardItemRequest.prototype = {
 
-	execute: function _execute()
-	{
-		//exchWebService.commonFunctions.LOG("erForewardItemRequest.execute\n");
+    execute: function _execute() {
+        //exchWebService.commonFunctions.LOG("erForewardItemRequest.execute\n");
 
-		var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:CreateItem xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
-		req.setAttribute("MessageDisposition", "SendAndSaveCopy");
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:CreateItem xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
+        req.setAttribute("MessageDisposition", "SendAndSaveCopy");
 
-		var forwardItem = req.addChildTag("Items", "nsMessages", null).addChildTag("ForwardItem", "nsTypes", null);
-		var toRecipients = forwardItem.addChildTag("ToRecipients", "nsTypes", null);
+        var forwardItem = req.addChildTag("Items", "nsMessages", null).addChildTag("ForwardItem", "nsTypes", null);
+        var toRecipients = forwardItem.addChildTag("ToRecipients", "nsTypes", null);
 
-		for each (let emailId in this.argument.attendees) 
-                { 
-                        var email = new String(emailId); 
-                        var start = email.indexOf('<'); 
-			if(start<0){
-				toRecipients.addChildTag("Mailbox", "nsTypes", null).addChildTag("EmailAddress", "nsTypes", email);
-			}
-			else{
-				email = email.substr(start+1);
-	                        var end = email.indexOf('>'); 
-				toRecipients.addChildTag("Mailbox", "nsTypes", null).addChildTag("EmailAddress", "nsTypes", email.substr(0,end));
-			}
-                }
-		
-		var referenceItemId = forwardItem.addChildTag("ReferenceItemId", "nsTypes", null);
-		referenceItemId.setAttribute("Id", this.argument.item.id);
-		referenceItemId.setAttribute("ChangeKey", this.argument.item.changeKey);
+        for each(let emailId in this.argument.attendees) {
+            var email = new String(emailId);
+            var start = email.indexOf('<');
+            if (start < 0) {
+                toRecipients.addChildTag("Mailbox", "nsTypes", null).addChildTag("EmailAddress", "nsTypes", email);
+            }
+            else {
+                email = email.substr(start + 1);
+                var end = email.indexOf('>');
+                toRecipients.addChildTag("Mailbox", "nsTypes", null).addChildTag("EmailAddress", "nsTypes", email.substr(0, end));
+            }
+        }
 
-		forwardItem.addChildTag("NewBodyContent", "nsTypes", this.argument.item.body).setAttribute("BodyType", "HTML");
+        var referenceItemId = forwardItem.addChildTag("ReferenceItemId", "nsTypes", null);
+        referenceItemId.setAttribute("Id", this.argument.item.id);
+        referenceItemId.setAttribute("ChangeKey", this.argument.item.changeKey);
 
-		this.parent.xml2jxon = true;
-		
-		//dump("erForewardItemRequest.execute>"+String(this.parent.makeSoapMessage(req))+"\n");
- 
-               this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-		req = null;
-		
-	},
+        forwardItem.addChildTag("NewBodyContent", "nsTypes", this.argument.item.body).setAttribute("BodyType", "HTML");
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-		//exchWebService.commonFunctions.LOG("erForewardItemRequest.onSendOk: "+String(aResp)+"\n");
-		var rm = aResp.XPath("/s:Envelope/s:Body/m:CreateItemResponse/m:ResponseMessages/m:CreateItemResponseMessage/m:ResponseCode");
+        this.parent.xml2jxon = true;
 
-		if (rm.length == 0) {
-			this.onSendError(aExchangeRequest, this.parent.ER_ERROR_RESPONS_NOT_VALID, "Respons does not contain expected field");
-			return;
-		}
+        //dump("erForewardItemRequest.execute>"+String(this.parent.makeSoapMessage(req))+"\n");
 
-		var responseCode = rm[0].value;
-		rm = null;
+        this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
+        req = null;
 
-		var response;
-		if (responseCode != "NoError") {
-			var messageText = aResp.XPath("/s:Envelope/s:Body/m:CreateItemResponse/m:ResponseMessages/m:CreateItemResponseMessage/m:MessageText");
-			if (messageText.length == 0) {
-				messageText = "(unknown)";
-			}
-			else {
-				messageText = messageText[0].value;
-			}
-			response="Event forwarding not successful!:"+messageText+"("+responseCode+")";
-			//this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Event forewarding not successful!:"+messageText+"("+responseCode+")" );
-			messageText = null;
-		}
-		else{
-			response = "Event forwarding successful!";
-		}
-	
-		if (this.mCbOk) {
-			this.mCbOk(this, response);
-		}
-		this.isRunning = false;
-	},
+    },
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        //exchWebService.commonFunctions.LOG("erForewardItemRequest.onSendOk: "+String(aResp)+"\n");
+        var rm = aResp.XPath("/s:Envelope/s:Body/m:CreateItemResponse/m:ResponseMessages/m:CreateItemResponseMessage/m:ResponseCode");
+
+        if (rm.length == 0) {
+            this.onSendError(aExchangeRequest, this.parent.ER_ERROR_RESPONS_NOT_VALID, "Respons does not contain expected field");
+            return;
+        }
+
+        var responseCode = rm[0].value;
+        rm = null;
+
+        var response;
+        if (responseCode != "NoError") {
+            var messageText = aResp.XPath("/s:Envelope/s:Body/m:CreateItemResponse/m:ResponseMessages/m:CreateItemResponseMessage/m:MessageText");
+            if (messageText.length == 0) {
+                messageText = "(unknown)";
+            }
+            else {
+                messageText = messageText[0].value;
+            }
+            response = "Event forwarding not successful!:" + messageText + "(" + responseCode + ")";
+            //this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Event forewarding not successful!:"+messageText+"("+responseCode+")" );
+            messageText = null;
+        }
+        else {
+            response = "Event forwarding successful!";
+        }
+
+        if (this.mCbOk) {
+            this.mCbOk(this, response);
+        }
+        this.isRunning = false;
+    },
+
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
-
-

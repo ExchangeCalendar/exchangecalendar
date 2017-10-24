@@ -26,17 +26,15 @@ var Cu = Components.utils;
 
 Cu.import("resource://exchangecalendar/ecFunctions.js");
 
-if (! exchWebService) var exchWebService = {};
+if (!exchWebService) var exchWebService = {};
 
 exchWebService.manageEWSAccountsMenu = {
 
-	showManager: function _showManager()
-	{
-		window.openDialog("chrome://exchangecalendar/content/manageEWSAccounts.xul",
-			"manageEWSAccounts",
-			"chrome,titlebar,toolbar,centerscreen,dialog,modal=yes,resizable=yes",
-			null); 
-	},
+    showManager: function _showManager() {
+        window.openDialog("chrome://exchangecalendar/content/manageEWSAccounts.xul",
+            "manageEWSAccounts",
+            "chrome,titlebar,toolbar,centerscreen,dialog,modal=yes,resizable=yes",
+            null);
+    },
 
 }
-

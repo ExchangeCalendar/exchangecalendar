@@ -52,131 +52,129 @@ Cu.import("resource://exchangecalendar/soapFunctions.js");
 
 var EXPORTED_SYMBOLS = ["erSendMeetingResponsRequest"];
 
-function erSendMeetingResponsRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
+function erSendMeetingResponsRequest(aArgument, aCbOk, aCbError, aListener) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	var self = this;
+    var self = this;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
-	this.argument = aArgument;
-	this.serverUrl = aArgument.serverUrl;
-	this.listener = aListener;
-	this.bodyText = aArgument.bodyText;
-	this.senderMailbox = aArgument.senderMailbox;
-	this.response = aArgument.response;
-	this.item = aArgument.item;
-	this.messageDisposition = aArgument.messageDisposition;
-	this.pstart = aArgument.proposeStart;
-	this.pend = aArgument.proposeEnd;
-	this.proposeNewTime = aArgument.proposeNewTime;
-	this.isRunning = true;
-	this.execute();
+    this.argument = aArgument;
+    this.serverUrl = aArgument.serverUrl;
+    this.listener = aListener;
+    this.bodyText = aArgument.bodyText;
+    this.senderMailbox = aArgument.senderMailbox;
+    this.response = aArgument.response;
+    this.item = aArgument.item;
+    this.messageDisposition = aArgument.messageDisposition;
+    this.pstart = aArgument.proposeStart;
+    this.pend = aArgument.proposeEnd;
+    this.proposeNewTime = aArgument.proposeNewTime;
+    this.isRunning = true;
+    this.execute();
 }
 
 erSendMeetingResponsRequest.prototype = {
 
-	execute: function _execute()
-	{
-//		exchWebService.commonFunctions.LOG("erSendMeetingResponsRequest.execute\n");
+    execute: function _execute() {
+        //		exchWebService.commonFunctions.LOG("erSendMeetingResponsRequest.execute\n");
 
-		var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:CreateItem xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:CreateItem xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
 
-		var SendMeetingInvitations = "SendToAllAndSaveCopy";
+        var SendMeetingInvitations = "SendToAllAndSaveCopy";
 
-		if ((cal.isEvent(this.argument.item)) && (!this.messageDisposition)) {
-			req.setAttribute('SendMeetingInvitations', SendMeetingInvitations);
-		}	
+        if ((cal.isEvent(this.argument.item)) && (!this.messageDisposition)) {
+            req.setAttribute('SendMeetingInvitations', SendMeetingInvitations);
+        }
 
-		if (this.messageDisposition) {
-			req.setAttribute('MessageDisposition', this.messageDisposition);
-		}
-		else {
-			req.setAttribute('MessageDisposition', "SendAndSaveCopy");
-		}
+        if (this.messageDisposition) {
+            req.setAttribute('MessageDisposition', this.messageDisposition);
+        }
+        else {
+            req.setAttribute('MessageDisposition', "SendAndSaveCopy");
+        }
 
-		const responseMap = {
-			"NEEDS-ACTION"	: exchWebService.commonFunctions.xmlToJxon('<nsTypes:TentativelyAcceptItem xmlns:nsTypes="'+nsTypesStr+'"/>'),
-			"TENTATIVE"	: exchWebService.commonFunctions.xmlToJxon('<nsTypes:TentativelyAcceptItem xmlns:nsTypes="'+nsTypesStr+'"/>'),
-			"ACCEPTED"	: exchWebService.commonFunctions.xmlToJxon('<nsTypes:AcceptItem xmlns:nsTypes="'+nsTypesStr+'"/>'),
-			"DECLINED"	: exchWebService.commonFunctions.xmlToJxon('<nsTypes:DeclineItem xmlns:nsTypes="'+nsTypesStr+'"/>')
-		}; 
+        const responseMap = {
+            "NEEDS-ACTION": exchWebService.commonFunctions.xmlToJxon('<nsTypes:TentativelyAcceptItem xmlns:nsTypes="' + nsTypesStr + '"/>'),
+            "TENTATIVE": exchWebService.commonFunctions.xmlToJxon('<nsTypes:TentativelyAcceptItem xmlns:nsTypes="' + nsTypesStr + '"/>'),
+            "ACCEPTED": exchWebService.commonFunctions.xmlToJxon('<nsTypes:AcceptItem xmlns:nsTypes="' + nsTypesStr + '"/>'),
+            "DECLINED": exchWebService.commonFunctions.xmlToJxon('<nsTypes:DeclineItem xmlns:nsTypes="' + nsTypesStr + '"/>')
+        };
 
-		var r = responseMap[this.response];
+        var r = responseMap[this.response];
 
-		if (!r) {
-			this.onSendError(this, this.parent.ER_ERROR_UNKNOWN_MEETING_REPSONSE, "No valid response entered"+this.response);
-		}
+        if (!r) {
+            this.onSendError(this, this.parent.ER_ERROR_UNKNOWN_MEETING_REPSONSE, "No valid response entered" + this.response);
+        }
 
-		if (this.bodyText) {
-			r.addChildTag("Body", "nsTypes", this.bodyText).setAttribute("BodyType", "Text");
-		}
+        if (this.bodyText) {
+            r.addChildTag("Body", "nsTypes", this.bodyText).setAttribute("BodyType", "Text");
+        }
 
-		if (this.senderMailbox) {
-			r.addChildTag("Sender", "nsTypes", null).addChildTag("Mailbox", "nsTypes", null).addChildTag("EmailAddress", "nsTypes", this.senderMailbox);
-		} 
-		
-		var referenceItemId = r.addChildTag("ReferenceItemId", "nsTypes", null);
-		referenceItemId.setAttribute("Id", this.item.id);
-		referenceItemId.setAttribute("ChangeKey", this.item.changeKey);
-		
-		this.exchangeStatistics = Cc["@1st-setup.nl/exchange/statistics;1"]
-				.getService(Ci.mivExchangeStatistics);
-				
+        if (this.senderMailbox) {
+            r.addChildTag("Sender", "nsTypes", null).addChildTag("Mailbox", "nsTypes", null).addChildTag("EmailAddress", "nsTypes", this.senderMailbox);
+        }
 
-		if (this.exchangeStatistics.getServerVersion(this.serverUrl).indexOf("Exchange2013") > -1) {  
-				if( this.proposeNewTime == true ){
-					r.addChildTag("ProposedStart", "nsTypes", this.pstart);   
-					r.addChildTag("ProposedEnd", "nsTypes", this.pend);
-				}
-		}
-		
-		req.addChildTag("Items", "nsMessages", null).addChildTagObject(r);
-		r = null;
+        var referenceItemId = r.addChildTag("ReferenceItemId", "nsTypes", null);
+        referenceItemId.setAttribute("Id", this.item.id);
+        referenceItemId.setAttribute("ChangeKey", this.item.changeKey);
 
-		this.parent.xml2jxon = true;
+        this.exchangeStatistics = Cc["@1st-setup.nl/exchange/statistics;1"]
+            .getService(Ci.mivExchangeStatistics);
 
-	//	exchWebService.commonFunctions.LOG("erSendMeetingResponsRequest.execute>"+String(req));
-		this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-		req = null;
-	},
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-	//	exchWebService.commonFunctions.LOG("erSendMeetingResponsRequest.onSendOkxxxxxxxxxx : "+String(aResp)+"\n");
+        if (this.exchangeStatistics.getServerVersion(this.serverUrl).indexOf("Exchange2013") > -1) {
+            if (this.proposeNewTime == true) {
+                r.addChildTag("ProposedStart", "nsTypes", this.pstart);
+                r.addChildTag("ProposedEnd", "nsTypes", this.pend);
+            }
+        }
 
-		var rm = aResp.XPath("/s:Envelope/s:Body/m:CreateItemResponse/m:ResponseMessages/m:CreateItemResponseMessage[@ResponseClass='Success']");
-		if (rm.length == 0) {
-			this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on sending meeting respons.");
-			return;
-		}
+        req.addChildTag("Items", "nsMessages", null).addChildTagObject(r);
+        r = null;
 
-		var responseCode = rm[0].getTagValue("m:ResponseCode");
-		if (responseCode != "NoError") {
-			this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on sending meeting respons:"+responseCode);
-			return;
-		}
-		rm = null;
+        this.parent.xml2jxon = true;
 
-		if (this.mCbOk) {
-			this.mCbOk(this); //, itemId, changeKey);
-		}
-		this.isRunning = false;
-	},
+        //	exchWebService.commonFunctions.LOG("erSendMeetingResponsRequest.execute>"+String(req));
+        this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
+        req = null;
+    },
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		//exchWebService.commonFunctions.LOG("erSendMeetingResponsRequest.onSendError: "+aMsg+"\n");
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        //	exchWebService.commonFunctions.LOG("erSendMeetingResponsRequest.onSendOkxxxxxxxxxx : "+String(aResp)+"\n");
+
+        var rm = aResp.XPath("/s:Envelope/s:Body/m:CreateItemResponse/m:ResponseMessages/m:CreateItemResponseMessage[@ResponseClass='Success']");
+        if (rm.length == 0) {
+            this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on sending meeting respons.");
+            return;
+        }
+
+        var responseCode = rm[0].getTagValue("m:ResponseCode");
+        if (responseCode != "NoError") {
+            this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on sending meeting respons:" + responseCode);
+            return;
+        }
+        rm = null;
+
+        if (this.mCbOk) {
+            this.mCbOk(this); //, itemId, changeKey);
+        }
+        this.isRunning = false;
+    },
+
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        //exchWebService.commonFunctions.LOG("erSendMeetingResponsRequest.onSendError: "+aMsg+"\n");
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
-
-

@@ -12,7 +12,7 @@ pref("extensions.extras.LowIcon", "chrome://exchangecalendar-common/skin/images/
 pref("extensions.extras.LowestColor", "#99FF99");
 pref("extensions.extras.LowestIcon", "chrome://exchangecalendar-common/skin/images/lowest.gif");
 pref("extensions.extras.ShadeHigh", true);
-pref("extensions.extras.ShadeLow", false); 
-pref("calendar.timezone.local.auto", true ); 
-pref("extensions.1st-setup.others.warnAboutPrereleaseVersion", true); 
-user_pref("mailnews.database.global.indexer.enabled", true); 
+pref("extensions.extras.ShadeLow", false);
+pref("calendar.timezone.local.auto", true);
+pref("extensions.1st-setup.others.warnAboutPrereleaseVersion", true);
+user_pref("mailnews.database.global.indexer.enabled", true);

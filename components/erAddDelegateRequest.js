@@ -19,140 +19,139 @@ Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecalendar/ecFunctions.js");
 Cu.import("resource://exchangecalendar/ecExchangeRequest.js");
-Cu.import("resource://exchangecalendar/soapFunctions.js"); 
+Cu.import("resource://exchangecalendar/soapFunctions.js");
 
 Cu.import("resource://interfaces/xml2json/xml2json.js");
 
 var EXPORTED_SYMBOLS = ["erAddDelegateRequest"];
-function erAddDelegateRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
 
-	var self = this;
+function erAddDelegateRequest(aArgument, aCbOk, aCbError, aListener) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    var self = this;
 
-	this.argument = aArgument;
-	this.serverUrl = aArgument.serverUrl;
-	this.listener = aListener;
-	this.mailbox = aArgument.mailbox;
-	this.delegateemail=aArgument.delegateemail;
-	this.delegateproperties=aArgument.delegateproperties;
-	this.delegatingItem = aArgument.delegatingItem;
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
-    this.permission = ""; 
-	switch( this.delegatingItem ){
-		case "calendar":
-			 this.permission = "CalendarFolderPermissionLevel";
-			break;
-		case  "tasks":
-			 this.permission = "TasksFolderPermissionLevel";
-			break;
-		case  "inbox":
-			 this.permission = "InboxFolderPermissionLevel";
-			break;
-		case "contacts":
-			 this.permission = "ContactsFolderPermissionLevel";  
-			break;
-		case "notes":
-			 this.permission = "NotesFolderPermissionLevel";
-			break;
-		case "journal":
-			 this.permission = "JournalFolderPermissionLevel";
-			break;
-		default:
- 	}
-	
-	this.isRunning = true;
-	this.execute();
+    this.argument = aArgument;
+    this.serverUrl = aArgument.serverUrl;
+    this.listener = aListener;
+    this.mailbox = aArgument.mailbox;
+    this.delegateemail = aArgument.delegateemail;
+    this.delegateproperties = aArgument.delegateproperties;
+    this.delegatingItem = aArgument.delegatingItem;
+
+    this.permission = "";
+    switch (this.delegatingItem) {
+    case "calendar":
+        this.permission = "CalendarFolderPermissionLevel";
+        break;
+    case "tasks":
+        this.permission = "TasksFolderPermissionLevel";
+        break;
+    case "inbox":
+        this.permission = "InboxFolderPermissionLevel";
+        break;
+    case "contacts":
+        this.permission = "ContactsFolderPermissionLevel";
+        break;
+    case "notes":
+        this.permission = "NotesFolderPermissionLevel";
+        break;
+    case "journal":
+        this.permission = "JournalFolderPermissionLevel";
+        break;
+    default:
+    }
+
+    this.isRunning = true;
+    this.execute();
 }
 
 erAddDelegateRequest.prototype = {
 
-	execute: function _execute()
-	{
- 		exchWebService.commonFunctions.LOG("erAddDelegateRequest.execute\n");
+    execute: function _execute() {
+        exchWebService.commonFunctions.LOG("erAddDelegateRequest.execute\n");
 
- 		var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:AddDelegate xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
- 		var mailBox = req.addChildTag("Mailbox", "nsMessages", null);  
-		mailBox.addChildTag("EmailAddress", "nsTypes", this.mailbox );  
- 		 
-		var delegateusers = req.addChildTag("DelegateUsers","nsMessages", null);  
-		var delegateuser=delegateusers.addChildTag("DelegateUser","nsTypes", null);  
-		var userid=delegateuser.addChildTag("UserId","nsTypes", null);  
-		userid.addChildTag("PrimarySmtpAddress","nsTypes",this.delegateemail);   
-		
-		var delegatepermissions = delegateuser.addChildTag("DelegatePermissions","nsTypes", null); 
-		delegatepermissions.addChildTag(this.permission,"nsTypes", this.delegateproperties.DelegatePermissions );
-		delegateuser.addChildTag("ReceiveCopiesOfMeetingMessages","nsTypes", this.delegateproperties.ReceiveCopiesOfMeetingMessages); 
-		delegateuser.addChildTag("ViewPrivateItems","nsTypes", this.delegateproperties.ViewPrivateItems ); 
-		req.addChildTag("DeliverMeetingRequests", "nsMessages",this.delegateproperties.DeliverMeetingRequests );     
-	
-		exchWebService.commonFunctions.LOG("erAddDelegateRequest.execute2 " + req + "\n" );
-		
-		this.parent.xml2jxon = true;
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:AddDelegate xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
+        var mailBox = req.addChildTag("Mailbox", "nsMessages", null);
+        mailBox.addChildTag("EmailAddress", "nsTypes", this.mailbox);
+
+        var delegateusers = req.addChildTag("DelegateUsers", "nsMessages", null);
+        var delegateuser = delegateusers.addChildTag("DelegateUser", "nsTypes", null);
+        var userid = delegateuser.addChildTag("UserId", "nsTypes", null);
+        userid.addChildTag("PrimarySmtpAddress", "nsTypes", this.delegateemail);
+
+        var delegatepermissions = delegateuser.addChildTag("DelegatePermissions", "nsTypes", null);
+        delegatepermissions.addChildTag(this.permission, "nsTypes", this.delegateproperties.DelegatePermissions);
+        delegateuser.addChildTag("ReceiveCopiesOfMeetingMessages", "nsTypes", this.delegateproperties.ReceiveCopiesOfMeetingMessages);
+        delegateuser.addChildTag("ViewPrivateItems", "nsTypes", this.delegateproperties.ViewPrivateItems);
+        req.addChildTag("DeliverMeetingRequests", "nsMessages", this.delegateproperties.DeliverMeetingRequests);
+
+        exchWebService.commonFunctions.LOG("erAddDelegateRequest.execute2 " + req + "\n");
+
+        this.parent.xml2jxon = true;
         this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-		req = null;
-	},
+        req = null;
+    },
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-		exchWebService.commonFunctions.LOG("erAddDelegateRequest.onSendOk: " + aResp +"\n");
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        exchWebService.commonFunctions.LOG("erAddDelegateRequest.onSendOk: " + aResp + "\n");
 
-		var rm = aResp.XPath("/s:Envelope/s:Body/m:AddDelegateResponse/m:ResponseMessages/m:DelegateUserResponseMessageType[@ResponseClass='Success']");
-		if (rm.length == 0) {
-			this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on sending meeting respons.");
-			return;
-		}
+        var rm = aResp.XPath("/s:Envelope/s:Body/m:AddDelegateResponse/m:ResponseMessages/m:DelegateUserResponseMessageType[@ResponseClass='Success']");
+        if (rm.length == 0) {
+            this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on sending meeting respons.");
+            return;
+        }
 
-		var responseCode = rm[0].getTagValue("m:ResponseCode");
-		if (responseCode != "NoError") {
-			this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on sending meeting respons:"+responseCode);
-			return;
-		}
- 
-		var delegates=[];
-		if ( rm.length > 0) 
-		{  
- 			for( index=0;index<rm.length;index++)
-			{ 
-			  //   exchWebService.commonFunctions.LOG("erAddDelegateRequest.onSendOk:  " + index + " : " +  rm[index] + " \n");  
- 				//m:DeliverMeetingRequests
-			    var delegateUser = rm[index].getTag("m:DelegateUser");   
-			    if ( delegateUser )  {
-					 delegates[index]={ 
-						  SID: delegateUser.getTag("t:UserId").getTagValue("t:SID") ,
-						  PrimarySmtpAddress: delegateUser.getTag("t:UserId").getTagValue("t:PrimarySmtpAddress"),
-						  DisplayName: delegateUser.getTag("t:UserId").getTagValue("t:DisplayName"), 
-						  /*adding local permission so we receive no response for that */ 
-						  DelegatePermissions: this.delegateproperties.DelegatePermissions  ,
-						  ReceiveCopiesOfMeetingMessages:delegateUser.getTagValue("t:ReceiveCopiesOfMeetingMessages"),
-						  ViewPrivateItems: delegateUser.getTagValue("t:ViewPrivateItems"),
-						  DeliverMeetingRequests:this.delegateproperties.DeliverMeetingRequests ,
-				 	}; 
-			    }
-			}  
-		} 
-		
-		rm = null; 
-		if (this.mCbOk) {
-			this.mCbOk(this,delegates); 
-		}
-		this.isRunning = false;
-	},
+        var responseCode = rm[0].getTagValue("m:ResponseCode");
+        if (responseCode != "NoError") {
+            this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on sending meeting respons:" + responseCode);
+            return;
+        }
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		 exchWebService.commonFunctions.LOG("erAddDelegateRequest.onSendError: "+aMsg+"\n");
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+        var delegates = [];
+        if (rm.length > 0) {
+            for (index = 0; index < rm.length; index++) {
+                //   exchWebService.commonFunctions.LOG("erAddDelegateRequest.onSendOk:  " + index + " : " +  rm[index] + " \n");  
+                //m:DeliverMeetingRequests
+                var delegateUser = rm[index].getTag("m:DelegateUser");
+                if (delegateUser) {
+                    delegates[index] = {
+                        SID: delegateUser.getTag("t:UserId").getTagValue("t:SID"),
+                        PrimarySmtpAddress: delegateUser.getTag("t:UserId").getTagValue("t:PrimarySmtpAddress"),
+                        DisplayName: delegateUser.getTag("t:UserId").getTagValue("t:DisplayName"),
+                        /*adding local permission so we receive no response for that */
+                        DelegatePermissions: this.delegateproperties.DelegatePermissions,
+                        ReceiveCopiesOfMeetingMessages: delegateUser.getTagValue("t:ReceiveCopiesOfMeetingMessages"),
+                        ViewPrivateItems: delegateUser.getTagValue("t:ViewPrivateItems"),
+                        DeliverMeetingRequests: this.delegateproperties.DeliverMeetingRequests,
+                    };
+                }
+            }
+        }
+
+        rm = null;
+        if (this.mCbOk) {
+            this.mCbOk(this, delegates);
+        }
+        this.isRunning = false;
+    },
+
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        exchWebService.commonFunctions.LOG("erAddDelegateRequest.onSendError: " + aMsg + "\n");
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
 
 /*

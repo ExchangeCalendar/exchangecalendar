@@ -52,154 +52,156 @@ Cu.import("resource://exchangecalendar/erGetMasterOccurrenceId.js");
 
 var EXPORTED_SYMBOLS = ["erGetOccurrenceIndexRequest"];
 
-function erGetOccurrenceIndexRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
+function erGetOccurrenceIndexRequest(aArgument, aCbOk, aCbError, aListener) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	var self = this;
+    var self = this;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
-	this.argument = aArgument;
-	this.serverUrl = aArgument.serverUrl;
-	this.listener = aListener;
-	this.masterID = aArgument.masterItem.id;
-	this.masterChangeKey = aArgument.masterItem.changeKey;
-//	this.startDate = aArgument.masterItem.getProperty("X-Start");
+    this.argument = aArgument;
+    this.serverUrl = aArgument.serverUrl;
+    this.listener = aListener;
+    this.masterID = aArgument.masterItem.id;
+    this.masterChangeKey = aArgument.masterItem.changeKey;
+    //	this.startDate = aArgument.masterItem.getProperty("X-Start");
 
-	this.currentSearchIndex = 1;
-	this.currentRealIndex = 0;
-	this.idGroupSize = 15; // We will request in pages of 15 occurrences of the list at once
+    this.currentSearchIndex = 1;
+    this.currentRealIndex = 0;
+    this.idGroupSize = 15; // We will request in pages of 15 occurrences of the list at once
 
-	var self = this;
+    var self = this;
 
-	this.isRunning = true;
-	var tmpObject = new erGetMasterOccurrenceIdRequest( 
-			{user: aArgument.user, 
-			 serverUrl: aArgument.serverUrl,
-			 item: aArgument.item,
-			 folderID: aArgument.folderID,
-			 changeKey: aArgument.changeKey,
-			 getType: "lightning" }, 
-			function(erGetMasterOccurrenceIdRequest, aId, aChangeKey) { self.getMasterOk(erGetMasterOccurrenceIdRequest, aId, aChangeKey);}, 
-			function(erGetMasterOccurrenceIdRequest, aCode, aMsg) { self.onSendError(erGetMasterOccurrenceIdRequest, aCode, aMsg);},
-			aListener);
+    this.isRunning = true;
+    var tmpObject = new erGetMasterOccurrenceIdRequest({
+            user: aArgument.user,
+            serverUrl: aArgument.serverUrl,
+            item: aArgument.item,
+            folderID: aArgument.folderID,
+            changeKey: aArgument.changeKey,
+            getType: "lightning"
+        },
+        function (erGetMasterOccurrenceIdRequest, aId, aChangeKey) {
+            self.getMasterOk(erGetMasterOccurrenceIdRequest, aId, aChangeKey);
+        },
+        function (erGetMasterOccurrenceIdRequest, aCode, aMsg) {
+            self.onSendError(erGetMasterOccurrenceIdRequest, aCode, aMsg);
+        },
+        aListener);
 
-//	this.execute();
+    //	this.execute();
 }
 
 erGetOccurrenceIndexRequest.prototype = {
 
-	execute: function _execute()
-	{
-		exchWebService.commonFunctions.LOG("erGetOccurrenceIndexRequest.execute\n");
+    execute: function _execute() {
+        exchWebService.commonFunctions.LOG("erGetOccurrenceIndexRequest.execute\n");
 
-		var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:GetItem xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:GetItem xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
 
-		var itemShape = req.addChildTag("ItemShape", "nsMessages", null); 
-		itemShape.addChildTag("BaseShape", "nsTypes", "IdOnly");
+        var itemShape = req.addChildTag("ItemShape", "nsMessages", null);
+        itemShape.addChildTag("BaseShape", "nsTypes", "IdOnly");
 
-		itemShape.addChildTag("AdditionalProperties", "nsTypes", null).addChildTag("FieldURI", "nsTypes", null).setAttribute("FieldURI","calendar:Start");		
+        itemShape.addChildTag("AdditionalProperties", "nsTypes", null).addChildTag("FieldURI", "nsTypes", null).setAttribute("FieldURI", "calendar:Start");
 
-		var itemids = exchWebService.commonFunctions.xmlToJxon('<nsMessages:ItemIds xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
-		for (var x = 0; x < this.idGroupSize; x++) {
-			var occurrenceItemId = itemids.addChildTag("OccurrenceItemId", "nsTypes", null);
-			occurrenceItemId.setAttribute("RecurringMasterId", this.masterID);
-			occurrenceItemId.setAttribute("ChangeKey", this.masterChangeKey);
-			occurrenceItemId.setAttribute("InstanceIndex", this.currentSearchIndex++);
-		}
+        var itemids = exchWebService.commonFunctions.xmlToJxon('<nsMessages:ItemIds xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
+        for (var x = 0; x < this.idGroupSize; x++) {
+            var occurrenceItemId = itemids.addChildTag("OccurrenceItemId", "nsTypes", null);
+            occurrenceItemId.setAttribute("RecurringMasterId", this.masterID);
+            occurrenceItemId.setAttribute("ChangeKey", this.masterChangeKey);
+            occurrenceItemId.setAttribute("InstanceIndex", this.currentSearchIndex++);
+        }
 
-		req.addChildTagObject(itemids);
-		itemids = null;
+        req.addChildTagObject(itemids);
+        itemids = null;
 
-		this.parent.xml2jxon = true;
+        this.parent.xml2jxon = true;
 
-//		exchWebService.commonFunctions.LOG("erGetOccurrenceIndexRequest.execute:"+String(this.parent.makeSoapMessage(req)));
+        //		exchWebService.commonFunctions.LOG("erGetOccurrenceIndexRequest.execute:"+String(this.parent.makeSoapMessage(req)));
 
-                this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-		req = null;
-	},
+        this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
+        req = null;
+    },
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-//		exchWebService.commonFunctions.LOG("erGetOccurrenceIndexRequest.onSendOk>"+String(aResp));
-		var finished = false;
-		var found = false;
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        //		exchWebService.commonFunctions.LOG("erGetOccurrenceIndexRequest.onSendOk>"+String(aResp));
+        var finished = false;
+        var found = false;
 
-		var rm = aResp.XPath("/s:Envelope/s:Body/m:GetItemResponse/m:ResponseMessages/m:GetItemResponseMessage");
+        var rm = aResp.XPath("/s:Envelope/s:Body/m:GetItemResponse/m:ResponseMessages/m:GetItemResponseMessage");
 
-		for each (var e in rm) {
+        for each(var e in rm) {
 
-			var responseCode = e.getTagValue("m:ResponseCode");
-			switch (responseCode) {
-				case "ErrorCalendarOccurrenceIsDeletedFromRecurrence" :
-					this.currentRealIndex++;
-					break;
-				case "NoError":
-					var items = e.XPath("/m:Items/*");
-					for each(var item in items) {
-						this.currentRealIndex++;
-						if (this.argument.item.id == item.getAttributeByTag("t:ItemId","Id")) {
-							// We found our occurrence
-							finished = true;
-							found = true;
-							break;
-						}
-					}
-					items = null;
-					break;
-				case "ErrorCalendarOccurrenceIndexIsOutOfRecurrenceRange" :
-					finished = true;
-			}
+            var responseCode = e.getTagValue("m:ResponseCode");
+            switch (responseCode) {
+            case "ErrorCalendarOccurrenceIsDeletedFromRecurrence":
+                this.currentRealIndex++;
+                break;
+            case "NoError":
+                var items = e.XPath("/m:Items/*");
+                for each(var item in items) {
+                    this.currentRealIndex++;
+                    if (this.argument.item.id == item.getAttributeByTag("t:ItemId", "Id")) {
+                        // We found our occurrence
+                        finished = true;
+                        found = true;
+                        break;
+                    }
+                }
+                items = null;
+                break;
+            case "ErrorCalendarOccurrenceIndexIsOutOfRecurrenceRange":
+                finished = true;
+            }
 
-			if ((finished) || (found)) {
-				break;	// break the loop
-			}
-		}
-		rm = null;
+            if ((finished) || (found)) {
+                break; // break the loop
+            }
+        }
+        rm = null;
 
-		if (found) {
-			// We found our occurrence.
-			if (this.mCbOk) {
-				this.mCbOk(this, this.currentRealIndex, this.masterID, this.masterChangeKey);
-			}
-			this.isRunning = false;
-		}
-		else {
-			if (finished) {
-				// We hit the end of the occurrence list and did not find our occurrence.
-				// Error....
-				this.onSendError(aExchangeRequest, this.parent.ER_ERROR_GETOCCURRENCEINDEX_NOTFOUND, "Index could not be found for occurrence.");
-				return;
-			}
-			else {
-				// We did not find the occurrence but we did not yet hit the end of the
-				// occurrence list. Request the next page.
-				this.execute();
-			}
-		}
-	},
+        if (found) {
+            // We found our occurrence.
+            if (this.mCbOk) {
+                this.mCbOk(this, this.currentRealIndex, this.masterID, this.masterChangeKey);
+            }
+            this.isRunning = false;
+        }
+        else {
+            if (finished) {
+                // We hit the end of the occurrence list and did not find our occurrence.
+                // Error....
+                this.onSendError(aExchangeRequest, this.parent.ER_ERROR_GETOCCURRENCEINDEX_NOTFOUND, "Index could not be found for occurrence.");
+                return;
+            }
+            else {
+                // We did not find the occurrence but we did not yet hit the end of the
+                // occurrence list. Request the next page.
+                this.execute();
+            }
+        }
+    },
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 
-	getMasterOk: function _getMasterOk(erGetMasterOccurrenceIdRequest, aId, aChangeKey)
-	{
-		this.masterID = aId;
-		this.masterChangeKey = aChangeKey;
+    getMasterOk: function _getMasterOk(erGetMasterOccurrenceIdRequest, aId, aChangeKey) {
+        this.masterID = aId;
+        this.masterChangeKey = aChangeKey;
 
-		this.execute();
-	},
+        this.execute();
+    },
 
 };
-
-

@@ -29,7 +29,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 function mivExchangeMsgAccountManagerExtension() {
 
-	//this.logInfo("mivExchangeMsgAccountManagerExtension: init");
+    //this.logInfo("mivExchangeMsgAccountManagerExtension: init");
 
 }
 
@@ -37,66 +37,64 @@ var mivExchangeMsgAccountManagerExtensionGUID = "9b353ed2-b8c9-42aa-8aad-e2ee853
 
 mivExchangeMsgAccountManagerExtension.prototype = {
 
-	QueryInterface : XPCOMUtils.generateQI([Ci.mivExchangeMsgAccountManagerExtension,
-				Ci.nsIMsgAccountManagerExtension,
-				Ci.nsIClassInfo,
-				Ci.nsISupports]),
+    QueryInterface: XPCOMUtils.generateQI([Ci.mivExchangeMsgAccountManagerExtension,
+        Ci.nsIMsgAccountManagerExtension,
+        Ci.nsIClassInfo,
+        Ci.nsISupports
+    ]),
 
-	_className : "mivExchangeMsgAccountManagerExtension",
+    _className: "mivExchangeMsgAccountManagerExtension",
 
-	classDescription : "Exchange EWS Msg Account Manager Extension",
+    classDescription: "Exchange EWS Msg Account Manager Extension",
 
-	classID : components.ID("{"+mivExchangeMsgAccountManagerExtensionGUID+"}"),
-	contractID : "@mozilla.org/accountmanager/extension;1?name=exchangeWebServiceMail",
-	flags : Ci.nsIClassInfo.THREADSAFE,
-	implementationLanguage : Ci.nsIProgrammingLanguage.JAVASCRIPT,
+    classID: components.ID("{" + mivExchangeMsgAccountManagerExtensionGUID + "}"),
+    contractID: "@mozilla.org/accountmanager/extension;1?name=exchangeWebServiceMail",
+    flags: Ci.nsIClassInfo.THREADSAFE,
+    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
-	getInterfaces : function _getInterfaces(count) 
-	{
-		var ifaces = [Ci.mivExchangeMsgAccountManagerExtension,
-				Ci.nsIMsgAccountManagerExtension,
-				Ci.nsIClassInfo,
-				Ci.nsISupports];
-		count.value = ifaces.length;
-		return ifaces;
-	},
+    getInterfaces: function _getInterfaces(count) {
+        var ifaces = [Ci.mivExchangeMsgAccountManagerExtension,
+            Ci.nsIMsgAccountManagerExtension,
+            Ci.nsIClassInfo,
+            Ci.nsISupports
+        ];
+        count.value = ifaces.length;
+        return ifaces;
+    },
 
-//  readonly attribute ACString name;   // examples:  mdn
-	get name()
-	{
-dump("mivExchangeMsgAccountManagerExtension.name:\n");
-		return "exchangeWebServiceMail";
-	},
+    //  readonly attribute ACString name;   // examples:  mdn
+    get name() {
+        dump("mivExchangeMsgAccountManagerExtension.name:\n");
+        return "exchangeWebServiceMail";
+    },
 
-//  boolean showPanel(in nsIMsgIncomingServer server);
-	showPanel: function _showPanel(aServer)
-	{
-dump("mivExchangeMsgAccountManagerExtension.showPanel: aServer.type:"+aServer.type+"\n");
-	},
+    //  boolean showPanel(in nsIMsgIncomingServer server);
+    showPanel: function _showPanel(aServer) {
+        dump("mivExchangeMsgAccountManagerExtension.showPanel: aServer.type:" + aServer.type + "\n");
+    },
 
-//  readonly attribute ACString chromePackageName;  // example:  messenger, chrome://messenger/content/am-mdn.xul and chrome://messenger/locale/am-mdn.properties
-	get chromePackageName()
-	{
-dump("mivExchangeMsgAccountManagerExtension.chromePackageName:\n");
-		return "exchangemail"
-	},
+    //  readonly attribute ACString chromePackageName;  // example:  messenger, chrome://messenger/content/am-mdn.xul and chrome://messenger/locale/am-mdn.properties
+    get chromePackageName() {
+        dump("mivExchangeMsgAccountManagerExtension.chromePackageName:\n");
+        return "exchangemail"
+    },
 
 };
 
 function NSGetFactory(cid) {
 
-	try {
-		if (!NSGetFactory.mivExchangeMsgAccountManagerExtension) {
-			NSGetFactory.mivExchangeMsgAccountManagerExtension = XPCOMUtils.generateNSGetFactory([mivExchangeMsgAccountManagerExtension]);
+    try {
+        if (!NSGetFactory.mivExchangeMsgAccountManagerExtension) {
+            NSGetFactory.mivExchangeMsgAccountManagerExtension = XPCOMUtils.generateNSGetFactory([mivExchangeMsgAccountManagerExtension]);
 
-	}
+        }
 
-	} catch(e) {
-		Components.utils.reportError(e);
-		dump(e);
-		throw e;
-	}
+    }
+    catch (e) {
+        Components.utils.reportError(e);
+        dump(e);
+        throw e;
+    }
 
-	return NSGetFactory.mivExchangeMsgAccountManagerExtension(cid);
-} 
-
+    return NSGetFactory.mivExchangeMsgAccountManagerExtension(cid);
+}

@@ -31,46 +31,46 @@ var Cu = Components.utils;
 var Ci = Components.interfaces;
 var Cc = Components.classes;
 
-function exchChangeCalendarProperties(aDocument, aWindow)
-{
-	this._document = aDocument;
-	this._window = aWindow;
+function exchChangeCalendarProperties(aDocument, aWindow) {
+    this._document = aDocument;
+    this._window = aWindow;
 
-	this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
-				.getService(Ci.mivFunctions);
+    this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
+        .getService(Ci.mivFunctions);
 }
 
 exchChangeCalendarProperties.prototype = {
 
-	onLoad : function _onLoad(){
-		var aCalendar = this._window.arguments[0].calendar;
-		if(aCalendar.type == "exchangecalendar"){
-			this._document.getElementById("calendar-cache-row").setAttribute("collapsed",true);
-			if (aCalendar.getProperty("exchWebService.useOfflineCache")){
-					this._document.getElementById("exchange-cache").checked=aCalendar.getProperty("exchWebService.useOfflineCache");
-				
-			}
-			this._document.getElementById("calendar-refreshInterval-row").hidden = true;
-		}
-		else{
-			this._document.getElementById("calendar-refreshInterval-row").hidden = false;
+    onLoad: function _onLoad() {
+        var aCalendar = this._window.arguments[0].calendar;
+        if (aCalendar.type == "exchangecalendar") {
+            this._document.getElementById("calendar-cache-row").setAttribute("collapsed", true);
+            if (aCalendar.getProperty("exchWebService.useOfflineCache")) {
+                this._document.getElementById("exchange-cache").checked = aCalendar.getProperty("exchWebService.useOfflineCache");
 
-			this._document.getElementById("exchange-cache-row").setAttribute("collapsed",true);
-		}
-	},
+            }
+            this._document.getElementById("calendar-refreshInterval-row").hidden = true;
+        }
+        else {
+            this._document.getElementById("calendar-refreshInterval-row").hidden = false;
 
-	changeCachePref : function _changeCachePref()
-	{
-		var aCalendar = this._window.arguments[0].calendar;
-		if(this._document.getElementById("exchange-cache").checked){
-			aCalendar.setProperty("exchWebService.useOfflineCache", true);
-		}
-		else{
-			aCalendar.setProperty("exchWebService.useOfflineCache", false);	
-		}
-	},
+            this._document.getElementById("exchange-cache-row").setAttribute("collapsed", true);
+        }
+    },
+
+    changeCachePref: function _changeCachePref() {
+        var aCalendar = this._window.arguments[0].calendar;
+        if (this._document.getElementById("exchange-cache").checked) {
+            aCalendar.setProperty("exchWebService.useOfflineCache", true);
+        }
+        else {
+            aCalendar.setProperty("exchWebService.useOfflineCache", false);
+        }
+    },
 }
 
 var tmpChangeCalendarProperties = new exchChangeCalendarProperties(document, window);
-window.addEventListener("load", function () { window.removeEventListener("load",arguments.callee,false); tmpChangeCalendarProperties.onLoad(); }, true);
-
+window.addEventListener("load", function () {
+    window.removeEventListener("load", arguments.callee, false);
+    tmpChangeCalendarProperties.onLoad();
+}, true);

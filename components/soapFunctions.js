@@ -46,76 +46,75 @@ Cu.import("resource://interfaces/xml2json/xml2json.js");
 
 var EXPORTED_SYMBOLS = ["makeParentFolderIds2", "makeParentFolderIds3", "publicFoldersMap"];
 
-const publicFoldersMap = { "publicfoldersroot" : true };
+const publicFoldersMap = {
+    "publicfoldersroot": true
+};
 
 // This is the xml2jxon version.
-function makeParentFolderIds2(aParentItem, aArgument)
-{
-	var globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
-			.getService(Ci.mivFunctions);
+function makeParentFolderIds2(aParentItem, aArgument) {
+    var globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
+        .getService(Ci.mivFunctions);
 
-	var ParentFolderIds = globalFunctions.xmlToJxon('<nsMessages:'+aParentItem+' xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
+    var ParentFolderIds = globalFunctions.xmlToJxon('<nsMessages:' + aParentItem + ' xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
 
-	if (! aArgument.folderID) {
-		var DistinguishedFolderId = globalFunctions.xmlToJxon('<nsTypes:DistinguishedFolderId xmlns:nsTypes="'+nsTypesStr+'"/>');
-		DistinguishedFolderId.setAttribute("Id", aArgument.folderBase);
+    if (!aArgument.folderID) {
+        var DistinguishedFolderId = globalFunctions.xmlToJxon('<nsTypes:DistinguishedFolderId xmlns:nsTypes="' + nsTypesStr + '"/>');
+        DistinguishedFolderId.setAttribute("Id", aArgument.folderBase);
 
-		// If the folderBase is a public folder then do not provide mailbox if
-		// available.
-		if (! publicFoldersMap[aArgument.folderBase]) {
-			if (aArgument.mailbox) {
-				DistinguishedFolderId.addChildTag("Mailbox", "nsTypes", null).addChildTag("EmailAddress", "nsTypes", aArgument.mailbox);
-			}
-		}
-		ParentFolderIds.addChildTagObject(DistinguishedFolderId);
-		DistinguishedFolderId = null;
-	}
-	else {
-		var FolderId = globalFunctions.xmlToJxon('<nsTypes:FolderId xmlns:nsTypes="'+nsTypesStr+'"/>');
-		FolderId.setAttribute("Id", aArgument.folderID);
-		if ((aArgument.changeKey) && (aArgument.changeKey != "")) {
-			FolderId.setAttribute("ChangeKey", aArgument.changeKey);
-		}
-		
-		ParentFolderIds.addChildTagObject(FolderId);
-		FolderId = null;
-	}
+        // If the folderBase is a public folder then do not provide mailbox if
+        // available.
+        if (!publicFoldersMap[aArgument.folderBase]) {
+            if (aArgument.mailbox) {
+                DistinguishedFolderId.addChildTag("Mailbox", "nsTypes", null).addChildTag("EmailAddress", "nsTypes", aArgument.mailbox);
+            }
+        }
+        ParentFolderIds.addChildTagObject(DistinguishedFolderId);
+        DistinguishedFolderId = null;
+    }
+    else {
+        var FolderId = globalFunctions.xmlToJxon('<nsTypes:FolderId xmlns:nsTypes="' + nsTypesStr + '"/>');
+        FolderId.setAttribute("Id", aArgument.folderID);
+        if ((aArgument.changeKey) && (aArgument.changeKey != "")) {
+            FolderId.setAttribute("ChangeKey", aArgument.changeKey);
+        }
 
-	return ParentFolderIds;
+        ParentFolderIds.addChildTagObject(FolderId);
+        FolderId = null;
+    }
+
+    return ParentFolderIds;
 }
 
 // This is the xml2json version.
-function makeParentFolderIds3(aParentItem, aArgument)
-{
-	var root = xml2json.newJSON();
-	var ParentFolderIds = xml2json.addTag(root, aParentItem, "nsMessages");
-	xml2json.setAttribute(ParentFolderIds, "xmlns:nsMessages", nsMessagesStr);
-	xml2json.setAttribute(ParentFolderIds, "xmlns:nsTypes", nsTypesStr);
+function makeParentFolderIds3(aParentItem, aArgument) {
+    var root = xml2json.newJSON();
+    var ParentFolderIds = xml2json.addTag(root, aParentItem, "nsMessages");
+    xml2json.setAttribute(ParentFolderIds, "xmlns:nsMessages", nsMessagesStr);
+    xml2json.setAttribute(ParentFolderIds, "xmlns:nsTypes", nsTypesStr);
 
-	if (! aArgument.folderID) {
-		let DistinguishedFolderId = xml2json.addTag(ParentFolderIds, "DistinguishedFolderId", "nsTypes", null);
-		xml2json.setAttribute(DistinguishedFolderId, "Id", aArgument.folderBase);
+    if (!aArgument.folderID) {
+        let DistinguishedFolderId = xml2json.addTag(ParentFolderIds, "DistinguishedFolderId", "nsTypes", null);
+        xml2json.setAttribute(DistinguishedFolderId, "Id", aArgument.folderBase);
 
-		// If the folderBase is a public folder then do not provide mailbox if
-		// available.
-		if (! publicFoldersMap[aArgument.folderBase]) {
-			if (aArgument.mailbox) {
-				let mailbox = xml2json.addTag(DistinguishedFolderId, "Mailbox", "nsTypes", null);
-				xml2json.addTag(mailbox, "EmailAddress", "nsTypes", aArgument.mailbox);
-				mailbox = null;
-			}
-		}
-		DistinguishedFolderId = null;
-	}
-	else {
-		let FolderId = xml2json.addTag(ParentFolderIds, "FolderId", "nsTypes", null);
-		xml2json.setAttribute(FolderId, "Id", aArgument.folderID);
-		if ((aArgument.changeKey) && (aArgument.changeKey != "")) {
-			xml2json.setAttribute(FolderId, "ChangeKey", aArgument.changeKey);
-		}
-		FolderId = null;
-	}
+        // If the folderBase is a public folder then do not provide mailbox if
+        // available.
+        if (!publicFoldersMap[aArgument.folderBase]) {
+            if (aArgument.mailbox) {
+                let mailbox = xml2json.addTag(DistinguishedFolderId, "Mailbox", "nsTypes", null);
+                xml2json.addTag(mailbox, "EmailAddress", "nsTypes", aArgument.mailbox);
+                mailbox = null;
+            }
+        }
+        DistinguishedFolderId = null;
+    }
+    else {
+        let FolderId = xml2json.addTag(ParentFolderIds, "FolderId", "nsTypes", null);
+        xml2json.setAttribute(FolderId, "Id", aArgument.folderID);
+        if ((aArgument.changeKey) && (aArgument.changeKey != "")) {
+            xml2json.setAttribute(FolderId, "ChangeKey", aArgument.changeKey);
+        }
+        FolderId = null;
+    }
 
-	return ParentFolderIds;
+    return ParentFolderIds;
 }
-

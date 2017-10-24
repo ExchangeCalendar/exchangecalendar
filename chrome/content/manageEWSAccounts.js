@@ -29,404 +29,397 @@ Cu.import("resource://exchangecalendar/erAutoDiscover.js");
 Cu.import("resource://exchangecalendar/erPrimarySMTPCheck.js");
 Cu.import("resource://exchangecalendar/erGetFolder.js");
 
-if (! exchWebService) var exchWebService = {};
+if (!exchWebService) var exchWebService = {};
 
 exchWebService.manageEWSAccounts = {
 
-	_detailsChecked: false,
-	_detailsChanged: false,
-	selectedAccount: {},
+    _detailsChecked: false,
+    _detailsChanged: false,
+    selectedAccount: {},
 
-	accountManager : Cc["@1st-setup.nl/exchange/accountmanager;1"]
-				.getService(Ci.mivExchangeAccountManager),
+    accountManager: Cc["@1st-setup.nl/exchange/accountmanager;1"]
+        .getService(Ci.mivExchangeAccountManager),
 
-	globalFunctions : Cc["@1st-setup.nl/global/functions;1"]
-				.getService(Ci.mivFunctions),
+    globalFunctions: Cc["@1st-setup.nl/global/functions;1"]
+        .getService(Ci.mivFunctions),
 
-	set detailsChecked(aValue)
-	{
-		this._detailsChecked = aValue;
+    set detailsChecked(aValue) {
+        this._detailsChecked = aValue;
 
-		this.checkRequired();
-	},
+        this.checkRequired();
+    },
 
-	set detailsChanged(aValue)
-	{
-		this._detailsChanged = aValue;
-		if (aValue) {
-			document.getElementById("exchWebService_manageEWSAccounts_save_button").hidden = false;
-		}
-		else {
-			document.getElementById("exchWebService_manageEWSAccounts_save_button").hidden = true;
-		}
-	},
+    set detailsChanged(aValue) {
+        this._detailsChanged = aValue;
+        if (aValue) {
+            document.getElementById("exchWebService_manageEWSAccounts_save_button").hidden = false;
+        }
+        else {
+            document.getElementById("exchWebService_manageEWSAccounts_save_button").hidden = true;
+        }
+    },
 
-	detailsOk: false,
+    detailsOk: false,
 
-	checkRequired: function _checkRequired()
-	{
-		let canAdvance = true;
-		let vbox = document.getElementById('exchWebService-account-settings');
-		if (vbox) {
-			let eList = vbox.getElementsByAttribute('required', 'true');
-			for (let i = 0; i < eList.length && canAdvance; ++i) {
+    checkRequired: function _checkRequired() {
+        let canAdvance = true;
+        let vbox = document.getElementById('exchWebService-account-settings');
+        if (vbox) {
+            let eList = vbox.getElementsByAttribute('required', 'true');
+            for (let i = 0; i < eList.length && canAdvance; ++i) {
 
-				if (!eList[i].hidden) {
-					canAdvance = (eList[i].value != "");
-				}
-			}
+                if (!eList[i].hidden) {
+                    canAdvance = (eList[i].value != "");
+                }
+            }
 
-			if (canAdvance) {
-				if (document.getElementById("exchWebService_autodiscover").checked) {
-					document.getElementById("exchWebService_autodiscovercheckbutton").hidden = false;
-					document.getElementById("exchWebService_servercheckbutton").hidden = true;
-				}
-				else {
-					document.getElementById("exchWebService_autodiscovercheckbutton").hidden = true;
-					document.getElementById("exchWebService_servercheckbutton").hidden = false;
-				}
-			}
-			else {
-				document.getElementById("exchWebService_autodiscovercheckbutton").hidden = true;
-				document.getElementById("exchWebService_servercheckbutton").hidden = true;
-			}
-		}
+            if (canAdvance) {
+                if (document.getElementById("exchWebService_autodiscover").checked) {
+                    document.getElementById("exchWebService_autodiscovercheckbutton").hidden = false;
+                    document.getElementById("exchWebService_servercheckbutton").hidden = true;
+                }
+                else {
+                    document.getElementById("exchWebService_autodiscovercheckbutton").hidden = true;
+                    document.getElementById("exchWebService_servercheckbutton").hidden = false;
+                }
+            }
+            else {
+                document.getElementById("exchWebService_autodiscovercheckbutton").hidden = true;
+                document.getElementById("exchWebService_servercheckbutton").hidden = true;
+            }
+        }
 
-		if (window) {
-			window.sizeToContent();
-		}
-	},
+        if (window) {
+            window.sizeToContent();
+        }
+    },
 
-	logInfo: function _logInfo(aMsg)
-	{
-		this.globalFunctions.LOG(aMsg);
-	},
+    logInfo: function _logInfo(aMsg) {
+        this.globalFunctions.LOG(aMsg);
+    },
 
-	onLoad: function _onLoad()
-	{
-		// Load the exchWebService_manageEWSAccounts_accounts_listbox
-		var listbox = document.getElementById("exchWebService-manageEWSAccounts-accounts-listbox");
-		if (listbox) {
-			while (listbox.itemCount > 0) {
-				listbox.removeItemAt(0);
-			}
-		}
+    onLoad: function _onLoad() {
+        // Load the exchWebService_manageEWSAccounts_accounts_listbox
+        var listbox = document.getElementById("exchWebService-manageEWSAccounts-accounts-listbox");
+        if (listbox) {
+            while (listbox.itemCount > 0) {
+                listbox.removeItemAt(0);
+            }
+        }
 
-		var accounts = this.accountManager.getAccounts();
+        var accounts = this.accountManager.getAccounts();
 
-		for (var index in accounts) {
-			if (listbox) {
-				var newItem = listbox.appendItem( accounts[index].name.value, accounts[index].id);
-			}
-		}
-	},
+        for (var index in accounts) {
+            if (listbox) {
+                var newItem = listbox.appendItem(accounts[index].name.value, accounts[index].id);
+            }
+        }
+    },
 
-	showDetails: function _showDetails(aAccount)
-	{
-		document.getElementById("exchWebService_autodiscover").disabled = false;
+    showDetails: function _showDetails(aAccount) {
+        document.getElementById("exchWebService_autodiscover").disabled = false;
 
-		document.getElementById("exchWebService_manageEWSAccounts_account_name").value = aAccount.name.value;
-		document.getElementById("exchWebService_manageEWSAccounts_account_name").disabled = false;
+        document.getElementById("exchWebService_manageEWSAccounts_account_name").value = aAccount.name.value;
+        document.getElementById("exchWebService_manageEWSAccounts_account_name").disabled = false;
 
-		document.getElementById("exchWebService_server").value = aAccount.server.value;
-		document.getElementById("exchWebService_server").disabled = false;
+        document.getElementById("exchWebService_server").value = aAccount.server.value;
+        document.getElementById("exchWebService_server").disabled = false;
 
-		document.getElementById("exchWebService_mailbox").value = aAccount.mailbox.value;
-		document.getElementById("exchWebService_mailbox").disabled = false;
+        document.getElementById("exchWebService_mailbox").value = aAccount.mailbox.value;
+        document.getElementById("exchWebService_mailbox").disabled = false;
 
-		document.getElementById("exchWebService_windowsuser").value = aAccount.user.value;
-		document.getElementById("exchWebService_windowsuser").disabled = false;
-	},
+        document.getElementById("exchWebService_windowsuser").value = aAccount.user.value;
+        document.getElementById("exchWebService_windowsuser").disabled = false;
+    },
 
-	disableDetails: function _showDetails(aAccount)
-	{
-		document.getElementById("exchWebService_autodiscover").disabled = true;
+    disableDetails: function _showDetails(aAccount) {
+        document.getElementById("exchWebService_autodiscover").disabled = true;
 
-		document.getElementById("exchWebService_manageEWSAccounts_account_name").value = "";
-		document.getElementById("exchWebService_manageEWSAccounts_account_name").disabled = true;
+        document.getElementById("exchWebService_manageEWSAccounts_account_name").value = "";
+        document.getElementById("exchWebService_manageEWSAccounts_account_name").disabled = true;
 
-		document.getElementById("exchWebService_server").value = "";
-		document.getElementById("exchWebService_server").disabled = true;
+        document.getElementById("exchWebService_server").value = "";
+        document.getElementById("exchWebService_server").disabled = true;
 
-		document.getElementById("exchWebService_mailbox").value = "";
-		document.getElementById("exchWebService_mailbox").disabled = true;
+        document.getElementById("exchWebService_mailbox").value = "";
+        document.getElementById("exchWebService_mailbox").disabled = true;
 
-		document.getElementById("exchWebService_windowsuser").value = "";
-		document.getElementById("exchWebService_windowsuser").disabled = true;
+        document.getElementById("exchWebService_windowsuser").value = "";
+        document.getElementById("exchWebService_windowsuser").disabled = true;
 
-		this.detailsChanged = false;
-		this.detailsChecked = true;
-	},
+        this.detailsChanged = false;
+        this.detailsChecked = true;
+    },
 
-	onSelect: function _onSelect()
-	{
-		var item = document.getElementById("exchWebService-manageEWSAccounts-accounts-listbox").selectedItem;
+    onSelect: function _onSelect() {
+        var item = document.getElementById("exchWebService-manageEWSAccounts-accounts-listbox").selectedItem;
 
-		this.selectedAccount = {};
-		if (item == null) {
-			this.disableDetails();
-			document.getElementById("exchWebService_manageEWSAccounts_removeAccount_button").disabled = true;
-			return;
-		}
+        this.selectedAccount = {};
+        if (item == null) {
+            this.disableDetails();
+            document.getElementById("exchWebService_manageEWSAccounts_removeAccount_button").disabled = true;
+            return;
+        }
 
-		var tmpResult = this.accountManager.getAccountById(item.value);
+        var tmpResult = this.accountManager.getAccountById(item.value);
 
-		if (!tmpResult.result) return;
-		this.selectedAccount = tmpResult.account;
+        if (!tmpResult.result) return;
+        this.selectedAccount = tmpResult.account;
 
-		this.showDetails(this.selectedAccount);			
+        this.showDetails(this.selectedAccount);
 
-		document.getElementById("exchWebService_server_status").status = 0;
-		document.getElementById("exchWebService_mailbox_status").status = 0;
+        document.getElementById("exchWebService_server_status").status = 0;
+        document.getElementById("exchWebService_mailbox_status").status = 0;
 
-		document.getElementById("exchWebService_manageEWSAccounts_removeAccount_button").disabled = false;
-	},
+        document.getElementById("exchWebService_manageEWSAccounts_removeAccount_button").disabled = false;
+    },
 
-	onClose: function _onClose()
-	{
-		return true;
-	},
+    onClose: function _onClose() {
+        return true;
+    },
 
-	addNewAccount: function _addNewAccount()
-	{
-		this.selectedAccount = {
-				id : this.globalFunctions.getUUID(),
-				name: { type: "string", value:"new Account"},
-				server: { type: "string", value:""},
-				user: { type: "string", value:""},
-				mailbox: { type: "string", value:""} };
-		this.accountManager.saveAccount(this.selectedAccount);
-		var listbox = document.getElementById("exchWebService-manageEWSAccounts-accounts-listbox");
-		if (listbox) {
-			var newItem = listbox.appendItem( this.selectedAccount.name.value, this.selectedAccount.id);
-			listbox.selectedItem = newItem;
-		}
-	},
+    addNewAccount: function _addNewAccount() {
+        this.selectedAccount = {
+            id: this.globalFunctions.getUUID(),
+            name: {
+                type: "string",
+                value: "new Account"
+            },
+            server: {
+                type: "string",
+                value: ""
+            },
+            user: {
+                type: "string",
+                value: ""
+            },
+            mailbox: {
+                type: "string",
+                value: ""
+            }
+        };
+        this.accountManager.saveAccount(this.selectedAccount);
+        var listbox = document.getElementById("exchWebService-manageEWSAccounts-accounts-listbox");
+        if (listbox) {
+            var newItem = listbox.appendItem(this.selectedAccount.name.value, this.selectedAccount.id);
+            listbox.selectedItem = newItem;
+        }
+    },
 
-	removeAccount: function _removeAccount()
-	{
-		this.accountManager.removeAccount(this.selectedAccount);
-		
-		var listbox = document.getElementById("exchWebService-manageEWSAccounts-accounts-listbox");
-		if (listbox) {
-			var oldIndex = listbox.selectedIndex;
-			listbox.selectedIndex = -1;
-			listbox.removeItemAt(oldIndex);
+    removeAccount: function _removeAccount() {
+        this.accountManager.removeAccount(this.selectedAccount);
 
-			if (listbox.itemCount == 0) {
-				this.disableDetails();
-				document.getElementById("exchWebService_manageEWSAccounts_removeAccount_button").disabled = true;
-			}
-			else {
-				if (oldIndex == listbox.itemCount) {
-					oldIndex--;
-				}
-				listbox.selectedIndex = oldIndex;
-			}
-		}
+        var listbox = document.getElementById("exchWebService-manageEWSAccounts-accounts-listbox");
+        if (listbox) {
+            var oldIndex = listbox.selectedIndex;
+            listbox.selectedIndex = -1;
+            listbox.removeItemAt(oldIndex);
 
-	},
+            if (listbox.itemCount == 0) {
+                this.disableDetails();
+                document.getElementById("exchWebService_manageEWSAccounts_removeAccount_button").disabled = true;
+            }
+            else {
+                if (oldIndex == listbox.itemCount) {
+                    oldIndex--;
+                }
+                listbox.selectedIndex = oldIndex;
+            }
+        }
 
-	saveAccount: function _saveAccount()
-	{
-		this.detailsChanged = false;
-		this.accountManager.saveAccount(this.selectedAccount);
-		document.getElementById("exchWebService-manageEWSAccounts-accounts-listbox").selectedItem.label = this.selectedAccount.name.value;
-	},
+    },
 
-	doAutodiscoverChanged: function _doAutodiscoverChanged(aCheckBox)
-	{
-		if (aCheckBox.checked) {
-			document.getElementById("exchWebService_mailboxrow").hidden = false;
-			document.getElementById("exchWebService_mailboxrow").setAttribute("required", "true");
-			document.getElementById("exchWebService_serverrow").hidden = true;
-		}
-		else {
-			document.getElementById("exchWebService_mailboxrow").hidden = true;
-			document.getElementById("exchWebService_mailboxrow").setAttribute("required", "false");
-			document.getElementById("exchWebService_serverrow").hidden = false;
-		}
-		this.detailsChecked = false;
-	},
+    saveAccount: function _saveAccount() {
+        this.detailsChanged = false;
+        this.accountManager.saveAccount(this.selectedAccount);
+        document.getElementById("exchWebService-manageEWSAccounts-accounts-listbox").selectedItem.label = this.selectedAccount.name.value;
+    },
 
-	doNameChanged: function _doNameChanged(aTextBox)
-	{
-		this.detailsChanged = true;
-		this.selectedAccount.name.value = aTextBox.value;
-	},
+    doAutodiscoverChanged: function _doAutodiscoverChanged(aCheckBox) {
+        if (aCheckBox.checked) {
+            document.getElementById("exchWebService_mailboxrow").hidden = false;
+            document.getElementById("exchWebService_mailboxrow").setAttribute("required", "true");
+            document.getElementById("exchWebService_serverrow").hidden = true;
+        }
+        else {
+            document.getElementById("exchWebService_mailboxrow").hidden = true;
+            document.getElementById("exchWebService_mailboxrow").setAttribute("required", "false");
+            document.getElementById("exchWebService_serverrow").hidden = false;
+        }
+        this.detailsChecked = false;
+    },
 
-	doServerChanged: function _doServerChanged(aTextBox)
-	{
-		document.getElementById("exchWebService_server_status").status = 0;
-		this.detailsChecked = false;
-		this.selectedAccount.server.value = aTextBox.value;
-		if (aTextBox.value != "") {
-			var serverExists = this.accountManager.getAccountByServer(this.selectedAccount.server.value);
-			if ((serverExists != null) && (serverExists.id != this.selectedAccount.id)) {
-				// We allready have an account with the same server. warn and remove save button.
-				this.detailsChanged = false;
-				return;
-			}
-		}
-		this.detailsChanged = true;
-	},
+    doNameChanged: function _doNameChanged(aTextBox) {
+        this.detailsChanged = true;
+        this.selectedAccount.name.value = aTextBox.value;
+    },
 
-	doMailboxChanged: function _doMailboxChanged(aTextBox)
-	{
-		document.getElementById("exchWebService_mailbox_status").status = 0;
-		this.detailsChecked = false;
-		this.detailsChanged = true;
-		this.selectedAccount.mailbox.value = aTextBox.value;
-	},
+    doServerChanged: function _doServerChanged(aTextBox) {
+        document.getElementById("exchWebService_server_status").status = 0;
+        this.detailsChecked = false;
+        this.selectedAccount.server.value = aTextBox.value;
+        if (aTextBox.value != "") {
+            var serverExists = this.accountManager.getAccountByServer(this.selectedAccount.server.value);
+            if ((serverExists != null) && (serverExists.id != this.selectedAccount.id)) {
+                // We allready have an account with the same server. warn and remove save button.
+                this.detailsChanged = false;
+                return;
+            }
+        }
+        this.detailsChanged = true;
+    },
 
-	doUserChanged: function _doUserChanged(aTextBox)
-	{
-		this.detailsChecked = false;
-		this.detailsChanged = true;
-		this.selectedAccount.user.value = aTextBox.value;
-	},
+    doMailboxChanged: function _doMailboxChanged(aTextBox) {
+        document.getElementById("exchWebService_mailbox_status").status = 0;
+        this.detailsChecked = false;
+        this.detailsChanged = true;
+        this.selectedAccount.mailbox.value = aTextBox.value;
+    },
 
-	doAutodiscoverCheck: function _doAutodiscoverCheck()
-	{
-		document.getElementById("exchWebService_autodiscovercheckbutton").disabled = true;
+    doUserChanged: function _doUserChanged(aTextBox) {
+        this.detailsChecked = false;
+        this.detailsChanged = true;
+        this.selectedAccount.user.value = aTextBox.value;
+    },
 
-		try {
-			window.setCursor("wait");
-			var user = document.getElementById("exchWebService_windowsuser").value;
-			var mailbox = document.getElementById("exchWebService_mailbox").value;
-			var tmpObject = new erAutoDiscoverRequest( 
-				{user: user, 
-				 mailbox: mailbox}, 
-				 this.autodiscoveryOK, 
-				 this.autodiscoveryError, null);
-		}
-		catch(err) {
-			window.setCursor("auto");
-			this.globalFunctions.ERROR("Warning: Could not create erAutoDiscoverRequest. Err="+err+"\n");
-		}
-	},
+    doAutodiscoverCheck: function _doAutodiscoverCheck() {
+        document.getElementById("exchWebService_autodiscovercheckbutton").disabled = true;
 
-	autodiscoveryOK: function _autodiscoveryOK(ewsUrls, DisplayName, SMTPAddress)
-	{
-		this.globalFunctions.LOG("ecAutodiscoveryOK");
-		var selectedEWSUrl = {value:undefined};
-		var userCancel = false;
+        try {
+            window.setCursor("wait");
+            var user = document.getElementById("exchWebService_windowsuser").value;
+            var mailbox = document.getElementById("exchWebService_mailbox").value;
+            var tmpObject = new erAutoDiscoverRequest({
+                    user: user,
+                    mailbox: mailbox
+                },
+                this.autodiscoveryOK,
+                this.autodiscoveryError, null);
+        }
+        catch (err) {
+            window.setCursor("auto");
+            this.globalFunctions.ERROR("Warning: Could not create erAutoDiscoverRequest. Err=" + err + "\n");
+        }
+    },
 
-		if (ewsUrls) {
-			if (ewsUrls.length() > 1) {
-				// We have got multiple ews urls returned. Let the use choose.
+    autodiscoveryOK: function _autodiscoveryOK(ewsUrls, DisplayName, SMTPAddress) {
+        this.globalFunctions.LOG("ecAutodiscoveryOK");
+        var selectedEWSUrl = {
+            value: undefined
+        };
+        var userCancel = false;
 
-				window.openDialog("chrome://exchangecalendar/content/selectEWSUrl.xul",
-					"selectfrommultipleews",
-					"chrome,titlebar,toolbar,centerscreen,dialog,modal=yes,resizable=no",
-					ewsUrls, selectedEWSUrl); 
+        if (ewsUrls) {
+            if (ewsUrls.length() > 1) {
+                // We have got multiple ews urls returned. Let the use choose.
 
-				if ((!selectedEWSUrl.value) || (selectedEWSUrl.value == "")) {
-					this.globalFunctions.LOG("  ++++ Selection canceled by user");
-					userCancel = true;
-				}
-			}
-			else {
-				// We only have one url. Use it.
-				selectedEWSUrl.value = ewsUrls.text();
-			}
+                window.openDialog("chrome://exchangecalendar/content/selectEWSUrl.xul",
+                    "selectfrommultipleews",
+                    "chrome,titlebar,toolbar,centerscreen,dialog,modal=yes,resizable=no",
+                    ewsUrls, selectedEWSUrl);
 
-		}
+                if ((!selectedEWSUrl.value) || (selectedEWSUrl.value == "")) {
+                    this.globalFunctions.LOG("  ++++ Selection canceled by user");
+                    userCancel = true;
+                }
+            }
+            else {
+                // We only have one url. Use it.
+                selectedEWSUrl.value = ewsUrls.text();
+            }
 
-		if (!userCancel) {
-			document.getElementById("exchWebService_server").value = selectedEWSUrl.value; 
-			document.getElementById("exchWebService_serverrow").hidden = false; 
-			document.getElementById("exchWebService_mailboxrow").hidden = false; 
+        }
 
-			gexchWebServicesDetailsChecked = true;
-			document.getElementById("exchWebService_autodiscovercheckbutton").disabled = false;
-			document.getElementById("exchWebService_autodiscover").checked = false;
-		}
-		else {
-			document.getElementById("exchWebService_autodiscovercheckbutton").disabled = false;
-		}
+        if (!userCancel) {
+            document.getElementById("exchWebService_server").value = selectedEWSUrl.value;
+            document.getElementById("exchWebService_serverrow").hidden = false;
+            document.getElementById("exchWebService_mailboxrow").hidden = false;
 
-		window.setCursor("auto");
-		this.detailsChecked = true;
-		document.getElementById("exchWebService_server_status").status = 2;
-		document.getElementById("exchWebService_mailbox_status").status = 2;
-	},
+            gexchWebServicesDetailsChecked = true;
+            document.getElementById("exchWebService_autodiscovercheckbutton").disabled = false;
+            document.getElementById("exchWebService_autodiscover").checked = false;
+        }
+        else {
+            document.getElementById("exchWebService_autodiscovercheckbutton").disabled = false;
+        }
 
-	autodiscoveryError: function _autodiscoveryError(aExchangeRequest, aCode, aMsg)
-	{
-		this.globalFunctions.LOG("ecAutodiscoveryError. aCode:"+aCode+", aMsg:"+aMsg);
-		switch (aCode) {
-		case -20:
-		case -30:
-			break;
-		case -6:
-		case -9:
-		case -10:
-		case -14:
-		case -15:
-		case -16:
-		case -17:
-		case -18:
-			alert(this.globalFunctions.getString("calExchangeCalendar", "ecErrorAutodiscoveryURLInvalid", [document.getElementById("exchWebService_mailbox").value], "exchangecalendar"));
-			break;
-		default:
-			alert(this.globalFunctions.getString("calExchangeCalendar", "ecErrorAutodiscovery", [aMsg, aCode], "exchangecalendar"));
-		}
+        window.setCursor("auto");
+        this.detailsChecked = true;
+        document.getElementById("exchWebService_server_status").status = 2;
+        document.getElementById("exchWebService_mailbox_status").status = 2;
+    },
 
-		document.getElementById("exchWebService_autodiscovercheckbutton").disabled = false;
-		window.setCursor("auto");
-		this.detailsChecked = false;
-		document.getElementById("exchWebService_mailbox_status").status = 1;
-	},
+    autodiscoveryError: function _autodiscoveryError(aExchangeRequest, aCode, aMsg) {
+        this.globalFunctions.LOG("ecAutodiscoveryError. aCode:" + aCode + ", aMsg:" + aMsg);
+        switch (aCode) {
+        case -20:
+        case -30:
+            break;
+        case -6:
+        case -9:
+        case -10:
+        case -14:
+        case -15:
+        case -16:
+        case -17:
+        case -18:
+            alert(this.globalFunctions.getString("calExchangeCalendar", "ecErrorAutodiscoveryURLInvalid", [document.getElementById("exchWebService_mailbox").value], "exchangecalendar"));
+            break;
+        default:
+            alert(this.globalFunctions.getString("calExchangeCalendar", "ecErrorAutodiscovery", [aMsg, aCode], "exchangecalendar"));
+        }
 
-	doCheckServer: function _doCheckServer()
-	{
-		document.getElementById("exchWebService_servercheckbutton").disabled = true;
+        document.getElementById("exchWebService_autodiscovercheckbutton").disabled = false;
+        window.setCursor("auto");
+        this.detailsChecked = false;
+        document.getElementById("exchWebService_mailbox_status").status = 1;
+    },
+
+    doCheckServer: function _doCheckServer() {
+        document.getElementById("exchWebService_servercheckbutton").disabled = true;
 
 
-		try {
-			window.setCursor("wait");
-			var user = document.getElementById("exchWebService_windowsuser").value;
-			var tmpObject = new erGetFolderRequest(
-				{user: user, 
-				 mailbox: "",
-				 folderBase: "publicfoldersroot",
-				 folderPath: "/",
-				 serverUrl: document.getElementById("exchWebService_server").value}, this.checkServerOK, this.checkServerError)
-		}
-		catch(err) {
-			window.setCursor("auto");
-			this.globalFunctions.ERROR("Warning: Error during creation of erGetFolderRequest. Err="+err+"\n");
-		}
-	},
+        try {
+            window.setCursor("wait");
+            var user = document.getElementById("exchWebService_windowsuser").value;
+            var tmpObject = new erGetFolderRequest({
+                user: user,
+                mailbox: "",
+                folderBase: "publicfoldersroot",
+                folderPath: "/",
+                serverUrl: document.getElementById("exchWebService_server").value
+            }, this.checkServerOK, this.checkServerError)
+        }
+        catch (err) {
+            window.setCursor("auto");
+            this.globalFunctions.ERROR("Warning: Error during creation of erGetFolderRequest. Err=" + err + "\n");
+        }
+    },
 
-	checkServerOK: function _checkServerOK( folderID, changeKey, folderClass)
-	{
+    checkServerOK: function _checkServerOK(folderID, changeKey, folderClass) {
 
-		document.getElementById("exchWebService_servercheckbutton").disabled = false;
-		window.setCursor("auto");
-		this.detailsChecked = true;
-		document.getElementById("exchWebService_server_status").status = 2;
-	},
+        document.getElementById("exchWebService_servercheckbutton").disabled = false;
+        window.setCursor("auto");
+        this.detailsChecked = true;
+        document.getElementById("exchWebService_server_status").status = 2;
+    },
 
-	checkServerError: function _checkServerError(aExchangeRequest, aCode, aMsg)
-	{
-		this.globalFunctions.LOG("exchWebServicesCheckServerError");
-		switch (aCode) {
-		case -20:
-		case -30:
-			break;
-		case -6:
-			alert(this.globalFunctions.getString("calExchangeCalendar", "ecErrorServerCheckURLInvalid", [document.getElementById("exchWebService_server").value], "exchangecalendar"));
-			break;
-		default:
-			alert(this.globalFunctions.getString("calExchangeCalendar", "ecErrorServerCheck", [aMsg, aCode], "exchangecalendar"));
-		}
-		document.getElementById("exchWebService_servercheckbutton").disabled = false;
+    checkServerError: function _checkServerError(aExchangeRequest, aCode, aMsg) {
+        this.globalFunctions.LOG("exchWebServicesCheckServerError");
+        switch (aCode) {
+        case -20:
+        case -30:
+            break;
+        case -6:
+            alert(this.globalFunctions.getString("calExchangeCalendar", "ecErrorServerCheckURLInvalid", [document.getElementById("exchWebService_server").value], "exchangecalendar"));
+            break;
+        default:
+            alert(this.globalFunctions.getString("calExchangeCalendar", "ecErrorServerCheck", [aMsg, aCode], "exchangecalendar"));
+        }
+        document.getElementById("exchWebService_servercheckbutton").disabled = false;
 
-		window.setCursor("auto");
-		this.detailsChecked = false;
-		document.getElementById("exchWebService_server_status").status = 1;
-	},
+        window.setCursor("auto");
+        this.detailsChecked = false;
+        document.getElementById("exchWebService_server_status").status = 1;
+    },
 }
-

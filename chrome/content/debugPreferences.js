@@ -40,7 +40,7 @@ var Cu = Components.utils;
 
 Cu.import("resource://exchangecalendar/ecFunctions.js");
 
-if (! exchWebService) var exchWebService = {};
+if (!exchWebService) var exchWebService = {};
 
 exchWebService.debugPreferences = {
 
@@ -48,7 +48,7 @@ exchWebService.debugPreferences = {
     browseDebugFile: function _browseDebugFile() {
         const nsIFilePicker = Ci.nsIFilePicker;
         var fp = Cc["@mozilla.org/filepicker;1"]
-                    .createInstance(nsIFilePicker);
+            .createInstance(nsIFilePicker);
 
         var title = "Open log file";
 
@@ -57,41 +57,38 @@ exchWebService.debugPreferences = {
         var ret = fp.show();
 
         if (ret == nsIFilePicker.returnOK) {
-		exchWebService.commonFunctions.LOG("[["+fp.file.path+"]]");
+            exchWebService.commonFunctions.LOG("[[" + fp.file.path + "]]");
             document.getElementById("extensions.1st-setup.debug.file").value = fp.file.path;
-//		exchWebService.commonFunctions.LOG("[["+fp.fileURL.spec.replace("file://", "")+"]]");
-//            document.getElementById("extensions.1st-setup.debug.file").value = fp.fileURL.spec.replace("file://", "");
-	    this.readLogLocation();
+            //		exchWebService.commonFunctions.LOG("[["+fp.fileURL.spec.replace("file://", "")+"]]");
+            //            document.getElementById("extensions.1st-setup.debug.file").value = fp.fileURL.spec.replace("file://", "");
+            this.readLogLocation();
         }
 
     },
 
-	onLoad: function _onLoad()
-	{
-		this.disableChildren(document.getElementById("exchangeWebService_debug_groupbox1"), !document.getElementById("extensions.1st-setup.debug.log").value);
-		this.disableChildren(document.getElementById("exchangeWebService_debug_groupbox2"), !document.getElementById("extensions.1st-setup.debug.log").value);
-	},
+    onLoad: function _onLoad() {
+        this.disableChildren(document.getElementById("exchangeWebService_debug_groupbox1"), !document.getElementById("extensions.1st-setup.debug.log").value);
+        this.disableChildren(document.getElementById("exchangeWebService_debug_groupbox2"), !document.getElementById("extensions.1st-setup.debug.log").value);
+    },
 
-	disableChildren: function _disableChildren(aObject, aStatus)
-	{
-		var children = aObject.children;
-		for (var i=0; i < children.length; i++) {
-			children[i].disabled = aStatus;
-			this.disableChildren(children[i], aStatus);
-		}
-	},
+    disableChildren: function _disableChildren(aObject, aStatus) {
+        var children = aObject.children;
+        for (var i = 0; i < children.length; i++) {
+            children[i].disabled = aStatus;
+            this.disableChildren(children[i], aStatus);
+        }
+    },
 
-	debugLogChanged: function _debugLogChanged(aCheckBox)
-	{
-		if (aCheckBox.checked) {
-			this.disableChildren(document.getElementById("exchangeWebService_debug_groupbox1"), false);
-			this.disableChildren(document.getElementById("exchangeWebService_debug_groupbox2"), false);
-		}
-		else {
-			this.disableChildren(document.getElementById("exchangeWebService_debug_groupbox1"), true);
-			this.disableChildren(document.getElementById("exchangeWebService_debug_groupbox2"), true);
-		}
-	},
+    debugLogChanged: function _debugLogChanged(aCheckBox) {
+        if (aCheckBox.checked) {
+            this.disableChildren(document.getElementById("exchangeWebService_debug_groupbox1"), false);
+            this.disableChildren(document.getElementById("exchangeWebService_debug_groupbox2"), false);
+        }
+        else {
+            this.disableChildren(document.getElementById("exchangeWebService_debug_groupbox1"), true);
+            this.disableChildren(document.getElementById("exchangeWebService_debug_groupbox2"), true);
+        }
+    },
 
     readLogLocation: function _readLogLocation() {
         var logUrl = document.getElementById("exchangeWebService_preference_debug_file_filefield");

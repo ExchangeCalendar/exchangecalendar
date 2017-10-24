@@ -38,108 +38,108 @@ const nsXSIStr = "http://www.w3.org/2001/XMLSchema-instance";
 const nsErrors = "http://schemas.microsoft.com/exchange/services/2006/errors";
 
 function mivNameSpaces() {
-	this.nameSpaces = new Array();
+    this.nameSpaces = new Array();
 
-	this.addNameSpace("s", nsSoapStr);
-	this.addNameSpace("m", nsMessagesStr);
-	this.addNameSpace("t", nsTypesStr);
-	this.addNameSpace("a1", nsAutodiscoverResponseStr1);
-	this.addNameSpace("a2", nsAutodiscoverResponseStr2);
+    this.addNameSpace("s", nsSoapStr);
+    this.addNameSpace("m", nsMessagesStr);
+    this.addNameSpace("t", nsTypesStr);
+    this.addNameSpace("a1", nsAutodiscoverResponseStr1);
+    this.addNameSpace("a2", nsAutodiscoverResponseStr2);
 }
 
 var mivNameSpacesGUID = "c58005d7-70c2-4f2e-935a-af11333f8964";
 
 mivNameSpaces.prototype = {
 
-	// methods from nsISupport
+    // methods from nsISupport
 
-	/* void QueryInterface(
-	  in nsIIDRef uuid,
-	  [iid_is(uuid),retval] out nsQIResult result
-	);	 */
-	QueryInterface: XPCOMUtils.generateQI([Ci.mivNameSpaces,
-			Ci.nsIClassInfo,
-			Ci.nsISupports]),
+    /* void QueryInterface(
+      in nsIIDRef uuid,
+      [iid_is(uuid),retval] out nsQIResult result
+    );	 */
+    QueryInterface: XPCOMUtils.generateQI([Ci.mivNameSpaces,
+        Ci.nsIClassInfo,
+        Ci.nsISupports
+    ]),
 
-	// Attributes from nsIClassInfo
+    // Attributes from nsIClassInfo
 
-	classDescription: "XML NameSpace manager.",
-	classID: components.ID("{"+mivNameSpacesGUID+"}"),
-	contractID: "@1st-setup.nl/conversion/namespaces;1",
-	flags: Ci.nsIClassInfo.SINGLETON || Ci.nsIClassInfo.THREADSAFE,
-	implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
+    classDescription: "XML NameSpace manager.",
+    classID: components.ID("{" + mivNameSpacesGUID + "}"),
+    contractID: "@1st-setup.nl/conversion/namespaces;1",
+    flags: Ci.nsIClassInfo.SINGLETON || Ci.nsIClassInfo.THREADSAFE,
+    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
-	// void getInterfaces(out PRUint32 count, [array, size_is(count), retval] out nsIIDPtr array);
-	getInterfaces: function _getInterfaces(count) 
-	{
-		var ifaces = [Ci.mivNameSpaces,
-			Ci.nsIClassInfo,
-			Ci.nsISupports];
-		count.value = ifaces.length;
-		return ifaces;
-	},
+    // void getInterfaces(out PRUint32 count, [array, size_is(count), retval] out nsIIDPtr array);
+    getInterfaces: function _getInterfaces(count) {
+        var ifaces = [Ci.mivNameSpaces,
+            Ci.nsIClassInfo,
+            Ci.nsISupports
+        ];
+        count.value = ifaces.length;
+        return ifaces;
+    },
 
-	getHelperForLanguage: function _getHelperForLanguage(language) {
-		return null;
-	},
-	// External methods
+    getHelperForLanguage: function _getHelperForLanguage(language) {
+        return null;
+    },
+    // External methods
 
-	getNameSpace: function _getNameSpace(aIndex)
-	{
-		if (aIndex >= this.nameSpaces.length) return null;
+    getNameSpace: function _getNameSpace(aIndex) {
+        if (aIndex >= this.nameSpaces.length) return null;
 
-		return this.nameSpaces[aIndex].value;
-	},
+        return this.nameSpaces[aIndex].value;
+    },
 
-	addNameSpace: function _addNameSpace(aAlias, aValue)
-	{
-		var tmpAlias = aAlias;
-		if ((tmpAlias == "") || (tmpAlias === undefined)) {
-			tmpAlias = "_default_";
-		}
+    addNameSpace: function _addNameSpace(aAlias, aValue) {
+        var tmpAlias = aAlias;
+        if ((tmpAlias == "") || (tmpAlias === undefined)) {
+            tmpAlias = "_default_";
+        }
 
-		// find if we already have this namespace and value.
-		for (var index in this.nameSpaces) {
-			if (this.nameSpaces[index].alias == tmpAlias) {
-				if (this.nameSpaces[index].value == aValue) {
-					return index;
-				}
-			}
-		}
+        // find if we already have this namespace and value.
+        for (var index in this.nameSpaces) {
+            if (this.nameSpaces[index].alias == tmpAlias) {
+                if (this.nameSpaces[index].value == aValue) {
+                    return index;
+                }
+            }
+        }
 
-		this.nameSpaces.push({ alias: tmpAlias,
-				       value: aValue});
-		return (this.nameSpaces.length-1);
-	},
+        this.nameSpaces.push({
+            alias: tmpAlias,
+            value: aValue
+        });
+        return (this.nameSpaces.length - 1);
+    },
 
-	findNameSpaceByAlias: function _findNameSpaceByAlias(aAlias)
-	{
-		for each(var record in this.nameSpaces) {
-			if (record.alias == aAlias) {
-				return record.value;
-			}
-		}
-		// When not found return null;
-		return null;
-	},
+    findNameSpaceByAlias: function _findNameSpaceByAlias(aAlias) {
+        for each(var record in this.nameSpaces) {
+                if (record.alias == aAlias) {
+                    return record.value;
+                }
+            }
+            // When not found return null;
+        return null;
+    },
 
 }
 
 function NSGetFactory(cid) {
 
-	try {
-		if (!NSGetFactory.mivNameSpaces) {
-			// Load main script from lightning that we need.
-			NSGetFactory.mivNameSpaces = XPCOMUtils.generateNSGetFactory([mivNameSpaces]);
-			
-	}
+    try {
+        if (!NSGetFactory.mivNameSpaces) {
+            // Load main script from lightning that we need.
+            NSGetFactory.mivNameSpaces = XPCOMUtils.generateNSGetFactory([mivNameSpaces]);
 
-	} catch(e) {
-		Components.utils.reportError(e);
-		dump(e);
-		throw e;
-	}
+        }
 
-	return NSGetFactory.mivNameSpaces(cid);
-} 
+    }
+    catch (e) {
+        Components.utils.reportError(e);
+        dump(e);
+        throw e;
+    }
 
+    return NSGetFactory.mivNameSpaces(cid);
+}

@@ -38,53 +38,56 @@ const nsXSIStr = "http://www.w3.org/2001/XMLSchema-instance";
 const nsErrors = "http://schemas.microsoft.com/exchange/services/2006/errors";
 
 function mivTagNames() {
-	this.tagNames = new Array();
+    this.tagNames = new Array();
 }
 
 var mivTagNamesGUID = "b7309b24-96c6-4393-9ae4-05f3e7e8a4ac";
 
 mivTagNames.prototype = {
-	QueryInterface: XPCOMUtils.generateQI([Ci.mivTagNames,Ci.nsIClassInfo,Ci.nsISupports]),
-	classDescription: "XML TagNames manager.",
-	classID: components.ID("{"+mivTagNamesGUID+"}"),
-	contractID: "@1st-setup.nl/conversion/tagnames;1",
-	flags: Ci.nsIClassInfo.SINGLETON || Ci.nsIClassInfo.THREADSAFE,
-	implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
-	getInterfaces: function _getInterfaces(count) 
-	{
-		var ifaces = [Ci.mivTagNames,Ci.nsIClassInfo,Ci.nsISupports];
-		count.value = ifaces.length;
-		return ifaces;
-	},
-	getHelperForLanguage: function _getHelperForLanguage(language) {return null;},
-	getTagName: function _getTagName(aIndex)
-	{
-		if (aIndex >= this.tagNames.length) return "";
-		return this.tagNames[aIndex];
-	},
-	addTagName: function _addTagName(aValue)
-	{
-		for (let index in this.tagNames) {if (this.tagNames[index] == aValue) {return index;}}
-		this.tagNames.push(aValue);
-		return (this.tagNames.length-1);
-	},
+    QueryInterface: XPCOMUtils.generateQI([Ci.mivTagNames, Ci.nsIClassInfo, Ci.nsISupports]),
+    classDescription: "XML TagNames manager.",
+    classID: components.ID("{" + mivTagNamesGUID + "}"),
+    contractID: "@1st-setup.nl/conversion/tagnames;1",
+    flags: Ci.nsIClassInfo.SINGLETON || Ci.nsIClassInfo.THREADSAFE,
+    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
+    getInterfaces: function _getInterfaces(count) {
+        var ifaces = [Ci.mivTagNames, Ci.nsIClassInfo, Ci.nsISupports];
+        count.value = ifaces.length;
+        return ifaces;
+    },
+    getHelperForLanguage: function _getHelperForLanguage(language) {
+        return null;
+    },
+    getTagName: function _getTagName(aIndex) {
+        if (aIndex >= this.tagNames.length) return "";
+        return this.tagNames[aIndex];
+    },
+    addTagName: function _addTagName(aValue) {
+        for (let index in this.tagNames) {
+            if (this.tagNames[index] == aValue) {
+                return index;
+            }
+        }
+        this.tagNames.push(aValue);
+        return (this.tagNames.length - 1);
+    },
 }
 
 function NSGetFactory(cid) {
 
-	try {
-		if (!NSGetFactory.mivTagNames) {
-			// Load main script from lightning that we need.
-			NSGetFactory.mivTagNames = XPCOMUtils.generateNSGetFactory([mivTagNames]);
-			
-	}
+    try {
+        if (!NSGetFactory.mivTagNames) {
+            // Load main script from lightning that we need.
+            NSGetFactory.mivTagNames = XPCOMUtils.generateNSGetFactory([mivTagNames]);
 
-	} catch(e) {
-		Components.utils.reportError(e);
-		dump(e);
-		throw e;
-	}
+        }
 
-	return NSGetFactory.mivTagNames(cid);
-} 
+    }
+    catch (e) {
+        Components.utils.reportError(e);
+        dump(e);
+        throw e;
+    }
 
+    return NSGetFactory.mivTagNames(cid);
+}

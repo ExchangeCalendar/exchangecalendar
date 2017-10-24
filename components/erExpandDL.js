@@ -35,104 +35,102 @@ Cu.import("resource://exchangecalendar/ecFunctions.js");
 
 var EXPORTED_SYMBOLS = ["erExpandDLRequest"];
 
-function erExpandDLRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
+function erExpandDLRequest(aArgument, aCbOk, aCbError, aListener) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	var self = this;
+    var self = this;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
-	this.argument = aArgument;
-	this.mailbox = aArgument.mailbox;
-	this.serverUrl = aArgument.serverUrl;
-	this.folderID = aArgument.folderID;
-	this.folderBase = aArgument.folderBase;
-	this.changeKey = aArgument.changeKey;
-	this.listener = aListener;
+    this.argument = aArgument;
+    this.mailbox = aArgument.mailbox;
+    this.serverUrl = aArgument.serverUrl;
+    this.folderID = aArgument.folderID;
+    this.folderBase = aArgument.folderBase;
+    this.changeKey = aArgument.changeKey;
+    this.listener = aListener;
 
-	this.emailAddress = aArgument.emailAddress;
-	this.itemId = aArgument.itemId;
+    this.emailAddress = aArgument.emailAddress;
+    this.itemId = aArgument.itemId;
 
-	this.isRunning = true;
-	this.execute();
+    this.isRunning = true;
+    this.execute();
 }
 
 erExpandDLRequest.prototype = {
 
-	execute: function _execute()
-	{
-//		exchWebService.commonFunctions.LOG("erExpandDLRequest.execute\n");
+    execute: function _execute() {
+        //		exchWebService.commonFunctions.LOG("erExpandDLRequest.execute\n");
 
-		var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:ExpandDL xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:ExpandDL xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
 
-		var mailBox = req.addChildTag("Mailbox", "nsMessages", null); 
+        var mailBox = req.addChildTag("Mailbox", "nsMessages", null);
 
-		if (this.emailAddress) {
-			mailBox.addChildTag("EmailAddress", "nsTypes", this.emailAddress);
-		}
-		if (this.itemId) {
-			var itemId = mailBox.addChildTag("ItemId", "nsTypes", null);
-			itemId.setAttribute("Id", this.itemId.id);
-			if (this.itemId.changeKey) {
-				itemId.setAttribute("ChangeKey", this.itemId.changeKey);
-			}
-		}
+        if (this.emailAddress) {
+            mailBox.addChildTag("EmailAddress", "nsTypes", this.emailAddress);
+        }
+        if (this.itemId) {
+            var itemId = mailBox.addChildTag("ItemId", "nsTypes", null);
+            itemId.setAttribute("Id", this.itemId.id);
+            if (this.itemId.changeKey) {
+                itemId.setAttribute("ChangeKey", this.itemId.changeKey);
+            }
+        }
 
-		this.parent.xml2jxon = true;
+        this.parent.xml2jxon = true;
 
-		exchWebService.commonFunctions.LOG("erExpandDLRequest.execute:"+String(this.parent.makeSoapMessage(req)));
+        exchWebService.commonFunctions.LOG("erExpandDLRequest.execute:" + String(this.parent.makeSoapMessage(req)));
 
-                this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-		req = null;
-	},
+        this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
+        req = null;
+    },
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-		exchWebService.commonFunctions.LOG("erExpandDLRequest.onSendOk:"+String(aResp));
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        exchWebService.commonFunctions.LOG("erExpandDLRequest.onSendOk:" + String(aResp));
 
-		var rm = aResp.XPath("/s:Envelope/s:Body/m:ExpandDLResponse/m:ResponseMessages/m:ExpandDLResponseMessage[@ResponseClass='Success' and m:ResponseCode = 'NoError']");
+        var rm = aResp.XPath("/s:Envelope/s:Body/m:ExpandDLResponse/m:ResponseMessages/m:ExpandDLResponseMessage[@ResponseClass='Success' and m:ResponseCode = 'NoError']");
 
-		if (rm.length == 0) {
-			this.onSendError(aExchangeRequest, this.parent.ER_ERROR_RESPONS_NOT_VALID, "Respons does not contain expected field");
-			return;
-		}
+        if (rm.length == 0) {
+            this.onSendError(aExchangeRequest, this.parent.ER_ERROR_RESPONS_NOT_VALID, "Respons does not contain expected field");
+            return;
+        }
 
-		var dlExpansion = rm[0].getTags("m:DLExpansion");
-		rm = null;
+        var dlExpansion = rm[0].getTags("m:DLExpansion");
+        rm = null;
 
-		var allMailboxes = new Array();
-		for each(var expansion in dlExpansion) {
+        var allMailboxes = new Array();
+        for each(var expansion in dlExpansion) {
 
-			var totalItemsInView = expansion.getAttribute("TotalItemsInView", 0);
-			var includesLastItem = expansion.getAttribute("IncludesLastItemInRange", "false");
+            var totalItemsInView = expansion.getAttribute("TotalItemsInView", 0);
+            var includesLastItem = expansion.getAttribute("IncludesLastItemInRange", "false");
 
-			var mailboxes = expansion.getTags("t:Mailbox");
-			for each(var mailbox in mailboxes) {
-				allMailboxes.push(mailbox);
-			}
-			mailboxes = null;
-		
-		}
-		dlExpansion = null;
+            var mailboxes = expansion.getTags("t:Mailbox");
+            for each(var mailbox in mailboxes) {
+                allMailboxes.push(mailbox);
+            }
+            mailboxes = null;
 
-		if (this.mCbOk) {
-			this.mCbOk(this, allMailboxes);
-		}
-		this.isRunning = false;
-	},
+        }
+        dlExpansion = null;
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+        if (this.mCbOk) {
+            this.mCbOk(this, allMailboxes);
+        }
+        this.isRunning = false;
+    },
+
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
-
-

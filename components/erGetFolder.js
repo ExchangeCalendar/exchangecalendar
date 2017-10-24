@@ -51,121 +51,119 @@ Cu.import("resource://exchangecalendar/soapFunctions.js");
 
 var EXPORTED_SYMBOLS = ["erGetFolderRequest"];
 
-function erGetFolderRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
+function erGetFolderRequest(aArgument, aCbOk, aCbError, aListener) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	var self = this;
+    var self = this;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
- 	this.argument = aArgument;
-	
-	this.serverUrl = aArgument.serverUrl;
-	this.folderID = aArgument.folderID;
-	this.folderBase = aArgument.folderBase;
-	this.changeKey = aArgument.changeKey;
-	this.listener = aListener;
+    this.argument = aArgument;
 
-/*	while ((aArgument.folderPath.length > 0) && (aArgument.folderPath.indexOf("/") == 0)) {
-		aArgument.folderPath = aArgument.folderPath.substr(1);
-	}*/
+    this.serverUrl = aArgument.serverUrl;
+    this.folderID = aArgument.folderID;
+    this.folderBase = aArgument.folderBase;
+    this.changeKey = aArgument.changeKey;
+    this.listener = aListener;
 
-	this.isRunning = true;
-	this.execute();
+    /*	while ((aArgument.folderPath.length > 0) && (aArgument.folderPath.indexOf("/") == 0)) {
+    		aArgument.folderPath = aArgument.folderPath.substr(1);
+    	}*/
+
+    this.isRunning = true;
+    this.execute();
 }
 
 erGetFolderRequest.prototype = {
 
-	execute: function _execute()
-	{
-		//exchWebService.commonFunctions.LOG("erGetFolderRequest.execute 1");
+    execute: function _execute() {
+        //exchWebService.commonFunctions.LOG("erGetFolderRequest.execute 1");
 
-		var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:GetFolder xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:GetFolder xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
 
-		req.addChildTag("FolderShape", "nsMessages", null).addChildTag("BaseShape", "nsTypes", "AllProperties");
+        req.addChildTag("FolderShape", "nsMessages", null).addChildTag("BaseShape", "nsTypes", "AllProperties");
 
-		var parentFolder = makeParentFolderIds2("FolderIds", this.argument);
-		req.addChildTagObject(parentFolder);
-		parentFolder = null;
+        var parentFolder = makeParentFolderIds2("FolderIds", this.argument);
+        req.addChildTagObject(parentFolder);
+        parentFolder = null;
 
-		//exchWebService.commonFunctions.LOG(" ++ xml2jxon ++:"+this.parent.makeSoapMessage(req));
+        //exchWebService.commonFunctions.LOG(" ++ xml2jxon ++:"+this.parent.makeSoapMessage(req));
 
-		//exchWebService.commonFunctions.LOG("erGetFolderRequest.execute:"+String(this.parent.makeSoapMessage(req)));
-		this.parent.xml2jxon = true;
-		this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-		req = null;
+        //exchWebService.commonFunctions.LOG("erGetFolderRequest.execute:"+String(this.parent.makeSoapMessage(req)));
+        this.parent.xml2jxon = true;
+        this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
+        req = null;
 
-	},
+    },
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-		//exchWebService.commonFunctions.LOG("erGetFolderRequest.onSendOk:"+String(aResp));
-		// Get FolderID and ChangeKey
-		var aError = false;
-		var aCode = 0;
-		var aMsg = "";
-		var aResult = undefined;
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        //exchWebService.commonFunctions.LOG("erGetFolderRequest.onSendOk:"+String(aResp));
+        // Get FolderID and ChangeKey
+        var aError = false;
+        var aCode = 0;
+        var aMsg = "";
+        var aResult = undefined;
 
-		var rm = aResp.XPath("/s:Envelope/s:Body/m:GetFolderResponse/m:ResponseMessages/m:GetFolderResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']");
+        var rm = aResp.XPath("/s:Envelope/s:Body/m:GetFolderResponse/m:ResponseMessages/m:GetFolderResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']");
 
-		if (rm.length > 0) {
-			var calendarFolder = rm[0].XPath("/m:Folders/t:CalendarFolder");
-			if (calendarFolder.length == 0) {
-				var calendarFolder = rm[0].XPath("/m:Folders/t:TasksFolder");
-			}
-			if (calendarFolder.length > 0) {
-				var folderID = calendarFolder[0].getAttributeByTag("t:FolderId", "Id");
-				var changeKey = calendarFolder[0].getAttributeByTag("t:FolderId", "ChangeKey");
-				var folderClass = calendarFolder[0].getTagValue("t:FolderClass");
-				this.displayName = calendarFolder[0].getTagValue("t:DisplayName");
-			}
-			else {
-				aMsg = "Did not find any CalendarFolder parts.";
-				aCode = this.parent.ER_ERROR_FINDFOLDER_FOLDERID_DETAILS;
-				aError = true;
-			}
-			calendarFolder = null;
-		}
-		else {
-			aMsg = this.parent.getSoapErrorMsg(aResp);
-			if (aMsg) {
-				aCode = this.parent.ER_ERROR_FINDFOLDER_FOLDERID_DETAILS;
-				aError = true;
-			}
-			else {
-				aCode = this.parent.ER_ERROR_SOAP_RESPONSECODE_NOTFOUND;
-				aError = true;
-				aMsg = "Wrong response received.";
-			}
-		}
+        if (rm.length > 0) {
+            var calendarFolder = rm[0].XPath("/m:Folders/t:CalendarFolder");
+            if (calendarFolder.length == 0) {
+                var calendarFolder = rm[0].XPath("/m:Folders/t:TasksFolder");
+            }
+            if (calendarFolder.length > 0) {
+                var folderID = calendarFolder[0].getAttributeByTag("t:FolderId", "Id");
+                var changeKey = calendarFolder[0].getAttributeByTag("t:FolderId", "ChangeKey");
+                var folderClass = calendarFolder[0].getTagValue("t:FolderClass");
+                this.displayName = calendarFolder[0].getTagValue("t:DisplayName");
+            }
+            else {
+                aMsg = "Did not find any CalendarFolder parts.";
+                aCode = this.parent.ER_ERROR_FINDFOLDER_FOLDERID_DETAILS;
+                aError = true;
+            }
+            calendarFolder = null;
+        }
+        else {
+            aMsg = this.parent.getSoapErrorMsg(aResp);
+            if (aMsg) {
+                aCode = this.parent.ER_ERROR_FINDFOLDER_FOLDERID_DETAILS;
+                aError = true;
+            }
+            else {
+                aCode = this.parent.ER_ERROR_SOAP_RESPONSECODE_NOTFOUND;
+                aError = true;
+                aMsg = "Wrong response received.";
+            }
+        }
 
-		rm = null;
+        rm = null;
 
-		if (aError) {
-			this.onSendError(aExchangeRequest, aCode, aMsg);
-		}
-		else {
-			if (this.mCbOk) {
-				this.properties = aResp;
-				this.mCbOk(this, folderID, changeKey, folderClass);
-			}
-			this.isRunning = false;
-		}
+        if (aError) {
+            this.onSendError(aExchangeRequest, aCode, aMsg);
+        }
+        else {
+            if (this.mCbOk) {
+                this.properties = aResp;
+                this.mCbOk(this, folderID, changeKey, folderClass);
+            }
+            this.isRunning = false;
+        }
 
-	},
+    },
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
-
-

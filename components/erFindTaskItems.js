@@ -50,82 +50,82 @@ Cu.import("resource://exchangecalendar/soapFunctions.js");
 
 var EXPORTED_SYMBOLS = ["erFindTaskItemsRequest"];
 
-function erFindTaskItemsRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
+function erFindTaskItemsRequest(aArgument, aCbOk, aCbError, aListener) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	var self = this;
+    var self = this;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
-	this.argument = aArgument;
-	this.mailbox = aArgument.mailbox;
-	this.serverUrl = aArgument.serverUrl;
-	this.folderID = aArgument.folderID;
-	this.folderBase = aArgument.folderBase;
-	this.changeKey = aArgument.changeKey;
-	this.listener = aListener;
-	this.itemFilter = aArgument.itemFilter;
+    this.argument = aArgument;
+    this.mailbox = aArgument.mailbox;
+    this.serverUrl = aArgument.serverUrl;
+    this.folderID = aArgument.folderID;
+    this.folderBase = aArgument.folderBase;
+    this.changeKey = aArgument.changeKey;
+    this.listener = aListener;
+    this.itemFilter = aArgument.itemFilter;
 
-	this.isRunning = true;
-	this.execute();
+    this.isRunning = true;
+    this.execute();
 }
 
 erFindTaskItemsRequest.prototype = {
 
-	execute: function _execute()
-	{
-//		exchWebService.commonFunctions.LOG("erGetTaskItemsRequest.execute\n");
+    execute: function _execute() {
+        //		exchWebService.commonFunctions.LOG("erGetTaskItemsRequest.execute\n");
 
-		var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:FindItem xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
-		req.setAttribute("Traversal", "Shallow");
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:FindItem xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
+        req.setAttribute("Traversal", "Shallow");
 
-		var itemShape = req.addChildTag("ItemShape", "nsMessages", null); 
-		itemShape.addChildTag("BaseShape", "nsTypes", "AllProperties");
-		itemShape = null;
+        var itemShape = req.addChildTag("ItemShape", "nsMessages", null);
+        itemShape.addChildTag("BaseShape", "nsTypes", "AllProperties");
+        itemShape = null;
 
-		var parentFolder = makeParentFolderIds2("ParentFolderIds", this.argument);
-		req.addChildTagObject(parentFolder);
-		parentFolder = null;
+        var parentFolder = makeParentFolderIds2("ParentFolderIds", this.argument);
+        req.addChildTagObject(parentFolder);
+        parentFolder = null;
 
-		this.parent.xml2jxon = true;
+        this.parent.xml2jxon = true;
 
-		//exchWebService.commonFunctions.LOG("erFindTaskItemsRequest.execute:"+String(this.parent.makeSoapMessage(req)));
-                this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-		req = null;
-	},
+        //exchWebService.commonFunctions.LOG("erFindTaskItemsRequest.execute:"+String(this.parent.makeSoapMessage(req)));
+        this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
+        req = null;
+    },
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-		//exchWebService.commonFunctions.LOG("erFindTaskItemsRequest.onSendOk:"+String(aResp)+"\n");
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        //exchWebService.commonFunctions.LOG("erFindTaskItemsRequest.onSendOk:"+String(aResp)+"\n");
 
-		var ids = [];
+        var ids = [];
 
-		var rm = aResp.XPath("/s:Envelope/s:Body/m:FindItemResponse/m:ResponseMessages/m:FindItemResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']/m:RootFolder/t:Items/t:Task");
+        var rm = aResp.XPath("/s:Envelope/s:Body/m:FindItemResponse/m:ResponseMessages/m:FindItemResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']/m:RootFolder/t:Items/t:Task");
 
-		for each (var e in rm) {
-			ids.push({Id: e.getAttributeByTag("t:ItemId","Id"),
-				  ChangeKey: e.getAttributeByTag("t:ItemId","ChangeKey")});
-		}
-		rm = null;
-	
-		if (this.mCbOk) {
-			this.mCbOk(this, ids);
-		}
-		this.isRunning = false;
-	},
+        for each(var e in rm) {
+            ids.push({
+                Id: e.getAttributeByTag("t:ItemId", "Id"),
+                ChangeKey: e.getAttributeByTag("t:ItemId", "ChangeKey")
+            });
+        }
+        rm = null;
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+        if (this.mCbOk) {
+            this.mCbOk(this, ids);
+        }
+        this.isRunning = false;
+    },
+
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
-
-

@@ -50,93 +50,91 @@ Cu.import("resource://exchangecalendar/soapFunctions.js");
 
 var EXPORTED_SYMBOLS = ["erSetUserOofSettingsRequest"];
 
-function erSetUserOofSettingsRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
+function erSetUserOofSettingsRequest(aArgument, aCbOk, aCbError, aListener) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	var self = this;
+    var self = this;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
-	this.argument = aArgument;
-	this.serverUrl = aArgument.serverUrl;
-	this.listener = aListener;
-	this.mailbox = aArgument.mailbox;
+    this.argument = aArgument;
+    this.serverUrl = aArgument.serverUrl;
+    this.listener = aListener;
+    this.mailbox = aArgument.mailbox;
 
-	this.oofState = aArgument.oofState;
-	this.externalAudience = aArgument.externalAudience;
-	this.startTime = aArgument.startTime;
-	this.endTime = aArgument.endTime;
-	this.internalReply = aArgument.internalReply;
-	this.externalReply = aArgument.externalReply;
+    this.oofState = aArgument.oofState;
+    this.externalAudience = aArgument.externalAudience;
+    this.startTime = aArgument.startTime;
+    this.endTime = aArgument.endTime;
+    this.internalReply = aArgument.internalReply;
+    this.externalReply = aArgument.externalReply;
 
-	this.isRunning = true;
-	this.execute();
+    this.isRunning = true;
+    this.execute();
 }
 
 erSetUserOofSettingsRequest.prototype = {
 
-	execute: function _execute()
-	{
-//		exchWebService.commonFunctions.LOG("erSetUserOofSettingsRequest.execute\n");
+    execute: function _execute() {
+        //		exchWebService.commonFunctions.LOG("erSetUserOofSettingsRequest.execute\n");
 
-		var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:SetUserOofSettingsRequest xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:SetUserOofSettingsRequest xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
 
-		req.addChildTag("Mailbox", "nsTypes", null).addChildTag("Address", "nsTypes", this.mailbox)
+        req.addChildTag("Mailbox", "nsTypes", null).addChildTag("Address", "nsTypes", this.mailbox)
 
-		var userOofSettings = req.addChildTag("UserOofSettings", "nsTypes", null);
-		userOofSettings.addChildTag("OofState", "nsTypes", this.oofState);
-		userOofSettings.addChildTag("ExternalAudience", "nsTypes", this.externalAudience);
+        var userOofSettings = req.addChildTag("UserOofSettings", "nsTypes", null);
+        userOofSettings.addChildTag("OofState", "nsTypes", this.oofState);
+        userOofSettings.addChildTag("ExternalAudience", "nsTypes", this.externalAudience);
 
-		var duration = userOofSettings.addChildTag("Duration", "nsTypes", null);
-		duration.addChildTag("StartTime", "nsTypes", cal.toRFC3339(this.startTime));
-		duration.addChildTag("EndTime", "nsTypes", cal.toRFC3339(this.endTime));
+        var duration = userOofSettings.addChildTag("Duration", "nsTypes", null);
+        duration.addChildTag("StartTime", "nsTypes", cal.toRFC3339(this.startTime));
+        duration.addChildTag("EndTime", "nsTypes", cal.toRFC3339(this.endTime));
 
-		userOofSettings.addChildTag("InternalReply", "nsTypes", null).addChildTag("Message", "nsTypes", this.internalReply);
-		userOofSettings.addChildTag("ExternalReply", "nsTypes", null).addChildTag("Message", "nsTypes", this.externalReply);
+        userOofSettings.addChildTag("InternalReply", "nsTypes", null).addChildTag("Message", "nsTypes", this.internalReply);
+        userOofSettings.addChildTag("ExternalReply", "nsTypes", null).addChildTag("Message", "nsTypes", this.externalReply);
 
-		this.parent.xml2jxon = true;
+        this.parent.xml2jxon = true;
 
-		exchWebService.commonFunctions.LOG("erSetUserOofSettingsRequest.execute: "+String(this.parent.makeSoapMessage(req))+"\n");
-                this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-		req = null;
-	},
+        exchWebService.commonFunctions.LOG("erSetUserOofSettingsRequest.execute: " + String(this.parent.makeSoapMessage(req)) + "\n");
+        this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
+        req = null;
+    },
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-		exchWebService.commonFunctions.LOG("erSetUserOofSettingsRequest.onSendOk: "+String(aResp)+"\n");
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        exchWebService.commonFunctions.LOG("erSetUserOofSettingsRequest.onSendOk: " + String(aResp) + "\n");
 
-		var rm = aResp.XPath("/s:Envelope/s:Body/m:SetUserOofSettingsResponse/m:ResponseMessage[@ResponseClass='Success']");
-		if (rm.length == 0) {
-			this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on sending user Oof Settings.");
-			return;
-		}
+        var rm = aResp.XPath("/s:Envelope/s:Body/m:SetUserOofSettingsResponse/m:ResponseMessage[@ResponseClass='Success']");
+        if (rm.length == 0) {
+            this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on sending user Oof Settings.");
+            return;
+        }
 
-		var responseCode = rm[0].getTagValue("m:ResponseCode");
-		if (responseCode != "NoError") {
-			this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on setting user Oof Settings:"+responseCode);
-			rm = null;
-			return;
-		}
-		rm = null;
+        var responseCode = rm[0].getTagValue("m:ResponseCode");
+        if (responseCode != "NoError") {
+            this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on setting user Oof Settings:" + responseCode);
+            rm = null;
+            return;
+        }
+        rm = null;
 
-		if (this.mCbOk) {
-			this.mCbOk(this);
-		}
-		this.isRunning = false;
-	},
+        if (this.mCbOk) {
+            this.mCbOk(this);
+        }
+        this.isRunning = false;
+    },
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
-
-

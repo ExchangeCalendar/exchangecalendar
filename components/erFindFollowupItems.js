@@ -50,95 +50,94 @@ Cu.import("resource://exchangecalendar/soapFunctions.js");
 
 var EXPORTED_SYMBOLS = ["erFindFollowupItemsRequest"];
 
-function erFindFollowupItemsRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
+function erFindFollowupItemsRequest(aArgument, aCbOk, aCbError, aListener) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	var self = this;
+    var self = this;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
-	this.argument = aArgument;
-	this.mailbox = aArgument.mailbox;
-	this.serverUrl = aArgument.serverUrl;
-	this.folderID = aArgument.folderID;
-	this.folderBase = aArgument.folderBase;
-	this.changeKey = aArgument.changeKey;
-	this.listener = aListener;
-	this.itemFilter = aArgument.itemFilter;
+    this.argument = aArgument;
+    this.mailbox = aArgument.mailbox;
+    this.serverUrl = aArgument.serverUrl;
+    this.folderID = aArgument.folderID;
+    this.folderBase = aArgument.folderBase;
+    this.changeKey = aArgument.changeKey;
+    this.listener = aListener;
+    this.itemFilter = aArgument.itemFilter;
 
-	this.isRunning = true;
-	this.execute();
+    this.isRunning = true;
+    this.execute();
 }
 
 erFindFollowupItemsRequest.prototype = {
 
-	execute: function _execute()
-	{
-//	exchWebService.commonFunctions.LOG("erGetFollowupItemsRequest.execute\n");
+    execute: function _execute() {
+        //	exchWebService.commonFunctions.LOG("erGetFollowupItemsRequest.execute\n");
 
-	var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:FindItem xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
-	req.setAttribute("Traversal", "Shallow");
- 	var itemShape = req.addChildTag("ItemShape", "nsMessages", null); 
-	itemShape.addChildTag("BaseShape", "nsTypes", "IdOnly");
-	itemShape = null;
-	
-	var Restriction = req.addChildTag("Restriction", "nsMessages", null); 
-	var Or=Restriction.addChildTag("Or", "nsTypes", null); 
-	
-	for each(var i in ["1","2"] )
-	{
-		var IsEqualTo=Or.addChildTag("IsEqualTo", "nsTypes", null); 
-		var ExtendedFieldURI=IsEqualTo.addChildTag("ExtendedFieldURI", "nsTypes", null); 
-		ExtendedFieldURI.setAttribute("PropertyTag","0x1090");
-		ExtendedFieldURI.setAttribute("PropertyType","Integer");
-		var FieldURIOrConstant=IsEqualTo.addChildTag("FieldURIOrConstant", "nsTypes", null);
-		var Constant=FieldURIOrConstant.addChildTag("Constant", "nsTypes", null);
-		Constant.setAttribute("Value", i);
-	} 
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:FindItem xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
+        req.setAttribute("Traversal", "Shallow");
+        var itemShape = req.addChildTag("ItemShape", "nsMessages", null);
+        itemShape.addChildTag("BaseShape", "nsTypes", "IdOnly");
+        itemShape = null;
 
-	var parentFolder = makeParentFolderIds2("ParentFolderIds", this.argument);
-	req.addChildTagObject(parentFolder);
-	parentFolder = null;
+        var Restriction = req.addChildTag("Restriction", "nsMessages", null);
+        var Or = Restriction.addChildTag("Or", "nsTypes", null);
 
-	this.parent.xml2jxon = true;
+        for each(var i in ["1", "2"]) {
+            var IsEqualTo = Or.addChildTag("IsEqualTo", "nsTypes", null);
+            var ExtendedFieldURI = IsEqualTo.addChildTag("ExtendedFieldURI", "nsTypes", null);
+            ExtendedFieldURI.setAttribute("PropertyTag", "0x1090");
+            ExtendedFieldURI.setAttribute("PropertyType", "Integer");
+            var FieldURIOrConstant = IsEqualTo.addChildTag("FieldURIOrConstant", "nsTypes", null);
+            var Constant = FieldURIOrConstant.addChildTag("Constant", "nsTypes", null);
+            Constant.setAttribute("Value", i);
+        }
 
-	// exchWebService.commonFunctions.LOG("erFindFollowupItemsRequest.execute:"+String(req));
-     this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-	req = null;
-	},
+        var parentFolder = makeParentFolderIds2("ParentFolderIds", this.argument);
+        req.addChildTagObject(parentFolder);
+        parentFolder = null;
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-		// exchWebService.commonFunctions.LOG("erFindFollowupItemsRequest.onSendOk:"+String(aResp)+"\n");
+        this.parent.xml2jxon = true;
 
-		var ids = [];
+        // exchWebService.commonFunctions.LOG("erFindFollowupItemsRequest.execute:"+String(req));
+        this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
+        req = null;
+    },
 
-		var rm = aResp.XPath("/s:Envelope/s:Body/m:FindItemResponse/m:ResponseMessages/m:FindItemResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']/m:RootFolder/t:Items/t:Message");
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        // exchWebService.commonFunctions.LOG("erFindFollowupItemsRequest.onSendOk:"+String(aResp)+"\n");
 
-		for each (var e in rm) {
-			ids.push({Id: e.getAttributeByTag("t:ItemId","Id"),
-				  ChangeKey: e.getAttributeByTag("t:ItemId","ChangeKey")});
-		}
-		rm = null;
-	
-		if (this.mCbOk) {
-			this.mCbOk(this, ids);
-		}
-		this.isRunning = false;
-	},
+        var ids = [];
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+        var rm = aResp.XPath("/s:Envelope/s:Body/m:FindItemResponse/m:ResponseMessages/m:FindItemResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']/m:RootFolder/t:Items/t:Message");
+
+        for each(var e in rm) {
+            ids.push({
+                Id: e.getAttributeByTag("t:ItemId", "Id"),
+                ChangeKey: e.getAttributeByTag("t:ItemId", "ChangeKey")
+            });
+        }
+        rm = null;
+
+        if (this.mCbOk) {
+            this.mCbOk(this, ids);
+        }
+        this.isRunning = false;
+    },
+
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
-
-
