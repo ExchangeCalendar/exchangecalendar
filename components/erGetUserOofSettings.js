@@ -50,109 +50,109 @@ Cu.import("resource://exchangecalendar/ecFunctions.js");
 
 var EXPORTED_SYMBOLS = ["erGetUserOofSettingsRequest"];
 
-function erGetUserOofSettingsRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
+function erGetUserOofSettingsRequest(aArgument, aCbOk, aCbError, aListener) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	var self = this;
+    var self = this;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
-	this.argument = aArgument;
-	this.serverUrl = aArgument.serverUrl;
-	this.listener = aListener;
-	this.mailbox = aArgument.mailbox;
+    this.argument = aArgument;
+    this.serverUrl = aArgument.serverUrl;
+    this.listener = aListener;
+    this.mailbox = aArgument.mailbox;
 
-	this.isRunning = true;
-	this.execute();
+    this.isRunning = true;
+    this.execute();
 }
 
 erGetUserOofSettingsRequest.prototype = {
 
-	execute: function _execute()
-	{
-//		exchWebService.commonFunctions.LOG("erGetUserOofSettingsRequest.execute\n");
+    execute: function _execute() {
+        //		exchWebService.commonFunctions.LOG("erGetUserOofSettingsRequest.execute\n");
 
-		//var req = <nsMessages:GetUserOofSettingsRequest xmlns:nsMessages={nsMessages}/>;
-		var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:GetUserOofSettingsRequest xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
+        //var req = <nsMessages:GetUserOofSettingsRequest xmlns:nsMessages={nsMessages}/>;
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:GetUserOofSettingsRequest xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
 
-		//req.nsTypes::Mailbox.nsTypes::Address = this.mailbox;
-		req.addChildTag("Mailbox", "nsTypes", null).addChildTag("Address", "nsTypes", this.mailbox);
+        //req.nsTypes::Mailbox.nsTypes::Address = this.mailbox;
+        req.addChildTag("Mailbox", "nsTypes", null).addChildTag("Address", "nsTypes", this.mailbox);
 
-		this.parent.xml2jxon = true;
+        this.parent.xml2jxon = true;
 
-		//exchWebService.commonFunctions.LOG("erGetUserOofSettingsRequest.execute: "+String(this.parent.makeSoapMessage(req))+"\n");
-                this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-		req = null;
-	},
+        //exchWebService.commonFunctions.LOG("erGetUserOofSettingsRequest.execute: "+String(this.parent.makeSoapMessage(req))+"\n");
+        this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
+        req = null;
+    },
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-		//exchWebService.commonFunctions.LOG("erGetUserOofSettingsRequest.onSendOk: "+String(aResp)+"\n");
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        //exchWebService.commonFunctions.LOG("erGetUserOofSettingsRequest.onSendOk: "+String(aResp)+"\n");
 
-		var oofSettingsResponse = aResp.XPath("/s:Envelope/s:Body/m:GetUserOofSettingsResponse");
-		var rm = oofSettingsResponse[0].XPath("/m:ResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']");
-		if (rm.length == 0) {
-			rm = null;
-			var rm = oofSettingsResponse[0].XPath("/m:ResponseMessage[@ResponseClass='Error']");
-			if (rm.length > 0) {
-				var responseCode = rm[0].getTagValue("m:ResponseCode");
-			}
-			else {
-				var responseCode = "unknown";
-			}
-			this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on getting user Oof Settings:"+responseCode);
-			oofSettingsResponse = null;
-			rm = null;
-			return;
-		}
-		rm = null;
+        var oofSettingsResponse = aResp.XPath("/s:Envelope/s:Body/m:GetUserOofSettingsResponse");
+        var rm = oofSettingsResponse[0].XPath("/m:ResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']");
+        if (rm.length == 0) {
+            rm = null;
+            var rm = oofSettingsResponse[0].XPath("/m:ResponseMessage[@ResponseClass='Error']");
+            if (rm.length > 0) {
+                var responseCode = rm[0].getTagValue("m:ResponseCode");
+            }
+            else {
+                var responseCode = "unknown";
+            }
+            this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on getting user Oof Settings:" + responseCode);
+            oofSettingsResponse = null;
+            rm = null;
+            return;
+        }
+        rm = null;
 
-		var oofSettingsXML = oofSettingsResponse[0].getTag("t:OofSettings");
+        var oofSettingsXML = oofSettingsResponse[0].getTag("t:OofSettings");
 
-		var oofSettings = { oofState: "Disabled",
-				    startTime: null,
-				    endTime: null,
-				    externalAudience: "All",
-				    internalReply: "",
-				    externalReply: "",
-				    allowExternalOof: "All"};
+        var oofSettings = {
+            oofState: "Disabled",
+            startTime: null,
+            endTime: null,
+            externalAudience: "All",
+            internalReply: "",
+            externalReply: "",
+            allowExternalOof: "All"
+        };
 
 
-		oofSettings.oofState = oofSettingsXML.getTagValue("t:OofState", "Disabled");
-		oofSettings.externalAudience = oofSettingsXML.getTagValue("t:ExternalAudience", "All");
+        oofSettings.oofState = oofSettingsXML.getTagValue("t:OofState", "Disabled");
+        oofSettings.externalAudience = oofSettingsXML.getTagValue("t:ExternalAudience", "All");
 
-		var duration = oofSettingsXML.getTag("t:Duration");
+        var duration = oofSettingsXML.getTag("t:Duration");
 
-		if (duration) {
-			oofSettings.startTime = cal.fromRFC3339(duration.getTagValue("t:StartTime"), exchWebService.commonFunctions.ecTZService().UTC).getInTimezone(exchWebService.commonFunctions.ecDefaultTimeZone());
-			oofSettings.endTime = cal.fromRFC3339(duration.getTagValue("t:EndTime"), exchWebService.commonFunctions.ecTZService().UTC).getInTimezone(exchWebService.commonFunctions.ecDefaultTimeZone());
-		}
+        if (duration) {
+            oofSettings.startTime = cal.fromRFC3339(duration.getTagValue("t:StartTime"), exchWebService.commonFunctions.ecTZService().UTC).getInTimezone(exchWebService.commonFunctions.ecDefaultTimeZone());
+            oofSettings.endTime = cal.fromRFC3339(duration.getTagValue("t:EndTime"), exchWebService.commonFunctions.ecTZService().UTC).getInTimezone(exchWebService.commonFunctions.ecDefaultTimeZone());
+        }
 
-		oofSettings.internalReply = oofSettingsXML.getTag("t:InternalReply").getTagValue("t:Message", null);
+        oofSettings.internalReply = oofSettingsXML.getTag("t:InternalReply").getTagValue("t:Message", null);
 
-		oofSettings.externalReply = oofSettingsXML.getTag("t:ExternalReply").getTagValue("t:Message", null);
+        oofSettings.externalReply = oofSettingsXML.getTag("t:ExternalReply").getTagValue("t:Message", null);
 
-		oofSettings.allowExternalOof = oofSettingsResponse[0].getTagValue("t:AllowExternalOof", "All");
+        oofSettings.allowExternalOof = oofSettingsResponse[0].getTagValue("t:AllowExternalOof", "All");
 
-		oofSettingsResponse = null;
-		if (this.mCbOk) {
-			this.mCbOk(this, oofSettings);
-		}
-		this.isRunning = false;
-	},
+        oofSettingsResponse = null;
+        if (this.mCbOk) {
+            this.mCbOk(this, oofSettings);
+        }
+        this.isRunning = false;
+    },
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
-
-

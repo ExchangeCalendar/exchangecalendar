@@ -46,136 +46,136 @@ Cu.import("resource://exchangecalendar/soapFunctions.js");
 
 var EXPORTED_SYMBOLS = ["erBrowseFolderRequest"];
 
-function erBrowseFolderRequest(aArgument, aCbOk, aCbError)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
+function erBrowseFolderRequest(aArgument, aCbOk, aCbError) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	var self = this;
+    var self = this;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		null);
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        null);
 
-	this.argument = aArgument;
-	
-	this.serverUrl = aArgument.serverUrl;
-	this.folderID = aArgument.folderID;
-	this.folderBase = aArgument.folderBase;
-	this.changeKey = aArgument.changeKey;
+    this.argument = aArgument;
 
-	this.isRunning = true;
-	this.execute();
+    this.serverUrl = aArgument.serverUrl;
+    this.folderID = aArgument.folderID;
+    this.folderBase = aArgument.folderBase;
+    this.changeKey = aArgument.changeKey;
+
+    this.isRunning = true;
+    this.execute();
 }
 
 erBrowseFolderRequest.prototype = {
 
-	execute: function _execute()
-	{
-//		exchWebService.commonFunctions.LOG("erBrowseFolderRequest.execute\n");
+    execute: function _execute() {
+        //		exchWebService.commonFunctions.LOG("erBrowseFolderRequest.execute\n");
 
-		var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:FindFolder xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
-		req.setAttribute("Traversal", "Shallow");
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:FindFolder xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
+        req.setAttribute("Traversal", "Shallow");
 
-		req.addChildTag("FolderShape", "nsMessages", null).addChildTag("BaseShape", "nsTypes", "AllProperties"); 
+        req.addChildTag("FolderShape", "nsMessages", null).addChildTag("BaseShape", "nsTypes", "AllProperties");
 
-		var parentFolder = makeParentFolderIds2("ParentFolderIds", this.argument);
-		req.addChildTagObject(parentFolder);
-		parentFolder = null;
+        var parentFolder = makeParentFolderIds2("ParentFolderIds", this.argument);
+        req.addChildTagObject(parentFolder);
+        parentFolder = null;
 
-		this.parent.xml2jxon = true;
+        this.parent.xml2jxon = true;
 
-		exchWebService.commonFunctions.LOG("erBrowseFolderRequest.execute:"+String(this.parent.makeSoapMessage(req)));
+        exchWebService.commonFunctions.LOG("erBrowseFolderRequest.execute:" + String(this.parent.makeSoapMessage(req)));
 
-		//exchWebService.commonFunctions.LOG("erBrowseFolderRequest.execute:"+String(this.parent.makeSoapMessage(req)));
-                this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-		req = null;
-	},
+        //exchWebService.commonFunctions.LOG("erBrowseFolderRequest.execute:"+String(this.parent.makeSoapMessage(req)));
+        this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
+        req = null;
+    },
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-		exchWebService.commonFunctions.LOG("erBrowseFolderRequest.onSendOk:"+String(aResp));
-		// Get FolderID and ChangeKey
-		var aContinue = true;
-		var aError = false;
-		var aCode = 0;
-		var aMsg = "";
-		var aResult = undefined;
-		var childFolders = [];
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        exchWebService.commonFunctions.LOG("erBrowseFolderRequest.onSendOk:" + String(aResp));
+        // Get FolderID and ChangeKey
+        var aContinue = true;
+        var aError = false;
+        var aCode = 0;
+        var aMsg = "";
+        var aResult = undefined;
+        var childFolders = [];
 
-		var rm = aResp.XPath("/s:Envelope/s:Body/m:FindFolderResponse/m:ResponseMessages/m:FindFolderResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']");
+        var rm = aResp.XPath("/s:Envelope/s:Body/m:FindFolderResponse/m:ResponseMessages/m:FindFolderResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']");
 
-		if (rm.length > 0) {
-			var rootFolder = rm[0].getTag("m:RootFolder");
-			if (rootFolder) {
-				if (rootFolder.getAttribute("IncludesLastItemInRange") == "true") {
-					// Process results.
-					var folders = rootFolder.XPath("/t:Folders/*");
-					exchWebService.commonFunctions.LOG("Found '"+folders.length+"' folders.");
-					for (var index in folders) {
-						exchWebService.commonFunctions.LOG("Adding folder:"+folders[index].getTagValue("t:DisplayName"));
-						var tmpFolderClass = folders[index].getTagValue("t:FolderClass", "");
-						childFolders.push({ user: this.argument.user, 
-									mailbox: this.argument.mailbox,
-									folderBase: this.argument.folderBase,
-									serverUrl: this.argument.serverUrl,
-									folderID: folders[index].getAttributeByTag("t:FolderId", "Id"),
-									changeKey: folders[index].getAttributeByTag("t:FolderId", "ChangeKey"),
-									foldername: folders[index].getTagValue("t:DisplayName", ""), 
-									isContainer: (folders[index].getTagValue("t:ChildFolderCount", 0) > 0),
-									isContainerOpen : false,
-									isContainerEmpty: (folders[index].getTagValue("t:ChildFolderCount", 0) == 0),
-									level: this.argument.level+1,
-									children: [],
-									folderClass: tmpFolderClass });
-					}
-					folders = null;
-				}
-				else {
-					// We do not know how to handle this yet. Do not know if it ever happens. We did not restrict MaxEntriesReturned.
-					exchWebService.commonFunctions.LOG("SUBMIT THIS LINE TO https://github.com/ExchangeCalendar/exchangecalendar/issues: IncludesLastItemInRange == false in FindFolderResponse.");
-				}
-			}
-			else {
-				aCode = this.parent.ER_ERROR_SOAP_RESPONSECODE_NOTFOUND;
-				aError = true;
-				aMsg = "No RootFolder found in FindFolderResponse.";
-			}
-		}
-		else {
-			aMsg = this.parent.getSoapErrorMsg(aResp);
-			if (aMsg) {
-				aCode = this.parent.ER_ERROR_CONVERTID;
-				aError = true;
-			}
-			else {
-				aCode = this.parent.ER_ERROR_SOAP_RESPONSECODE_NOTFOUND;
-				aError = true;
-				aMsg = "Wrong response received.";
-			}
-		}
-		rm = null;
+        if (rm.length > 0) {
+            var rootFolder = rm[0].getTag("m:RootFolder");
+            if (rootFolder) {
+                if (rootFolder.getAttribute("IncludesLastItemInRange") == "true") {
+                    // Process results.
+                    var folders = rootFolder.XPath("/t:Folders/*");
+                    exchWebService.commonFunctions.LOG("Found '" + folders.length + "' folders.");
+                    for (var index in folders) {
+                        exchWebService.commonFunctions.LOG("Adding folder:" + folders[index].getTagValue("t:DisplayName"));
+                        var tmpFolderClass = folders[index].getTagValue("t:FolderClass", "");
+                        childFolders.push({
+                            user: this.argument.user,
+                            mailbox: this.argument.mailbox,
+                            folderBase: this.argument.folderBase,
+                            serverUrl: this.argument.serverUrl,
+                            folderID: folders[index].getAttributeByTag("t:FolderId", "Id"),
+                            changeKey: folders[index].getAttributeByTag("t:FolderId", "ChangeKey"),
+                            foldername: folders[index].getTagValue("t:DisplayName", ""),
+                            isContainer: (folders[index].getTagValue("t:ChildFolderCount", 0) > 0),
+                            isContainerOpen: false,
+                            isContainerEmpty: (folders[index].getTagValue("t:ChildFolderCount", 0) == 0),
+                            level: this.argument.level + 1,
+                            children: [],
+                            folderClass: tmpFolderClass
+                        });
+                    }
+                    folders = null;
+                }
+                else {
+                    // We do not know how to handle this yet. Do not know if it ever happens. We did not restrict MaxEntriesReturned.
+                    exchWebService.commonFunctions.LOG("SUBMIT THIS LINE TO https://github.com/ExchangeCalendar/exchangecalendar/issues: IncludesLastItemInRange == false in FindFolderResponse.");
+                }
+            }
+            else {
+                aCode = this.parent.ER_ERROR_SOAP_RESPONSECODE_NOTFOUND;
+                aError = true;
+                aMsg = "No RootFolder found in FindFolderResponse.";
+            }
+        }
+        else {
+            aMsg = this.parent.getSoapErrorMsg(aResp);
+            if (aMsg) {
+                aCode = this.parent.ER_ERROR_CONVERTID;
+                aError = true;
+            }
+            else {
+                aCode = this.parent.ER_ERROR_SOAP_RESPONSECODE_NOTFOUND;
+                aError = true;
+                aMsg = "Wrong response received.";
+            }
+        }
+        rm = null;
 
-		if (aError) {
-			this.onSendError(aExchangeRequest, aCode, aMsg);
-		}
-		else {
-			if (this.mCbOk) {
-				this.mCbOk(this, childFolders);
-			}
-			this.isRunning = false;
-		}
+        if (aError) {
+            this.onSendError(aExchangeRequest, aCode, aMsg);
+        }
+        else {
+            if (this.mCbOk) {
+                this.mCbOk(this, childFolders);
+            }
+            this.isRunning = false;
+        }
 
-	},
+    },
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
-
-

@@ -55,84 +55,82 @@ Cu.import("resource://interfaces/xml2json/xml2json.js");
 
 var EXPORTED_SYMBOLS = ["erGetTimeZonesRequest"];
 
-function erGetTimeZonesRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	// Check if we have at least Exchange server version 2010.
-	this.exchangeStatistics = Cc["@1st-setup.nl/exchange/statistics;1"]
-			.getService(Ci.mivExchangeStatistics);
+function erGetTimeZonesRequest(aArgument, aCbOk, aCbError, aListener) {
+    // Check if we have at least Exchange server version 2010.
+    this.exchangeStatistics = Cc["@1st-setup.nl/exchange/statistics;1"]
+        .getService(Ci.mivExchangeStatistics);
 
-/*	if (this.exchangeStatistics.getServerVersion(aArgument.serverUrl).indexOf("2010") == -1) {
-		return;
-	}
-*/
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
+    /*	if (this.exchangeStatistics.getServerVersion(aArgument.serverUrl).indexOf("2010") == -1) {
+    		return;
+    	}
+    */
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	var self = this;
+    var self = this;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
-	this.argument = aArgument;
-	this.mailbox = aArgument.mailbox;
-	this.serverUrl = aArgument.serverUrl;
-	this.folderID = aArgument.folderID;
-	this.folderBase = aArgument.folderBase;
-	this.changeKey = aArgument.changeKey;
-	this.listener = aListener;
+    this.argument = aArgument;
+    this.mailbox = aArgument.mailbox;
+    this.serverUrl = aArgument.serverUrl;
+    this.folderID = aArgument.folderID;
+    this.folderBase = aArgument.folderBase;
+    this.changeKey = aArgument.changeKey;
+    this.listener = aListener;
 
-	this.isRunning = true;
-	this.execute();
+    this.isRunning = true;
+    this.execute();
 }
 
 erGetTimeZonesRequest.prototype = {
 
-	execute: function _execute()
-	{
-//		exchWebService.commonFunctions.LOG("erGetTimeZonesRequest\n");
+    execute: function _execute() {
+        //		exchWebService.commonFunctions.LOG("erGetTimeZonesRequest\n");
 
-		var root = xml2json.newJSON();
-		xml2json.parseXML(root, '<nsMessages:GetServerTimeZones xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
-		var req = root[telements][0];
-		xml2json.setAttribute(req, "ReturnFullTimeZoneData", "true");
+        var root = xml2json.newJSON();
+        xml2json.parseXML(root, '<nsMessages:GetServerTimeZones xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
+        var req = root[telements][0];
+        xml2json.setAttribute(req, "ReturnFullTimeZoneData", "true");
 
-		this.parent.xml2json = true;
-		//dump("erGetTimeZonesRequest.execute:"+req.toString()+"\n");
-                this.parent.sendRequest(this.parent.makeSoapMessage2(req), this.serverUrl);
-		req = null;
-	},
+        this.parent.xml2json = true;
+        //dump("erGetTimeZonesRequest.execute:"+req.toString()+"\n");
+        this.parent.sendRequest(this.parent.makeSoapMessage2(req), this.serverUrl);
+        req = null;
+    },
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-		//exchWebService.commonFunctions.LOG("erGetTimeZonesRequest.onSendOk:"+String(aResp));
-		var rm = xml2json.XPath(aResp, "/s:Envelope/s:Body/m:GetServerTimeZonesResponse/m:ResponseMessages/m:GetServerTimeZonesResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']");
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        //exchWebService.commonFunctions.LOG("erGetTimeZonesRequest.onSendOk:"+String(aResp));
+        var rm = xml2json.XPath(aResp, "/s:Envelope/s:Body/m:GetServerTimeZonesResponse/m:ResponseMessages/m:GetServerTimeZonesResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']");
 
-		if (rm.length > 0) {
+        if (rm.length > 0) {
 
-			if (this.mCbOk) {
-				this.mCbOk(this, aResp);
-			}
-			this.isRunning = false;
-		}
-		else {
-			exchWebService.commonFunctions.LOG("erGetTimeZonesRequest.onSendOk: DID NOT FIND valid response.");
-			this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SYNCFOLDERITEMS_UNKNOWN, "Error during SyncFolderItems:");//+ResponseCode);
-			rm = null;
-			return;
-		}
-		rm = null;
-	},
+            if (this.mCbOk) {
+                this.mCbOk(this, aResp);
+            }
+            this.isRunning = false;
+        }
+        else {
+            exchWebService.commonFunctions.LOG("erGetTimeZonesRequest.onSendOk: DID NOT FIND valid response.");
+            this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SYNCFOLDERITEMS_UNKNOWN, "Error during SyncFolderItems:"); //+ResponseCode);
+            rm = null;
+            return;
+        }
+        rm = null;
+    },
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		//exchWebService.commonFunctions.LOG("erGetTimeZonesRequest.onSendError:"+aMsg);
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        //exchWebService.commonFunctions.LOG("erGetTimeZonesRequest.onSendError:"+aMsg);
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
-
-

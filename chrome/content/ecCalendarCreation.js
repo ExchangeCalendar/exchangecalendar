@@ -38,189 +38,184 @@ var Cc = Components.classes;
 var Ci = Components.interfaces;
 var Cu = Components.utils;
 
-function exchCalendarCreation(aDocument, aWindow)
-{
-	this._document = aDocument;
-	this._window = aWindow;
+function exchCalendarCreation(aDocument, aWindow) {
+    this._document = aDocument;
+    this._window = aWindow;
 
-	this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
-				.getService(Ci.mivFunctions);
+    this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
+        .getService(Ci.mivFunctions);
 }
 
 exchCalendarCreation.prototype = {
 
-	oldLocationTextBox: "",
-	oldNextPage: "",
-	oldCache: false,
-	oldOnPageAdvanced: "",
+    oldLocationTextBox: "",
+    oldNextPage: "",
+    oldCache: false,
+    oldOnPageAdvanced: "",
 
-	firstTime: true,
+    firstTime: true,
 
-	createPrefs : Cc["@mozilla.org/preferences-service;1"]
-                    			.getService(Ci.nsIPrefService)
-		    			.getBranch("extensions.exchangecalendar@extensions.1st-setup.nl.createcalendar."),
+    createPrefs: Cc["@mozilla.org/preferences-service;1"]
+        .getService(Ci.nsIPrefService)
+        .getBranch("extensions.exchangecalendar@extensions.1st-setup.nl.createcalendar."),
 
-	doRadioExchangeCalendar: function _doRadioExchangeCalendar(type)
-	{
-		if (this.firstTime) {
-			// Get the next page to change how it should advance.
-			let aCustomizePage = this._document.getElementById('calendar-wizard').getPageById("customizePage");
-			this.oldNextPage = aCustomizePage.getAttribute("next");
-			this.oldOnPageAdvanced = aCustomizePage.getAttribute("onpageadvanced");
+    doRadioExchangeCalendar: function _doRadioExchangeCalendar(type) {
+        if (this.firstTime) {
+            // Get the next page to change how it should advance.
+            let aCustomizePage = this._document.getElementById('calendar-wizard').getPageById("customizePage");
+            this.oldNextPage = aCustomizePage.getAttribute("next");
+            this.oldOnPageAdvanced = aCustomizePage.getAttribute("onpageadvanced");
 
-			this.firstTime = false;		
-		}
+            this.firstTime = false;
+        }
 
-		if (type == "exchangecalendar") {
-			
-			// Get the next page to set back new values.
-			let aCustomizePage = this._document.getElementById('calendar-wizard').getPageById("customizePage");
-			aCustomizePage.removeAttribute("next");
-			aCustomizePage.removeAttribute("onpageadvanced"); 
-			aCustomizePage.setAttribute( "next", "exchWebService_exchange1");
-			aCustomizePage.setAttribute( "onpageadvanced", "return true;");
+        if (type == "exchangecalendar") {
 
-			this.oldLocationTextBox = this._document.getElementById("calendar-uri").value;
-			this.oldCache = this._document.getElementById("cache").checked;
+            // Get the next page to set back new values.
+            let aCustomizePage = this._document.getElementById('calendar-wizard').getPageById("customizePage");
+            aCustomizePage.removeAttribute("next");
+            aCustomizePage.removeAttribute("onpageadvanced");
+            aCustomizePage.setAttribute("next", "exchWebService_exchange1");
+            aCustomizePage.setAttribute("onpageadvanced", "return true;");
 
-			this._document.getElementById("calendar-uri").value = "https://auto/"+this.globalFunctions.getUUID();
-			this._document.getElementById("calendar-uri").setAttribute("disabled",true);
-			
-			this._document.getElementById("cache").parentNode.hidden = true;
-			this._document.getElementById("cache").checked = false;
-			var temp = this._document.getElementById("cache").parentNode.parentNode;
+            this.oldLocationTextBox = this._document.getElementById("calendar-uri").value;
+            this.oldCache = this._document.getElementById("cache").checked;
 
-			if(this._document.getElementById("exchange-cache-row")){
-				this._document.getElementById("exchange-cache-row").hidden = false;
-			}  
-			tmpSettingsOverlay.exchWebServicesCheckRequired();
+            this._document.getElementById("calendar-uri").value = "https://auto/" + this.globalFunctions.getUUID();
+            this._document.getElementById("calendar-uri").setAttribute("disabled", true);
 
-		}
-		else {
-			this._document.getElementById("calendar-uri").value = "";
-			this._document.getElementById("calendar-uri").removeAttribute("disabled",false);
+            this._document.getElementById("cache").parentNode.hidden = true;
+            this._document.getElementById("cache").checked = false;
+            var temp = this._document.getElementById("cache").parentNode.parentNode;
 
-			// Get the next page to set back  how it should advance.
-			var aCustomizePage = this._document.getElementById('calendar-wizard').getPageById("customizePage");
-			aCustomizePage.setAttribute( "next", this.oldNextPage);
-			aCustomizePage.setAttribute( "onpageadvanced", this.oldOnPageAdvanced);
+            if (this._document.getElementById("exchange-cache-row")) {
+                this._document.getElementById("exchange-cache-row").hidden = false;
+            }
+            tmpSettingsOverlay.exchWebServicesCheckRequired();
 
-			this._document.getElementById("cache").parentNode.hidden = false;
-			this._document.getElementById("cache").checked = this.oldCache;
-			
-			if(this._document.getElementById("exchange-cache-row")){
-				this._document.getElementById("exchange-cache-row").hidden = true; 
-			}
-			 		onSelectProvider(type); 
-		}
-		
-	},
+        }
+        else {
+            this._document.getElementById("calendar-uri").value = "";
+            this._document.getElementById("calendar-uri").removeAttribute("disabled", false);
 
-	initExchange1: function _initExchange1()
-	{
-		this.createPrefs.deleteBranch("");
+            // Get the next page to set back  how it should advance.
+            var aCustomizePage = this._document.getElementById('calendar-wizard').getPageById("customizePage");
+            aCustomizePage.setAttribute("next", this.oldNextPage);
+            aCustomizePage.setAttribute("onpageadvanced", this.oldOnPageAdvanced);
 
-		var selItem = this._document.getElementById("email-identity-menulist").selectedItem;
-		if (selItem) {
-			var identity = selItem.getAttribute("value");
-			if (identity != "none") {
-				var identityPrefs = Cc["@mozilla.org/preferences-service;1"]
-			            .getService(Ci.nsIPrefService)
-				    .getBranch("mail.identity."+identity+".");
+            this._document.getElementById("cache").parentNode.hidden = false;
+            this._document.getElementById("cache").checked = this.oldCache;
 
-				this._document.getElementById("exchWebService_mailbox").value = identityPrefs.getCharPref("useremail");
-				tmpSettingsOverlay.exchWebServicesInitMailbox(this._document.getElementById("exchWebService_mailbox").value);
-				this.createPrefs.setCharPref("mailbox", this._document.getElementById("exchWebService_mailbox").value);
-			}
-			else {
-				this._document.getElementById("exchWebService_mailbox").value = "";
-			}
-		}
-		else {
-			this.globalFunctions.LOG("no item selected");
-		}
+            if (this._document.getElementById("exchange-cache-row")) {
+                this._document.getElementById("exchange-cache-row").hidden = true;
+            }
+            onSelectProvider(type);
+        }
+
+    },
+
+    initExchange1: function _initExchange1() {
+        this.createPrefs.deleteBranch("");
+
+        var selItem = this._document.getElementById("email-identity-menulist").selectedItem;
+        if (selItem) {
+            var identity = selItem.getAttribute("value");
+            if (identity != "none") {
+                var identityPrefs = Cc["@mozilla.org/preferences-service;1"]
+                    .getService(Ci.nsIPrefService)
+                    .getBranch("mail.identity." + identity + ".");
+
+                this._document.getElementById("exchWebService_mailbox").value = identityPrefs.getCharPref("useremail");
+                tmpSettingsOverlay.exchWebServicesInitMailbox(this._document.getElementById("exchWebService_mailbox").value);
+                this.createPrefs.setCharPref("mailbox", this._document.getElementById("exchWebService_mailbox").value);
+            }
+            else {
+                this._document.getElementById("exchWebService_mailbox").value = "";
+            }
+        }
+        else {
+            this.globalFunctions.LOG("no item selected");
+        }
 
 
-		this._document.getElementById("exchWebService_folderpath").value = "/";
+        this._document.getElementById("exchWebService_folderpath").value = "/";
 
-		tmpSettingsOverlay.exchWebServicesCheckRequired();
-	
-	},
+        tmpSettingsOverlay.exchWebServicesCheckRequired();
 
-	/*
-	 * saveSettings: save calendar settings after calendar wizard completed
-	 *
-	 * Lightning original code to save calendar can be found in:
-	 * comm-central/calendar/resources/content/calendarCreation.js
-	 */
-	saveSettings: function _saveSettings()
-	{
-		this.globalFunctions.LOG("saveSettings Going to create the calendar in prefs.js");
+    },
 
-		// Calculate the new calendar.id and properties
-		let newCalId = this.globalFunctions.getUUID();
-		let newCalName = this._document.getElementById("calendar-name").value;
-		let newCalColor = this._document.getElementById("calendar-color").value;
+    /*
+     * saveSettings: save calendar settings after calendar wizard completed
+     *
+     * Lightning original code to save calendar can be found in:
+     * comm-central/calendar/resources/content/calendarCreation.js
+     */
+    saveSettings: function _saveSettings() {
+        this.globalFunctions.LOG("saveSettings Going to create the calendar in prefs.js");
 
-		// Save settings in dialog to new cal id.
-		tmpSettingsOverlay.exchWebServicesSaveExchangeSettingsByCalId(newCalId);
+        // Calculate the new calendar.id and properties
+        let newCalId = this.globalFunctions.getUUID();
+        let newCalName = this._document.getElementById("calendar-name").value;
+        let newCalColor = this._document.getElementById("calendar-color").value;
 
-		// Need to save the useOfflineCache preference separetly because it is not part of the main.
-		this.prefs = Cc["@mozilla.org/preferences-service;1"]
-			.getService(Ci.nsIPrefService)
-			.getBranch("extensions.exchangecalendar@extensions.1st-setup.nl."+newCalId+".");
-		this.prefs.setBoolPref("useOfflineCache", this._document.getElementById("exchange-cache").checked);
-		this.prefs.setIntPref("exchangePrefVersion", 1);
+        // Save settings in dialog to new cal id.
+        tmpSettingsOverlay.exchWebServicesSaveExchangeSettingsByCalId(newCalId);
 
-		// We create a new URI for this calendar which will contain the calendar.id
-		var ioService = Cc["@mozilla.org/network/io-service;1"]
-				.getService(Ci.nsIIOService);
-		var tmpURI = ioService.newURI("https://auto/"+newCalId, null, null);
+        // Need to save the useOfflineCache preference separetly because it is not part of the main.
+        this.prefs = Cc["@mozilla.org/preferences-service;1"]
+            .getService(Ci.nsIPrefService)
+            .getBranch("extensions.exchangecalendar@extensions.1st-setup.nl." + newCalId + ".");
+        this.prefs.setBoolPref("useOfflineCache", this._document.getElementById("exchange-cache").checked);
+        this.prefs.setIntPref("exchangePrefVersion", 1);
 
-		// Register calendar to global settings
-		var calPrefs = Cc["@mozilla.org/preferences-service;1"]
-			.getService(Ci.nsIPrefService)
-			.getBranch("calendar.registry."+newCalId+".");
-		calPrefs.setCharPref("name", newCalName);
+        // We create a new URI for this calendar which will contain the calendar.id
+        var ioService = Cc["@mozilla.org/network/io-service;1"]
+            .getService(Ci.nsIIOService);
+        var tmpURI = ioService.newURI("https://auto/" + newCalId, null, null);
 
-		// Create the new calendar object
-		// Should be synced with Lightning doCreateCalendar() code
-		var calManager = Cc["@mozilla.org/calendar/manager;1"]
-			.getService(Ci.calICalendarManager);
+        // Register calendar to global settings
+        var calPrefs = Cc["@mozilla.org/preferences-service;1"]
+            .getService(Ci.nsIPrefService)
+            .getBranch("calendar.registry." + newCalId + ".");
+        calPrefs.setCharPref("name", newCalName);
 
-		var newCal = calManager.createCalendar("exchangecalendar", tmpURI);
+        // Create the new calendar object
+        // Should be synced with Lightning doCreateCalendar() code
+        var calManager = Cc["@mozilla.org/calendar/manager;1"]
+            .getService(Ci.calICalendarManager);
 
-		newCal.id = newCalId;
-		newCal.name = newCalName;
+        var newCal = calManager.createCalendar("exchangecalendar", tmpURI);
 
-		newCal.setProperty("color", newCalColor);
+        newCal.id = newCalId;
+        newCal.name = newCalName;
 
-		newCal.setProperty("cache.enabled", false);
+        newCal.setProperty("color", newCalColor);
 
-		if (!this._document.getElementById("fire-alarms").checked) {
-			newCal.setProperty("suppressAlarms", true);
-		}
-		// End of sync
+        newCal.setProperty("cache.enabled", false);
 
-		var emailCalendarIdentity = this._document.getElementById("email-identity-menulist").selectedItem;
+        if (!this._document.getElementById("fire-alarms").checked) {
+            newCal.setProperty("suppressAlarms", true);
+        }
+        // End of sync
 
-		if (emailCalendarIdentity) {
-			var identity = emailCalendarIdentity.getAttribute("value");
-		}
-		else {
-			var identity = "";
-		}
+        var emailCalendarIdentity = this._document.getElementById("email-identity-menulist").selectedItem;
 
-		newCal.setProperty("imip.identity.key", identity); 
+        if (emailCalendarIdentity) {
+            var identity = emailCalendarIdentity.getAttribute("value");
+        }
+        else {
+            var identity = "";
+        }
+
+        newCal.setProperty("imip.identity.key", identity);
 
 
-		Cc["@mozilla.org/preferences-service;1"]
-			.getService(Ci.nsIPrefService).savePrefFile(null);
+        Cc["@mozilla.org/preferences-service;1"]
+            .getService(Ci.nsIPrefService).savePrefFile(null);
 
-		// Finally register completly the new calendar
-		calManager.registerCalendar(newCal);
-	},
+        // Finally register completly the new calendar
+        calManager.registerCalendar(newCal);
+    },
 }
 
 var tmpCalendarCreation = new exchCalendarCreation(document, window);
-

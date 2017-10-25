@@ -36,106 +36,104 @@ Cu.import("resource://exchangecalendar/exchangeAbFunctions.js");
 Cu.import("resource://exchangecalendar/erGetAttachments.js");
 
 var photoHandlerInline = {
-	onLoad: function _onLoad(aCard, aDocument)
-	{
-		return true;
-	},
+    onLoad: function _onLoad(aCard, aDocument) {
+        return true;
+    },
 
-	onShow: function _onShow(aCard, aDocument, aTargetID)
-	{
-		if ((aCard) && (aCard.getProperty("PhotoData", ""))) {
-			aDocument.getElementById(aTargetID).setAttribute("src", "data:image/jpeg;base64,"+aCard.getProperty("PhotoData", ""));
-			return true;
-		}
-		else {
-			return false;
-		}
-	},
+    onShow: function _onShow(aCard, aDocument, aTargetID) {
+        if ((aCard) && (aCard.getProperty("PhotoData", ""))) {
+            aDocument.getElementById(aTargetID).setAttribute("src", "data:image/jpeg;base64," + aCard.getProperty("PhotoData", ""));
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
 
-	onSave: function _onLoad(aCard, aDocument)
-	{
-		return true;
-	},
+    onSave: function _onLoad(aCard, aDocument) {
+        return true;
+    },
 }
 
 var photoHandlerExternal = {
-	onLoad: function _onLoad(aCard, aDocument)
-	{
-		return true;
-	},
+    onLoad: function _onLoad(aCard, aDocument) {
+        return true;
+    },
 
-	onShow: function _onShow(aCard, aDocument, aTargetID)
-	{
-		if ((aCard) && (aCard.getProperty("PhotoData", ""))) {
-			this.downloadAttachment(aDocument.getElementById(aTargetID), aCard);
-			aDocument.getElementById(aTargetID).setAttribute("src", "chrome://exchangecontacts/content/loading-from-server.png");
-			return true;
-		}
-		else {
-			return false;
-		}
-	},
+    onShow: function _onShow(aCard, aDocument, aTargetID) {
+        if ((aCard) && (aCard.getProperty("PhotoData", ""))) {
+            this.downloadAttachment(aDocument.getElementById(aTargetID), aCard);
+            aDocument.getElementById(aTargetID).setAttribute("src", "chrome://exchangecontacts/content/loading-from-server.png");
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
 
-	onSave: function _onLoad(aCard, aDocument)
-	{
-		return true;
-	},
+    onSave: function _onLoad(aCard, aDocument) {
+        return true;
+    },
 
-	downloadAttachment: function _downloadAttachment(aImg, aCard)
-	{
-		//dump("photoHandlerExternal.downloadAttachment\n");
-		if (!aImg) { return; }
+    downloadAttachment: function _downloadAttachment(aImg, aCard) {
+        //dump("photoHandlerExternal.downloadAttachment\n");
+        if (!aImg) {
+            return;
+        }
 
-		var self = this;
+        var self = this;
 
-		var tmpObject = new erGetAttachmentsRequest(
-			{user: aCard.getProperty("exchangeUser", ""), 
-			 serverUrl:  aCard.getProperty("exchangeServerUrl", "") ,
-			 img: aImg,
-			 attachmentIds: [aCard.getProperty("PhotoData", "")]}, 
-			function(aExchangeRequest, aAttachments){ self.onDownloadAttachmentOk(aExchangeRequest, aAttachments);}, 
-			function(aExchangeRequest, aCode, aMsg){ self.onDownloadAttachmentError(aExchangeRequest, aCode, aMsg);});
+        var tmpObject = new erGetAttachmentsRequest({
+                user: aCard.getProperty("exchangeUser", ""),
+                serverUrl: aCard.getProperty("exchangeServerUrl", ""),
+                img: aImg,
+                attachmentIds: [aCard.getProperty("PhotoData", "")]
+            },
+            function (aExchangeRequest, aAttachments) {
+                self.onDownloadAttachmentOk(aExchangeRequest, aAttachments);
+            },
+            function (aExchangeRequest, aCode, aMsg) {
+                self.onDownloadAttachmentError(aExchangeRequest, aCode, aMsg);
+            });
 
-	},
+    },
 
-	onDownloadAttachmentOk: function _onDownloadAttachmentOk(aExchangeRequest, aAttachments)
-	{
-		//dump("photoHandlerExternal.onDownloadAttachmentOk:"+aAttachments.length+"\n");
+    onDownloadAttachmentOk: function _onDownloadAttachmentOk(aExchangeRequest, aAttachments) {
+        //dump("photoHandlerExternal.onDownloadAttachmentOk:"+aAttachments.length+"\n");
 
-		if (aAttachments.length > 0) {
-			aExchangeRequest.argument.img.setAttribute("src", "data:image/jpeg;base64,"+aAttachments[0].content);
-		}
-	},
+        if (aAttachments.length > 0) {
+            aExchangeRequest.argument.img.setAttribute("src", "data:image/jpeg;base64," + aAttachments[0].content);
+        }
+    },
 
-	onDownloadAttachmentError: function _onDownloadAttachmentError(aExchangeRequest, aCode, aMsg)
-	{
-		//dump("photoHandlerExternal.onDownloadAttachmentError: aCode:"+aCode+", aMsg:"+aMsg+"\n");
-		aExchangeRequest.argument.img.setAttribute("src", "chrome://exchangecontacts/content/error-loading-from-server.png");
-	},
+    onDownloadAttachmentError: function _onDownloadAttachmentError(aExchangeRequest, aCode, aMsg) {
+        //dump("photoHandlerExternal.onDownloadAttachmentError: aCode:"+aCode+", aMsg:"+aMsg+"\n");
+        aExchangeRequest.argument.img.setAttribute("src", "chrome://exchangecontacts/content/error-loading-from-server.png");
+    },
 
 }
 
-function exchAbCardOverlay(aDocument, aWindow)
-{
-	this._document = aDocument;
-	this._window = aWindow;
+function exchAbCardOverlay(aDocument, aWindow) {
+    this._document = aDocument;
+    this._window = aWindow;
 
-	this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
-				.getService(Ci.mivFunctions);
+    this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
+        .getService(Ci.mivFunctions);
 }
 
 exchAbCardOverlay.prototype = {
 
-	onLoad: function _onLoad()
-	{
-		var self = this;
+    onLoad: function _onLoad() {
+        var self = this;
 
-		registerPhotoHandler("exchangeContactPhotoInline", photoHandlerInline);
-		registerPhotoHandler("exchangeContactPhotoExternal", photoHandlerExternal);
-	},
+        registerPhotoHandler("exchangeContactPhotoInline", photoHandlerInline);
+        registerPhotoHandler("exchangeContactPhotoExternal", photoHandlerExternal);
+    },
 
 }
 
 var tmpAbCardOverlay = new exchAbCardOverlay(document, window);
-window.addEventListener("load", function () { window.removeEventListener("load",arguments.callee,false); tmpAbCardOverlay.onLoad(); }, true);
-
+window.addEventListener("load", function () {
+    window.removeEventListener("load", arguments.callee, false);
+    tmpAbCardOverlay.onLoad();
+}, true);

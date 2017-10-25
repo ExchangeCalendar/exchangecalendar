@@ -45,104 +45,103 @@ Cu.import("resource://exchangecalendar/ecExchangeRequest.js");
 
 var EXPORTED_SYMBOLS = ["erConvertIDRequest"];
 
-function erConvertIDRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
+function erConvertIDRequest(aArgument, aCbOk, aCbError, aListener) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	var self = this;
+    var self = this;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
-	this.parent.debug = true;
+    this.parent.debug = true;
 
-	this.mailbox = aArgument.mailbox;
-	this.serverUrl = aArgument.serverUrl;
-	this.folderId = aArgument.folderId;
+    this.mailbox = aArgument.mailbox;
+    this.serverUrl = aArgument.serverUrl;
+    this.folderId = aArgument.folderId;
 
-	this.isRunning = true;
-	this.execute();
+    this.isRunning = true;
+    this.execute();
 }
 
 erConvertIDRequest.prototype = {
 
-	execute: function _execute()
-	{
-//		exchWebService.commonFunctions.LOG("erConvertIDRequest.Execute");
-		// We are going to do a dummy FindItem. It will return the real primarySMTP
+    execute: function _execute() {
+        //		exchWebService.commonFunctions.LOG("erConvertIDRequest.Execute");
+        // We are going to do a dummy FindItem. It will return the real primarySMTP
 
-		var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:ConvertId xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
-		req.setAttribute("DestinationFormat", "EwsId");
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:ConvertId xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
+        req.setAttribute("DestinationFormat", "EwsId");
 
-		var alternateId = req.addChildTag("SourceIds", "nsMessages", null).addChildTag("AlternateId", "nsTypes", null);
-		alternateId.setAttribute("Format", "HexEntryId");
-		alternateId.setAttribute("Id", this.folderId);
-		alternateId.setAttribute("Mailbox", this.mailbox);
+        var alternateId = req.addChildTag("SourceIds", "nsMessages", null).addChildTag("AlternateId", "nsTypes", null);
+        alternateId.setAttribute("Format", "HexEntryId");
+        alternateId.setAttribute("Id", this.folderId);
+        alternateId.setAttribute("Mailbox", this.mailbox);
 
-		//exchWebService.commonFunctions.LOG(" ++ xml2jxon ++:"+this.parent.makeSoapMessage(req));
+        //exchWebService.commonFunctions.LOG(" ++ xml2jxon ++:"+this.parent.makeSoapMessage(req));
 
-//		exchWebService.commonFunctions.LOG("erConvertIDRequest.execute:"+String(this.parent.makeSoapMessage(req)));
-		this.parent.xml2jxon = true;
+        //		exchWebService.commonFunctions.LOG("erConvertIDRequest.execute:"+String(this.parent.makeSoapMessage(req)));
+        this.parent.xml2jxon = true;
 
-                this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-		req = null;
-	},
+        this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
+        req = null;
+    },
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-		exchWebService.commonFunctions.LOG("erConvertIDRequest.onSendOk: "+String(aResp));
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        exchWebService.commonFunctions.LOG("erConvertIDRequest.onSendOk: " + String(aResp));
 
-		var aContinue = true;
-		var aError = false;
-		var aCode = 0;
-		var aMsg = "";
-		var aResult = undefined;
+        var aContinue = true;
+        var aError = false;
+        var aCode = 0;
+        var aMsg = "";
+        var aResult = undefined;
 
-		var rm = aResp.XPath("/s:Envelope/s:Body/m:ConvertIdResponse/m:ResponseMessages/m:ConvertIdResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']");
+        var rm = aResp.XPath("/s:Envelope/s:Body/m:ConvertIdResponse/m:ResponseMessages/m:ConvertIdResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']");
 
-		if (rm.length > 0) {
+        if (rm.length > 0) {
 
-//          <m:AlternateId xsi:type="t:AlternateIdType" Format="EwsId" Id="AAMkADNjZmIwYzQyLTdjYmEtNGFlMi05ZGE5LTBlYzRkNzYzODRhOAAuAAAAAAC8WradQ3BFT7SAoV2yp+k8AQDcsp8GsIe7Q5tUJHDnpdbjAAAtr+rqAAA=" Mailbox="jane@example.com"/>
+            //          <m:AlternateId xsi:type="t:AlternateIdType" Format="EwsId" Id="AAMkADNjZmIwYzQyLTdjYmEtNGFlMi05ZGE5LTBlYzRkNzYzODRhOAAuAAAAAAC8WradQ3BFT7SAoV2yp+k8AQDcsp8GsIe7Q5tUJHDnpdbjAAAtr+rqAAA=" Mailbox="jane@example.com"/>
 
-			var alternateId = rm[0].getAttributeByTag("m:AlternateId","Id");
-			var realMailbox = rm[0].getAttributeByTag("m:AlternateId","Mailbox");
-		}
-		else {
-			aMsg = this.parent.getSoapErrorMsg(aResp);
-			if (aMsg) {
-				aCode = this.parent.ER_ERROR_CONVERTID;
-				aError = true;
-			}
-			else {
-				aCode = this.parent.ER_ERROR_SOAP_RESPONSECODE_NOTFOUND;
-				aError = true;
-				aMsg = "Wrong response received.";
-			}
-		}
-		rm = null;
+            var alternateId = rm[0].getAttributeByTag("m:AlternateId", "Id");
+            var realMailbox = rm[0].getAttributeByTag("m:AlternateId", "Mailbox");
+        }
+        else {
+            aMsg = this.parent.getSoapErrorMsg(aResp);
+            if (aMsg) {
+                aCode = this.parent.ER_ERROR_CONVERTID;
+                aError = true;
+            }
+            else {
+                aCode = this.parent.ER_ERROR_SOAP_RESPONSECODE_NOTFOUND;
+                aError = true;
+                aMsg = "Wrong response received.";
+            }
+        }
+        rm = null;
 
-		if (aError) {
-			this.onSendError(aExchangeRequest, aCode, aMsg);
-		}
-		else {
-			if (this.mCbOk) {
-				this.mCbOk(alternateId, realMailbox);
-			}
-			this.isRunning = false;
-		}
-	},
+        if (aError) {
+            this.onSendError(aExchangeRequest, aCode, aMsg);
+        }
+        else {
+            if (this.mCbOk) {
+                this.mCbOk(alternateId, realMailbox);
+            }
+            this.isRunning = false;
+        }
+    },
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
 
 exchWebService.commonFunctions.LOG("++==--++");
-

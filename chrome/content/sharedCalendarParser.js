@@ -32,114 +32,107 @@ Cu.import("resource://exchangecalendar/ecFunctions.js");
 Cu.import("chrome://exchangecalendar/content/msgHdrUtils.js");
 Cu.import("resource:///modules/gloda/utils.js");
 
-if (! exchWebService) var exchWebService = {};
+if (!exchWebService) var exchWebService = {};
 
 exchWebService.hdrView = {
 
-	theHeaders: null,
+    theHeaders: null,
 
-	msgHdrViewLoad: function _msgHdrViewLoad(event)
-	{
-		exchWebService.commonFunctions.LOG("exchWebService.sharedCalendarParser.js: this.msgHdrViewLoad");
+    msgHdrViewLoad: function _msgHdrViewLoad(event) {
+        exchWebService.commonFunctions.LOG("exchWebService.sharedCalendarParser.js: this.msgHdrViewLoad");
 
-		var listener = {
-			onBeforeShowHeaderPane: function _listener_onBeforeShowHeaderPane() 
-			{
-				exchWebService.commonFunctions.LOG("exchWebService.sharedCalendarParser.js: _listener_onBeforeShowHeaderPane");
-			},
+        var listener = {
+            onBeforeShowHeaderPane: function _listener_onBeforeShowHeaderPane() {
+                exchWebService.commonFunctions.LOG("exchWebService.sharedCalendarParser.js: _listener_onBeforeShowHeaderPane");
+            },
 
-			onStartHeaders: function _listener_onStartHeaders ()
-			{
-				exchWebService.commonFunctions.LOG("exchWebService.sharedCalendarParser.js: _listener_onStartHeaders");
-	
-				exchWebService.hdrView.statusBarHide();
-			},
-	
-			onEndHeaders: function _listener_onEndHeaders ()
-			{
-				exchWebService.commonFunctions.LOG("exchWebService.sharedCalendarParser.js: _listener_onEndHeaders");
-				exchWebService.hdrView.statusBarHide();
+            onStartHeaders: function _listener_onStartHeaders() {
+                exchWebService.commonFunctions.LOG("exchWebService.sharedCalendarParser.js: _listener_onStartHeaders");
 
-				msgHdrGetHeaders(gFolderDisplay.selectedMessage, function (aHeaders) { 
+                exchWebService.hdrView.statusBarHide();
+            },
 
-						if ((exchWebService.check4Lightning) && (exchWebService.check4Lightning.lightningIsInstalled != 2)) {
-							return;
-						}
+            onEndHeaders: function _listener_onEndHeaders() {
+                exchWebService.commonFunctions.LOG("exchWebService.sharedCalendarParser.js: _listener_onEndHeaders");
+                exchWebService.hdrView.statusBarHide();
 
-						exchWebService.hdrView.theHeaders = null;
+                msgHdrGetHeaders(gFolderDisplay.selectedMessage, function (aHeaders) {
 
-						if ( (aHeaders.has("x-sharing-remote-uid")) &&  
-						     (aHeaders.has("x-sharing-local-type"))  &&  
-						     (aHeaders.has("x-sharing-remote-name")) ) {
-							if (aHeaders.get("x-sharing-local-type") == "IPF.Appointment") {
-								exchWebService.commonFunctions.LOG("This message has a x-sharing-remote-uid header; its value is "+aHeaders.get("x-sharing-remote-uid"));  
-								document.getElementById("exchWebServiceSharedCalendarLabel").value = GlodaUtils.deMime(aHeaders.get("x-sharing-remote-name"));
-								exchWebService.hdrView.theHeaders = aHeaders;
-								exchWebService.hdrView.statusBarShow();
-							}
-						}
-						else {
-							exchWebService.commonFunctions.LOG("NO x-sharing-remote-uid header");
-						}
-					});
-			},
-	
-		};
+                    if ((exchWebService.check4Lightning) && (exchWebService.check4Lightning.lightningIsInstalled != 2)) {
+                        return;
+                    }
 
-		gMessageListeners.push(listener);
+                    exchWebService.hdrView.theHeaders = null;
 
-		// Next part is to hide the bar when the user changes to another folder and
-		// a new message is not selected. Otherwise it will stay visible.
-        	listener.tbHideMessageHeaderPane = HideMessageHeaderPane;
-		HideMessageHeaderPane = function exchWebServiceHideMessageHeaderPane() {
-				exchWebService.commonFunctions.LOG("exchWebService.sharedCalendarParser.js: exchWebServiceHideMessageHeaderPane");
-				try {
-					exchWebService.hdrView.statusBarHide();
-				}
-				catch (ex) {};
-				listener.tbHideMessageHeaderPane.apply(null, arguments);
-			};
+                    if ((aHeaders.has("x-sharing-remote-uid"))
+                        && (aHeaders.has("x-sharing-local-type"))
+                        && (aHeaders.has("x-sharing-remote-name"))) {
+                        if (aHeaders.get("x-sharing-local-type") == "IPF.Appointment") {
+                            exchWebService.commonFunctions.LOG("This message has a x-sharing-remote-uid header; its value is " + aHeaders.get("x-sharing-remote-uid"));
+                            document.getElementById("exchWebServiceSharedCalendarLabel").value = GlodaUtils.deMime(aHeaders.get("x-sharing-remote-name"));
+                            exchWebService.hdrView.theHeaders = aHeaders;
+                            exchWebService.hdrView.statusBarShow();
+                        }
+                    }
+                    else {
+                        exchWebService.commonFunctions.LOG("NO x-sharing-remote-uid header");
+                    }
+                });
+            },
 
-	},
+        };
 
-	hdrViewUnload: function _hdrViewUnload()
-	{
-		exchWebService.commonFunctions.LOG("exchWebService.sharedCalendarParser.js: this.hdrViewUnLoad");
-		this.statusBarHide();
-	},
+        gMessageListeners.push(listener);
 
-	statusBarHide: function _statusBarHide()
-	{
-		var exchWebServiceSharedCalendarBox = document.getElementById("exchWebServiceSharedCalendarBox");
-		try {
-			exchWebServiceSharedCalendarBox.setAttribute("collapsed", "true")
-			//Enigmail.msg.setAttachmentReveal(null);
-		}
-		catch (ex) {}
-	},
+        // Next part is to hide the bar when the user changes to another folder and
+        // a new message is not selected. Otherwise it will stay visible.
+        listener.tbHideMessageHeaderPane = HideMessageHeaderPane;
+        HideMessageHeaderPane = function exchWebServiceHideMessageHeaderPane() {
+            exchWebService.commonFunctions.LOG("exchWebService.sharedCalendarParser.js: exchWebServiceHideMessageHeaderPane");
+            try {
+                exchWebService.hdrView.statusBarHide();
+            }
+            catch (ex) {};
+            listener.tbHideMessageHeaderPane.apply(null, arguments);
+        };
 
-	statusBarShow: function _statusBarShow()
-	{
-		var exchWebServiceSharedCalendarBox = document.getElementById("exchWebServiceSharedCalendarBox");
-		try {
-			exchWebServiceSharedCalendarBox.removeAttribute("collapsed");
-		}
-		catch (ex) { exchWebService.commonFunctions.LOG("ERROR:"+ex); }
-	},
+    },
+
+    hdrViewUnload: function _hdrViewUnload() {
+        exchWebService.commonFunctions.LOG("exchWebService.sharedCalendarParser.js: this.hdrViewUnLoad");
+        this.statusBarHide();
+    },
+
+    statusBarHide: function _statusBarHide() {
+        var exchWebServiceSharedCalendarBox = document.getElementById("exchWebServiceSharedCalendarBox");
+        try {
+            exchWebServiceSharedCalendarBox.setAttribute("collapsed", "true")
+                //Enigmail.msg.setAttachmentReveal(null);
+        }
+        catch (ex) {}
+    },
+
+    statusBarShow: function _statusBarShow() {
+        var exchWebServiceSharedCalendarBox = document.getElementById("exchWebServiceSharedCalendarBox");
+        try {
+            exchWebServiceSharedCalendarBox.removeAttribute("collapsed");
+        }
+        catch (ex) {
+            exchWebService.commonFunctions.LOG("ERROR:" + ex);
+        }
+    },
 
 
-	doAddSharedCalendar: function _doAddSharedCalendar()
-	{
-		exchWebService.commonFunctions.LOG("exchWebService.sharedCalendarParser.js: this.doAddSharedCalendar");
-		if (this.theHeaders) {
-			exchWebService.commonFunctions.LOG("  uid:"+this.theHeaders.get("x-sharing-remote-uid"));
-			exchWebService.commonFunctions.LOG(" name:"+GlodaUtils.deMime(this.theHeaders.get("x-sharing-remote-name")));
+    doAddSharedCalendar: function _doAddSharedCalendar() {
+        exchWebService.commonFunctions.LOG("exchWebService.sharedCalendarParser.js: this.doAddSharedCalendar");
+        if (this.theHeaders) {
+            exchWebService.commonFunctions.LOG("  uid:" + this.theHeaders.get("x-sharing-remote-uid"));
+            exchWebService.commonFunctions.LOG(" name:" + GlodaUtils.deMime(this.theHeaders.get("x-sharing-remote-name")));
 
-		}
-	},
+        }
+    },
 }
 
 // Currently turned of because not yet ready for version 1.7.13
 //addEventListener('messagepane-loaded', exchWebService.hdrView.msgHdrViewLoad, true);
 //addEventListener('messagepane-unloaded', exchWebService.hdrView.hdrViewUnload, true);
-

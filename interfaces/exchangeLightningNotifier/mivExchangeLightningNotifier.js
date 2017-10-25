@@ -31,18 +31,18 @@ Cu.import("resource://calendar/modules/calUtils.jsm");
 //Cu.import("resource://calendar/modules/calProviderUtils.jsm");
 
 function mivExchangeLightningNotifier() {
-	this.mObservers = new cal.ObserverBag(Ci.calIObserver);
+    this.mObservers = new cal.ObserverBag(Ci.calIObserver);
 
-	this.queue = [];
+    this.queue = [];
 
-	this.timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-	this.timerRunning = false;
+    this.timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+    this.timerRunning = false;
 
-	this.observerService = Cc["@mozilla.org/observer-service;1"]  
-	                          .getService(Ci.nsIObserverService); 
+    this.observerService = Cc["@mozilla.org/observer-service;1"]
+        .getService(Ci.nsIObserverService);
 
-	this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
-				.getService(Ci.mivFunctions);
+    this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
+        .getService(Ci.mivFunctions);
 
 }
 
@@ -52,71 +52,75 @@ var mivExchangeLightningNotifierGUID = "3b2d58f7-9528-44cf-8cd7-865dc209590c";
 
 mivExchangeLightningNotifier.prototype = {
 
-	// methods from nsISupport
-	QueryInterface: XPCOMUtils.generateQI([Ci.mivExchangeLightningNotifier,
-			Ci.nsISupports]),
+    // methods from nsISupport
+    QueryInterface: XPCOMUtils.generateQI([Ci.mivExchangeLightningNotifier,
+        Ci.nsISupports
+    ]),
 
-	// Attributes from nsIClassInfo
-	classDescription: "Load balancer in sending observer notify request to Lightning.",
-	classID: components.ID("{"+mivExchangeLightningNotifierGUID+"}"),
-	contractID: "@1st-setup.nl/exchange/lightningnotifier;1",
-	flags: Ci.nsIClassInfo.SINGLETON,
-	implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
+    // Attributes from nsIClassInfo
+    classDescription: "Load balancer in sending observer notify request to Lightning.",
+    classID: components.ID("{" + mivExchangeLightningNotifierGUID + "}"),
+    contractID: "@1st-setup.nl/exchange/lightningnotifier;1",
+    flags: Ci.nsIClassInfo.SINGLETON,
+    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
-	// External methods
+    // External methods
 
-	// Internal methods.
-	notify: function _notify() {
-		this.processQueue();
-	},
+    // Internal methods.
+    notify: function _notify() {
+        this.processQueue();
+    },
 
-	addToNotifyQueue: function _addToNotifyQueue(aCalendar, aCmd, aArg)
-	{
-		this.queue.push({calendar: aCalendar, cmd: aCmd, arg: aArg});
+    addToNotifyQueue: function _addToNotifyQueue(aCalendar, aCmd, aArg) {
+        this.queue.push({
+            calendar: aCalendar,
+            cmd: aCmd,
+            arg: aArg
+        });
 
-		if (!this.timerRunning) {
-			this.timerRunning = true;
-			//dump("mivExchangeLightningNotifier: Start timer\n");
-			this.timer.initWithCallback(this, 500, this.timer.TYPE_REPEATING_SLACK);
-		}
-	},
+        if (!this.timerRunning) {
+            this.timerRunning = true;
+            //dump("mivExchangeLightningNotifier: Start timer\n");
+            this.timer.initWithCallback(this, 500, this.timer.TYPE_REPEATING_SLACK);
+        }
+    },
 
-	processQueue: function _processQueue()
-	{
-		//dump("mivExchangeLightningNotifier: processQueue\n");
-		this.mObservers.notify("onStartBatch");
+    processQueue: function _processQueue() {
+        //dump("mivExchangeLightningNotifier: processQueue\n");
+        this.mObservers.notify("onStartBatch");
 
-		for (var counter = 0; ((counter < 100) && (this.queue.length > 0)); counter++) {
-			var notification = this.queue.shift();
-			notification.calendar.notifyObservers.notify(notification.cmd, notification.arg);
-			//this.mObservers.notify(notification.cmd, notification.arg);
-		}
-		this.mObservers.notify("onEndBatch");
+        for (var counter = 0;
+            ((counter < 100) && (this.queue.length > 0)); counter++) {
+            var notification = this.queue.shift();
+            notification.calendar.notifyObservers.notify(notification.cmd, notification.arg);
+            //this.mObservers.notify(notification.cmd, notification.arg);
+        }
+        this.mObservers.notify("onEndBatch");
 
-		if (this.queue.length == 0) {
-			//dump("mivExchangeLightningNotifier: stop timer\n");
-			this.timer.cancel();
-			this.timerRunning = false;
-		}
-	},
+        if (this.queue.length == 0) {
+            //dump("mivExchangeLightningNotifier: stop timer\n");
+            this.timer.cancel();
+            this.timerRunning = false;
+        }
+    },
 
 }
 
 function NSGetFactory(cid) {
 
-	try {
-		if (!NSGetFactory.mivExchangeLightningNotifier) {
-			// Load main script from lightning that we need.
-			NSGetFactory.mivExchangeLightningNotifier = XPCOMUtils.generateNSGetFactory([mivExchangeLightningNotifier]);
-			
-	}
+    try {
+        if (!NSGetFactory.mivExchangeLightningNotifier) {
+            // Load main script from lightning that we need.
+            NSGetFactory.mivExchangeLightningNotifier = XPCOMUtils.generateNSGetFactory([mivExchangeLightningNotifier]);
 
-	} catch(e) {
-		Components.utils.reportError(e);
-		dump(e);
-		throw e;
-	}
+        }
 
-	return NSGetFactory.mivExchangeLightningNotifier(cid);
-} 
+    }
+    catch (e) {
+        Components.utils.reportError(e);
+        dump(e);
+        throw e;
+    }
 
+    return NSGetFactory.mivExchangeLightningNotifier(cid);
+}

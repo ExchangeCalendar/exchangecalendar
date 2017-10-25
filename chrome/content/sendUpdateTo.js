@@ -41,18 +41,16 @@ var Cu = Components.utils;
 
 Cu.import("resource://exchangecalendar/ecFunctions.js");
 
-if (! exchWebService) var exchWebService = {};
+if (!exchWebService) var exchWebService = {};
 
 exchWebService.sendUpdateTo = {
 
-	onLoad: function _onLoad()
-	{
-		document.getElementById("exchWebService_sendUpdateTo_calendaritem-title").value = window.arguments[0].item.title;
+    onLoad: function _onLoad() {
+        document.getElementById("exchWebService_sendUpdateTo_calendaritem-title").value = window.arguments[0].item.title;
 
-	},
+    },
 
-	onAccept: function _onAccept()
-	{
-		window.arguments[0].response = document.getElementById("exchWebService_sendUpdateTo_radio-sendto").value;
-	},
+    onAccept: function _onAccept() {
+        window.arguments[0].response = document.getElementById("exchWebService_sendUpdateTo_radio-sendto").value;
+    },
 }

@@ -38,44 +38,42 @@ var Cu = Components.utils;
 
 Cu.import("resource://exchangecalendar/ecFunctions.js");
 
-if (! exchWebService) var exchWebService = {};
+if (!exchWebService) var exchWebService = {};
 
 exchWebService.selectEWSurl = {
 
-	onAccept: function _onAccept()
-	{
-		window.arguments[1].value = document.getElementById("exchWebService_selectEWSurl_urllist").selectedItem.value;
-		return true;
-	},
+    onAccept: function _onAccept() {
+        window.arguments[1].value = document.getElementById("exchWebService_selectEWSurl_urllist").selectedItem.value;
+        return true;
+    },
 
-	onLoad: function _onLoad()
-	{
-		var ewsUrls = window.arguments[0];
-		var firstItem = false;		
-		var results = new Array();
+    onLoad: function _onLoad() {
+        var ewsUrls = window.arguments[0];
+        var firstItem = false;
+        var results = new Array();
 
-		for (var index in ewsUrls) {
-			// Check if this one is not in the list.
-			exchWebService.commonFunctions.LOG("onLoad: index:"+index+", ewsUrls="+ewsUrls[index].value);
-			var inList = false;
-			for (var index2 in results) {
-				if (ewsUrls[index].value == results[index2]) {
-					inList = true;
-					break;
-				}
-			}
-			if (!inList) {
-				results.push(ewsUrls[index].value);
-			}
-		}
-		
-		for (var i= 0; i < results.length; i++) {
-			var newItem = document.getElementById("exchWebService_selectEWSurl_urllist").appendItem( results[i].toString(), results[i].toString(), results[i].toString() );
+        for (var index in ewsUrls) {
+            // Check if this one is not in the list.
+            exchWebService.commonFunctions.LOG("onLoad: index:" + index + ", ewsUrls=" + ewsUrls[index].value);
+            var inList = false;
+            for (var index2 in results) {
+                if (ewsUrls[index].value == results[index2]) {
+                    inList = true;
+                    break;
+                }
+            }
+            if (!inList) {
+                results.push(ewsUrls[index].value);
+            }
+        }
 
-			if (!firstItem) {
-				document.getElementById("exchWebService_selectEWSurl_urllist").selectedItem = newItem;
-				firstItem = true;
-			}
-		}
-	},
+        for (var i = 0; i < results.length; i++) {
+            var newItem = document.getElementById("exchWebService_selectEWSurl_urllist").appendItem(results[i].toString(), results[i].toString(), results[i].toString());
+
+            if (!firstItem) {
+                document.getElementById("exchWebService_selectEWSurl_urllist").selectedItem = newItem;
+                firstItem = true;
+            }
+        }
+    },
 }

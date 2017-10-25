@@ -40,43 +40,41 @@ var Cu = Components.utils;
 
 Cu.import("resource://exchangecalendar/ecFunctions.js");
 
-if (! exchWebService) var exchWebService = {};
+if (!exchWebService) var exchWebService = {};
 
 exchWebService.preInvitationResponse = {
 
-	onAccept: function _onAccept()
-	{
-		window.arguments[0].answer = "send";
-		window.arguments[0].response = document.getElementById("exchWebService_preInvitationResponse_radio").value;
-		return true;
-	},
+    onAccept: function _onAccept() {
+        window.arguments[0].answer = "send";
+        window.arguments[0].response = document.getElementById("exchWebService_preInvitationResponse_radio").value;
+        return true;
+    },
 
-	onLoad: function _onLoad()
-	{
-		var item = window.arguments[0].item;
+    onLoad: function _onLoad() {
+        var item = window.arguments[0].item;
 
-		document.getElementById("exchWebService_calendarName").value = item.calendar.name;
-		document.getElementById("exchWebService_itemTitle").value = item.title;
+        document.getElementById("exchWebService_calendarName").value = item.calendar.name;
+        document.getElementById("exchWebService_itemTitle").value = item.title;
 
-		let dtFormat = Cc["@mozilla.org/calendar/datetime-formatter;1"]
-		             .getService(Ci.calIDateTimeFormatter);
+        let dtFormat = Cc["@mozilla.org/calendar/datetime-formatter;1"]
+            .getService(Ci.calIDateTimeFormatter);
 
-		let tzService = Cc["@mozilla.org/calendar/timezone-service;1"]
-		             .getService(Ci.calITimezoneService);
+        let tzService = Cc["@mozilla.org/calendar/timezone-service;1"]
+            .getService(Ci.calITimezoneService);
 
-		let displayDate = item.startDate.getInTimezone(tzService.defaultTimezone);
-		document.getElementById("exchWebService_itemStart").value = dtFormat.formatDate(displayDate)+" "+dtFormat.formatTime(displayDate);
+        let displayDate = item.startDate.getInTimezone(tzService.defaultTimezone);
+        document.getElementById("exchWebService_itemStart").value = dtFormat.formatDate(displayDate) + " " + dtFormat.formatTime(displayDate);
 
-		document.getElementById("exchWebService_itemResponse").value = window.arguments[0].response;
+        document.getElementById("exchWebService_itemResponse").value = window.arguments[0].response;
 
-		if (item.organizer) {
-			document.getElementById("exchWebService_meetingOrganiser").value = item.organizer.commonName+" ("+item.organizer.id.replace(/^mailto:/i, '')+")";
-		}
-		else {
-			// Should never happen.
-			document.getElementById("exchWebService_meetingOrganiser").value = "(unknown)";
-		}
+        if (item.organizer) {
+            document.getElementById("exchWebService_meetingOrganiser").value = item.organizer.commonName + " (" + item.organizer.id.replace(/^mailto:/i, '') + ")";
+        }
+        else {
+            // Should never happen.
+            document.getElementById("exchWebService_meetingOrganiser").value = "(unknown)";
+        }
 
-	},
+    },
 
 }

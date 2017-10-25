@@ -26,96 +26,92 @@ var Cc = Components.classes;
 var Ci = Components.interfaces;
 var Cu = Components.utils;
 
-function exchExchangeContactSettings(aDocument, aWindow)
-{
-	this._document = aDocument;
-	this._window = aWindow;
+function exchExchangeContactSettings(aDocument, aWindow) {
+    this._document = aDocument;
+    this._window = aWindow;
 
-	this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
-				.getService(Ci.mivFunctions);
+    this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
+        .getService(Ci.mivFunctions);
 }
 
 exchExchangeContactSettings.prototype = {
 
-	isNewDirectory : true,
-	dirUUID : "",
+    isNewDirectory: true,
+    dirUUID: "",
 
-	checkRequired: function _checkRequired()
-	{
-	    let canAdvance = true;
-	    let vbox = this._document.getElementById('exchWebService-exchange-settings');
-	    if (vbox) {
-		let eList = vbox.getElementsByAttribute('required', 'true');
-		for (let i = 0; i < eList.length && canAdvance; ++i) {
-		    canAdvance = (eList[i].value != "");
-		}
+    checkRequired: function _checkRequired() {
+        let canAdvance = true;
+        let vbox = this._document.getElementById('exchWebService-exchange-settings');
+        if (vbox) {
+            let eList = vbox.getElementsByAttribute('required', 'true');
+            for (let i = 0; i < eList.length && canAdvance; ++i) {
+                canAdvance = (eList[i].value != "");
+            }
 
-		if (canAdvance) {
-			this._document.getElementById("exchWebService_ContactSettings_dialog").buttons = "accept,cancel";
-		}
-		else {
-			this._document.getElementById("exchWebService_ContactSettings_dialog").buttons = "cancel";
-		}
-	    }
+            if (canAdvance) {
+                this._document.getElementById("exchWebService_ContactSettings_dialog").buttons = "accept,cancel";
+            }
+            else {
+                this._document.getElementById("exchWebService_ContactSettings_dialog").buttons = "cancel";
+            }
+        }
 
-	},
+    },
 
-	onLoad: function _onLoad()
-	{
-		var directory = this._window.arguments[0].selectedDirectory;
-		if (!directory) {
-			// New directory to create
-			this.isNewDirectory = true;
-			this.dirUUID = "";
-			this._document.getElementById("exchWebService_folderbase").selectedIndex = 7;
-			tmpSettingsOverlay.exchWebServicesgFolderBase = "contacts";
-			this._document.getElementById("exchangeWebService_preference_contacts_pollinterval").value = 300;
-			this._document.getElementById("exchWebService-add-globaladdresslist").checked = false;
-		}
-		else {
-			this.isNewDirectory = false;
+    onLoad: function _onLoad() {
+        var directory = this._window.arguments[0].selectedDirectory;
+        if (!directory) {
+            // New directory to create
+            this.isNewDirectory = true;
+            this.dirUUID = "";
+            this._document.getElementById("exchWebService_folderbase").selectedIndex = 7;
+            tmpSettingsOverlay.exchWebServicesgFolderBase = "contacts";
+            this._document.getElementById("exchangeWebService_preference_contacts_pollinterval").value = 300;
+            this._document.getElementById("exchWebService-add-globaladdresslist").checked = false;
+        }
+        else {
+            this.isNewDirectory = false;
 
-			this.dirUUID = directory.uuid;
+            this.dirUUID = directory.uuid;
 
-			this.prefs = Cc["@mozilla.org/preferences-service;1"]
-		            	.getService(Ci.nsIPrefService)
-			    	.getBranch("extensions.exchangecontacts@extensions.1st-setup.nl.account."+this.dirUUID+".");
+            this.prefs = Cc["@mozilla.org/preferences-service;1"]
+                .getService(Ci.nsIPrefService)
+                .getBranch("extensions.exchangecontacts@extensions.1st-setup.nl.account." + this.dirUUID + ".");
 
-			this._document.getElementById("exchangeWebService_preference_contacts_pollinterval").value = this.globalFunctions.safeGetIntPref(this.prefs, "pollinterval", 300, true);
-			this._document.getElementById("exchWebService-add-globaladdresslist").checked = this.globalFunctions.safeGetBoolPref(this.prefs, "globalAddressList", false, true);
+            this._document.getElementById("exchangeWebService_preference_contacts_pollinterval").value = this.globalFunctions.safeGetIntPref(this.prefs, "pollinterval", 300, true);
+            this._document.getElementById("exchWebService-add-globaladdresslist").checked = this.globalFunctions.safeGetBoolPref(this.prefs, "globalAddressList", false, true);
 
-			// load preferences of current directory.
-			tmpSettingsOverlay.exchWebServicesLoadExchangeSettingsByContactUUID(directory.uuid);
+            // load preferences of current directory.
+            tmpSettingsOverlay.exchWebServicesLoadExchangeSettingsByContactUUID(directory.uuid);
 
-		}
+        }
 
-	},
+    },
 
-	onSave: function _onSave()
-	{
-		this._window.arguments[0].newAccountObject = tmpSettingsOverlay.exchWebServicesSaveExchangeSettingsByContactUUID(this.isNewDirectory, this.dirUUID);
+    onSave: function _onSave() {
+        this._window.arguments[0].newAccountObject = tmpSettingsOverlay.exchWebServicesSaveExchangeSettingsByContactUUID(this.isNewDirectory, this.dirUUID);
 
-		this._window.arguments[0].newAccountObject.pollinterval = this._document.getElementById("exchangeWebService_preference_contacts_pollinterval").value;
-		this._window.arguments[0].newAccountObject.addGlobalAddressList = this._document.getElementById("exchWebService-add-globaladdresslist").checked;
+        this._window.arguments[0].newAccountObject.pollinterval = this._document.getElementById("exchangeWebService_preference_contacts_pollinterval").value;
+        this._window.arguments[0].newAccountObject.addGlobalAddressList = this._document.getElementById("exchWebService-add-globaladdresslist").checked;
 
-		this._window.arguments[0].answer = "saved";
+        this._window.arguments[0].answer = "saved";
 
-		if (!this.isNewDirectory) {
+        if (!this.isNewDirectory) {
 
-			this.prefs = Cc["@mozilla.org/preferences-service;1"]
-			    	.getService(Ci.nsIPrefService)
-			    	.getBranch("extensions.exchangecontacts@extensions.1st-setup.nl.account."+this.dirUUID+".");
+            this.prefs = Cc["@mozilla.org/preferences-service;1"]
+                .getService(Ci.nsIPrefService)
+                .getBranch("extensions.exchangecontacts@extensions.1st-setup.nl.account." + this.dirUUID + ".");
 
-			this.prefs.setIntPref("pollinterval", this._window.arguments[0].newAccountObject.pollinterval);
-			this.prefs.setBoolPref("globalAddressList", this._window.arguments[0].newAccountObject.addGlobalAddressList);
+            this.prefs.setIntPref("pollinterval", this._window.arguments[0].newAccountObject.pollinterval);
+            this.prefs.setBoolPref("globalAddressList", this._window.arguments[0].newAccountObject.addGlobalAddressList);
 
-			var observerService = Cc["@mozilla.org/observer-service;1"]  
-				                  .getService(Ci.nsIObserverService);  
-			observerService.notifyObservers(this, "onContactReset", this.dirUUID);  
-		}
+            var observerService = Cc["@mozilla.org/observer-service;1"]
+                .getService(Ci.nsIObserverService);
+            observerService.notifyObservers(this, "onContactReset", this.dirUUID);
+        }
 
-		return true;
-	},
+        return true;
+    },
 
 }
 

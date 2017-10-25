@@ -35,171 +35,172 @@ var Cu = Components.utils;
 
 //if (! exchWebService) var exchWebService = {};
 
-function exchProgressPanel(aDocument, aWindow)
-{
-	this._document = aDocument;
-	this._window = aWindow;
+function exchProgressPanel(aDocument, aWindow) {
+    this._document = aDocument;
+    this._window = aWindow;
 
-	this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
-				.getService(Ci.mivFunctions);
+    this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
+        .getService(Ci.mivFunctions);
 }
 
 exchProgressPanel.prototype = {
 
-	queueSizeTotal: 0,
-	calendarQueues: {},
-	runningJobs: 0,
-	changeQueue: [],
-	busy: false,
-	isLoaded: false,
-	imageCounter: 1,
-	imageList: {    image1: "chrome://exchangecalendar-common/skin/images/arrow-circle.png",
-			image2: "chrome://exchangecalendar-common/skin/images/arrow-circle-315.png",
-			image3: "chrome://exchangecalendar-common/skin/images/arrow-circle-225.png",
-			image4: "chrome://exchangecalendar-common/skin/images/arrow-circle-135.png"
-			},
-	loadBalancer : Cc["@1st-setup.nl/exchange/loadbalancer;1"]  
-	                          .getService(Ci.mivExchangeLoadBalancer),  
-	timerRunning: false,
+    queueSizeTotal: 0,
+    calendarQueues: {},
+    runningJobs: 0,
+    changeQueue: [],
+    busy: false,
+    isLoaded: false,
+    imageCounter: 1,
+    imageList: {
+        image1: "chrome://exchangecalendar-common/skin/images/arrow-circle.png",
+        image2: "chrome://exchangecalendar-common/skin/images/arrow-circle-315.png",
+        image3: "chrome://exchangecalendar-common/skin/images/arrow-circle-225.png",
+        image4: "chrome://exchangecalendar-common/skin/images/arrow-circle-135.png"
+    },
+    loadBalancer: Cc["@1st-setup.nl/exchange/loadbalancer;1"]
+        .getService(Ci.mivExchangeLoadBalancer),
+    timerRunning: false,
 
-	notify: function _notify() 
-	{
-		if (this.isLoaded) {
+    notify: function _notify() {
+        if (this.isLoaded) {
 
-			var jobList = this.loadBalancer.jobList;
-			var running = 0;
-			var waiting = 0;
+            var jobList = this.loadBalancer.jobList;
+            var running = 0;
+            var waiting = 0;
 
-			// Update the tooltip
-			var mainVBox = this._document.getElementById("exchWebServiceProgressvbox");
-			if (mainVBox) {
-				var grid;
-				var rowCount = 0;
-				for (var server in jobList) {
-					if (!this._document.getElementById("exchWebServiceProgress.progress.grid"+rowCount)) {
-						grid = this._document.createElement("exchangeProgressGrid");
-						grid.setAttribute("id","exchWebServiceProgress.progress.grid"+rowCount);
-						grid.setAttribute("serverUrl",jobList[server].server);
-						mainVBox.appendChild(grid);
-					}
-					else {
-						grid = this._document.getElementById("exchWebServiceProgress.progress.grid"+rowCount);
-					}
+            // Update the tooltip
+            var mainVBox = this._document.getElementById("exchWebServiceProgressvbox");
+            if (mainVBox) {
+                var grid;
+                var rowCount = 0;
+                for (var server in jobList) {
+                    if (!this._document.getElementById("exchWebServiceProgress.progress.grid" + rowCount)) {
+                        grid = this._document.createElement("exchangeProgressGrid");
+                        grid.setAttribute("id", "exchWebServiceProgress.progress.grid" + rowCount);
+                        grid.setAttribute("serverUrl", jobList[server].server);
+                        mainVBox.appendChild(grid);
+                    }
+                    else {
+                        grid = this._document.getElementById("exchWebServiceProgress.progress.grid" + rowCount);
+                    }
 
-					running = running + jobList[server].runningJobs.length;
-					if (grid.beforeUpdate) {
-						grid.serverCount = jobList[server].runningJobs.length;
-						grid.beforeUpdate();
-					}
-					for (var calendarid in jobList[server].jobs) {
+                    running = running + jobList[server].runningJobs.length;
+                    if (grid.beforeUpdate) {
+                        grid.serverCount = jobList[server].runningJobs.length;
+                        grid.beforeUpdate();
+                    }
+                    for (var calendarid in jobList[server].jobs) {
 
-						var calendarName =  jobList[server].calendarNames[calendarid];
+                        var calendarName = jobList[server].calendarNames[calendarid];
 
-						if (grid.addCalendar) {
-							grid.addCalendar(jobList[server].calendarNames[calendarid], jobList[server].jobs[calendarid].length);
-						}
+                        if (grid.addCalendar) {
+                            grid.addCalendar(jobList[server].calendarNames[calendarid], jobList[server].jobs[calendarid].length);
+                        }
 
-						waiting = waiting +jobList[server].jobs[calendarid].length; 
-					}
-					if (grid.afterUpdate) {
-						grid.afterUpdate();
-					}
+                        waiting = waiting + jobList[server].jobs[calendarid].length;
+                    }
+                    if (grid.afterUpdate) {
+                        grid.afterUpdate();
+                    }
 
-					rowCount++;
-				}
+                    rowCount++;
+                }
 
-			}
+            }
 
-			if ((waiting == 0) && (running == 0)) {
-				this._document.getElementById("exchWebService-progress-panel").hidden = true;
-				this.timer.cancel();
-				this.timerRunning = false;
-			}
-			else {
-				if (this._document.getElementById("exchWebService-progress-panel").hidden) {
-					if ((waiting > 1) || (running > 0)) {
-						this._document.getElementById("exchWebService-progress-panel").hidden = false;
-						if (!this.timerRunning) {
-							this.timerRunning = true;
-							this.timer.initWithCallback(this, 200, this.timer.TYPE_REPEATING_SLACK);
-						}
-					}
-				}
-//				var tmpStr = running + "/" + waiting + " (r/w job";
-				var tmpStr = running + " running & " + waiting + " queued job";
-				if ((waiting+running) > 1) {
-					tmpStr = tmpStr + "s";
-				}
-//				tmpStr = tmpStr + ")";
-				this._document.getElementById("exchWebService-progress-label").value = tmpStr;
-			}
+            if ((waiting == 0) && (running == 0)) {
+                this._document.getElementById("exchWebService-progress-panel").hidden = true;
+                this.timer.cancel();
+                this.timerRunning = false;
+            }
+            else {
+                if (this._document.getElementById("exchWebService-progress-panel").hidden) {
+                    if ((waiting > 1) || (running > 0)) {
+                        this._document.getElementById("exchWebService-progress-panel").hidden = false;
+                        if (!this.timerRunning) {
+                            this.timerRunning = true;
+                            this.timer.initWithCallback(this, 200, this.timer.TYPE_REPEATING_SLACK);
+                        }
+                    }
+                }
+                //				var tmpStr = running + "/" + waiting + " (r/w job";
+                var tmpStr = running + " running & " + waiting + " queued job";
+                if ((waiting + running) > 1) {
+                    tmpStr = tmpStr + "s";
+                }
+                //				tmpStr = tmpStr + ")";
+                this._document.getElementById("exchWebService-progress-label").value = tmpStr;
+            }
 
 
-			this.imageCounter = Number(this.imageCounter) + Number(1);
-			if (this.imageCounter > 4) {
-				this.imageCounter = 1;
-			}
-			if (this._document) {
-				this._document.getElementById("exchWebService-progress-image").style.listStyleImage = "url('"+this.imageList["image"+this.imageCounter]+"')";
-			}
-		}
-	},
+            this.imageCounter = Number(this.imageCounter) + Number(1);
+            if (this.imageCounter > 4) {
+                this.imageCounter = 1;
+            }
+            if (this._document) {
+                this._document.getElementById("exchWebService-progress-image").style.listStyleImage = "url('" + this.imageList["image" + this.imageCounter] + "')";
+            }
+        }
+    },
 
-	observe: function _observe(subject, topic, data) 
-	{
-		if (topic == "onExchangeReadOnlyChange") {
-			calendarUpdateNewItemsCommand();
-			//document.commandDispatcher.updateCommands("calendar_commands");
-			return;
-		}
+    observe: function _observe(subject, topic, data) {
+        if (topic == "onExchangeReadOnlyChange") {
+            calendarUpdateNewItemsCommand();
+            //document.commandDispatcher.updateCommands("calendar_commands");
+            return;
+        }
 
-		if (topic == "onExchangeProgressChange") {
-			if (!this.timerRunning) {
-				this.timerRunning = true;
-				this.timer.initWithCallback(this, 200, this.timer.TYPE_REPEATING_SLACK);
-			}
-		}
-        },
+        if (topic == "onExchangeProgressChange") {
+            if (!this.timerRunning) {
+                this.timerRunning = true;
+                this.timer.initWithCallback(this, 200, this.timer.TYPE_REPEATING_SLACK);
+            }
+        }
+    },
 
-	init: function _init()
-	{
-		this.observerService = Cc["@mozilla.org/observer-service;1"]  
-                          .getService(Ci.nsIObserverService);
+    init: function _init() {
+        this.observerService = Cc["@mozilla.org/observer-service;1"]
+            .getService(Ci.nsIObserverService);
 
-		this.observerService.addObserver(this, "onExchangeProgressChange", false);
-		this.observerService.addObserver(this, "onExchangeReadOnlyChange", false);
+        this.observerService.addObserver(this, "onExchangeProgressChange", false);
+        this.observerService.addObserver(this, "onExchangeReadOnlyChange", false);
 
-		this.timer = Cc["@mozilla.org/timer;1"]
-				.createInstance(Ci.nsITimer);
-		this.timerRunning = false;
+        this.timer = Cc["@mozilla.org/timer;1"]
+            .createInstance(Ci.nsITimer);
+        this.timerRunning = false;
 
-	},
+    },
 
-	destroy: function _destroy()
-	{
-		this.observerService.removeObserver(this, "onExchangeProgressChange");
-		this.observerService.removeObserver(this, "onExchangeReadOnlyChange");
-	},
+    destroy: function _destroy() {
+        this.observerService.removeObserver(this, "onExchangeProgressChange");
+        this.observerService.removeObserver(this, "onExchangeReadOnlyChange");
+    },
 
-	onLoad: function _onLoad(event) {
-		this.init();
+    onLoad: function _onLoad(event) {
+        this.init();
 
-		// Do init
-		this.isLoaded = true;
+        // Do init
+        this.isLoaded = true;
 
-		// Add an unload function to the window so we don't leak any listeners
-		var self = this;
-		this._window.addEventListener("unload", function(){ self._window.removeEventListener("unload",arguments.callee,false); self.destroy();}, false);
+        // Add an unload function to the window so we don't leak any listeners
+        var self = this;
+        this._window.addEventListener("unload", function () {
+            self._window.removeEventListener("unload", arguments.callee, false);
+            self.destroy();
+        }, false);
 
-	},
+    },
 
-	openProgressDialog: function _openProgressDialog()
-	{
-	},
+    openProgressDialog: function _openProgressDialog() {},
 }
 
 var myExchProgressPanel = new exchProgressPanel(document, window);
-window.addEventListener("load", function () { window.removeEventListener("load",arguments.callee,true); dump("progress_panel\n"); myExchProgressPanel.onLoad(); }, true);
+window.addEventListener("load", function () {
+    window.removeEventListener("load", arguments.callee, true);
+    dump("progress_panel\n");
+    myExchProgressPanel.onLoad();
+}, true);
 
 /**
  * Creates the given element in the XUL namespace.
@@ -210,4 +211,3 @@ window.addEventListener("load", function () { window.removeEventListener("load",
 function createXULElement(el) {
     return document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", el);
 }
-

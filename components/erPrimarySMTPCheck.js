@@ -46,111 +46,109 @@ Cu.import("resource://exchangecalendar/ecExchangeRequest.js");
 
 var EXPORTED_SYMBOLS = ["erPrimarySMTPCheckRequest"];
 
-function erPrimarySMTPCheckRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
+function erPrimarySMTPCheckRequest(aArgument, aCbOk, aCbError, aListener) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	var self = this;
+    var self = this;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
-	this.argument = aArgument;
-	this.mailbox = aArgument.mailbox;
-	this.serverUrl = aArgument.serverUrl;
+    this.argument = aArgument;
+    this.mailbox = aArgument.mailbox;
+    this.serverUrl = aArgument.serverUrl;
 
-	this.isRunning = true;
-	this.execute();
+    this.isRunning = true;
+    this.execute();
 }
 
 erPrimarySMTPCheckRequest.prototype = {
 
-	execute: function _execute()
-	{
-//		exchWebService.commonFunctions.LOG("sendPrimarySmtpCheck\n");
-		// We are going to do a dummy FindItem. It will return the real primarySMTP
-		var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:FindItem xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
-		req.setAttribute("Traversal", "Shallow");
+    execute: function _execute() {
+        //		exchWebService.commonFunctions.LOG("sendPrimarySmtpCheck\n");
+        // We are going to do a dummy FindItem. It will return the real primarySMTP
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:FindItem xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
+        req.setAttribute("Traversal", "Shallow");
 
-		req.addChildTag("ItemShape", "nsMessages", null).addChildTag("BaseShape", "nsTypes", "IdOnly");
+        req.addChildTag("ItemShape", "nsMessages", null).addChildTag("BaseShape", "nsTypes", "IdOnly");
 
-		var view = exchWebService.commonFunctions.xmlToJxon('<nsMessages:CalendarView xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
-		// Dummy date range to limit result
-		view.setAttribute("StartDate", "2011-01-30T11:34:00Z");
-		view.setAttribute("EndDate", "2011-01-30T11:35:00Z");
-		view.setAttribute("MaxEntriesReturned", "1");
-		req.addChildTagObject(view);
-		view = null;
+        var view = exchWebService.commonFunctions.xmlToJxon('<nsMessages:CalendarView xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
+        // Dummy date range to limit result
+        view.setAttribute("StartDate", "2011-01-30T11:34:00Z");
+        view.setAttribute("EndDate", "2011-01-30T11:35:00Z");
+        view.setAttribute("MaxEntriesReturned", "1");
+        req.addChildTagObject(view);
+        view = null;
 
-		var parentFolderIds = makeParentFolderIds2("ParentFolderIds", this.argument);
-		req.addChildTagObject(parentFolderIds);
-		parentFolderIds = null;
+        var parentFolderIds = makeParentFolderIds2("ParentFolderIds", this.argument);
+        req.addChildTagObject(parentFolderIds);
+        parentFolderIds = null;
 
-		//exchWebService.commonFunctions.LOG("erPrimarySMTPCheckRequest.execute: "+String(this.parent.makeSoapMessage(req)));
-		this.parent.xml2jxon = true;
-                this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-		req = null;
-	},
+        //exchWebService.commonFunctions.LOG("erPrimarySMTPCheckRequest.execute: "+String(this.parent.makeSoapMessage(req)));
+        this.parent.xml2jxon = true;
+        this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
+        req = null;
+    },
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-		//exchWebService.commonFunctions.LOG("erPrimarySMTPCheckRequest.onSendOk: "+String(aResp));
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        //exchWebService.commonFunctions.LOG("erPrimarySMTPCheckRequest.onSendOk: "+String(aResp));
 
-		var aError = false;
-		var aCode = 0;
-		var aMsg = "";
-		var aResult = this.mailbox;
+        var aError = false;
+        var aCode = 0;
+        var aMsg = "";
+        var aResult = this.mailbox;
 
-		var rm = aResp.XPath("/s:Envelope/s:Body/m:FindItemResponse/m:ResponseMessages/m:FindItemResponseMessage[@ResponseClass='Error']");
+        var rm = aResp.XPath("/s:Envelope/s:Body/m:FindItemResponse/m:ResponseMessages/m:FindItemResponseMessage[@ResponseClass='Error']");
 
-		if (rm.length > 0) {
-			aMsg = rm[0].getTagValue("m:MessageText")+"("+rm[0].getTagValue("m:ResponseCode")+")";
-			switch (rm[0].getTagValue("m:ResponseCode")) {
-			case "ErrorNonPrimarySmtpAddress": 
-				aResult = rm[0].XPath("/m:MessageXml/t:Value[@Name='Primary']");
-				if (aResult.length > 0) {
-					aResult = aResult[0].value;
-					aError = false;
-				}
-				else {
-					aCode = this.parent.ER_ERROR_PRIMARY_SMTP_NOTFOUND;
-					aError = true;
-				}
-				aResult = null;
-				break;
-			case "ErrorNonExistentMailbox": 
-				aCode = this.parent.ER_ERROR_SPECIFIED_SMTP_NOTFOUND; 
-				aError = true;
-				break;
-			default: 
-				aCode = this.parent.ER_ERROR_PRIMARY_SMTP_UNKNOWN; 
-				aError = true;
-				break;
-			}
-		}
-		rm = null;
+        if (rm.length > 0) {
+            aMsg = rm[0].getTagValue("m:MessageText") + "(" + rm[0].getTagValue("m:ResponseCode") + ")";
+            switch (rm[0].getTagValue("m:ResponseCode")) {
+            case "ErrorNonPrimarySmtpAddress":
+                aResult = rm[0].XPath("/m:MessageXml/t:Value[@Name='Primary']");
+                if (aResult.length > 0) {
+                    aResult = aResult[0].value;
+                    aError = false;
+                }
+                else {
+                    aCode = this.parent.ER_ERROR_PRIMARY_SMTP_NOTFOUND;
+                    aError = true;
+                }
+                aResult = null;
+                break;
+            case "ErrorNonExistentMailbox":
+                aCode = this.parent.ER_ERROR_SPECIFIED_SMTP_NOTFOUND;
+                aError = true;
+                break;
+            default:
+                aCode = this.parent.ER_ERROR_PRIMARY_SMTP_UNKNOWN;
+                aError = true;
+                break;
+            }
+        }
+        rm = null;
 
-		if (aError) {
-			this.onSendError(aExchangeRequest, aCode, aMsg);
-		}
-		else {
-			if (this.mCbOk) {
-				this.mCbOk(aResult);
-			}
-			this.isRunning = false;
-		}
-	},
+        if (aError) {
+            this.onSendError(aExchangeRequest, aCode, aMsg);
+        }
+        else {
+            if (this.mCbOk) {
+                this.mCbOk(aResult);
+            }
+            this.isRunning = false;
+        }
+    },
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
-
-

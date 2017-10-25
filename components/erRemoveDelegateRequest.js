@@ -19,111 +19,114 @@ Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecalendar/ecFunctions.js");
 Cu.import("resource://exchangecalendar/ecExchangeRequest.js");
-Cu.import("resource://exchangecalendar/soapFunctions.js"); 
- 
+Cu.import("resource://exchangecalendar/soapFunctions.js");
+
 Cu.import("resource://interfaces/xml2json/xml2json.js");
 
 var EXPORTED_SYMBOLS = ["erRemoveDelegateRequest"];
-function erRemoveDelegateRequest(aArgument, aCbOk, aCbError, aListener)
-{
-	this.mCbOk = aCbOk;
-	this.mCbError = aCbError;
 
-	var self = this;
+function erRemoveDelegateRequest(aArgument, aCbOk, aCbError, aListener) {
+    this.mCbOk = aCbOk;
+    this.mCbError = aCbError;
 
-	this.parent = new ExchangeRequest(aArgument, 
-		function(aExchangeRequest, aResp) { self.onSendOk(aExchangeRequest, aResp);},
-		function(aExchangeRequest, aCode, aMsg) { self.onSendError(aExchangeRequest, aCode, aMsg);},
-		aListener);
+    var self = this;
 
-	this.argument = aArgument;
-	this.serverUrl = aArgument.serverUrl;
-	this.listener = aListener;
-	this.mailbox = aArgument.mailbox;
-	this.DelegateEmail=aArgument.DelegateEmail;
-	this.delegatingItem = aArgument.delegatingItem;
+    this.parent = new ExchangeRequest(aArgument,
+        function (aExchangeRequest, aResp) {
+            self.onSendOk(aExchangeRequest, aResp);
+        },
+        function (aExchangeRequest, aCode, aMsg) {
+            self.onSendError(aExchangeRequest, aCode, aMsg);
+        },
+        aListener);
 
-    this.permission = ""; 
-	switch( this.delegatingItem ){
-		case "calendar":
-			 this.permission = "CalendarFolderPermissionLevel";
-			break;
-		case  "tasks":
-			 this.permission = "TasksFolderPermissionLevel";
-			break;
-		case  "inbox":
-			 this.permission = "InboxFolderPermissionLevel";
-			break;
-		case "contacts":
-			 this.permission = "ContactsFolderPermissionLevel";  
-			break;
-		case "notes":
-			 this.permission = "NotesFolderPermissionLevel";
-			break;
-		case "journal":
-			 this.permission = "JournalFolderPermissionLevel";
-			break;
-		default:
- 	}
-	
-	this.isRunning = true;
-	this.execute();
+    this.argument = aArgument;
+    this.serverUrl = aArgument.serverUrl;
+    this.listener = aListener;
+    this.mailbox = aArgument.mailbox;
+    this.DelegateEmail = aArgument.DelegateEmail;
+    this.delegatingItem = aArgument.delegatingItem;
+
+    this.permission = "";
+    switch (this.delegatingItem) {
+    case "calendar":
+        this.permission = "CalendarFolderPermissionLevel";
+        break;
+    case "tasks":
+        this.permission = "TasksFolderPermissionLevel";
+        break;
+    case "inbox":
+        this.permission = "InboxFolderPermissionLevel";
+        break;
+    case "contacts":
+        this.permission = "ContactsFolderPermissionLevel";
+        break;
+    case "notes":
+        this.permission = "NotesFolderPermissionLevel";
+        break;
+    case "journal":
+        this.permission = "JournalFolderPermissionLevel";
+        break;
+    default:
+    }
+
+    this.isRunning = true;
+    this.execute();
 }
 
 erRemoveDelegateRequest.prototype = {
 
-	execute: function _execute()
-	{
- 		exchWebService.commonFunctions.LOG("erRemoveDelegateRequest.execute\n");
+    execute: function _execute() {
+        exchWebService.commonFunctions.LOG("erRemoveDelegateRequest.execute\n");
 
- 		var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:RemoveDelegate xmlns:nsMessages="'+nsMessagesStr+'" xmlns:nsTypes="'+nsTypesStr+'"/>');
- 		var mailBox = req.addChildTag("Mailbox", "nsMessages", null);  
-		mailBox.addChildTag("EmailAddress", "nsTypes", this.mailbox );  
- 		   
-		var userids=req.addChildTag("UserIds","nsMessages", null);  
-		var userid=userids.addChildTag("UserId","nsTypes", null);  
-		userid.addChildTag("PrimarySmtpAddress","nsTypes",this.DelegateEmail);   
-	
-		exchWebService.commonFunctions.LOG("erRemoveDelegateRequest.execute2 " + req + "\n" );
-		
-		this.parent.xml2jxon = true;
+        var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:RemoveDelegate xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
+        var mailBox = req.addChildTag("Mailbox", "nsMessages", null);
+        mailBox.addChildTag("EmailAddress", "nsTypes", this.mailbox);
+
+        var userids = req.addChildTag("UserIds", "nsMessages", null);
+        var userid = userids.addChildTag("UserId", "nsTypes", null);
+        userid.addChildTag("PrimarySmtpAddress", "nsTypes", this.DelegateEmail);
+
+        exchWebService.commonFunctions.LOG("erRemoveDelegateRequest.execute2 " + req + "\n");
+
+        this.parent.xml2jxon = true;
         this.parent.sendRequest(this.parent.makeSoapMessage(req), this.serverUrl);
-		req = null;
-	},
+        req = null;
+    },
 
-	onSendOk: function _onSendOk(aExchangeRequest, aResp)
-	{
-		exchWebService.commonFunctions.LOG("erRemoveDelegateRequest.onSendOk: " + aResp +"\n");
+    onSendOk: function _onSendOk(aExchangeRequest, aResp) {
+        exchWebService.commonFunctions.LOG("erRemoveDelegateRequest.onSendOk: " + aResp + "\n");
 
-		var rm = aResp.XPath("/s:Envelope/s:Body/m:RemoveDelegateResponse/m:ResponseMessages/m:DelegateUserResponseMessageType[@ResponseClass='Success']");
-		if (rm.length == 0) {
-			this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on sending meeting respons.");
-			return;
-		}
+        var rm = aResp.XPath("/s:Envelope/s:Body/m:RemoveDelegateResponse/m:ResponseMessages/m:DelegateUserResponseMessageType[@ResponseClass='Success']");
+        if (rm.length == 0) {
+            this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on sending meeting respons.");
+            return;
+        }
 
-		var responseCode = rm[0].getTagValue("m:ResponseCode");
-		if (responseCode != "NoError") {
-			this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on sending meeting respons:"+responseCode);
-			return;
-		}
-		
-		rm = null;
-		var  delegate=[];
-		delegate[0]={PrimarySmtpAddress:this.DelegateEmail};
-		if (this.mCbOk) {
-			this.mCbOk(this,delegate); 
-		}
-		this.isRunning = false;
-	},
+        var responseCode = rm[0].getTagValue("m:ResponseCode");
+        if (responseCode != "NoError") {
+            this.onSendError(aExchangeRequest, this.parent.ER_ERROR_SOAP_ERROR, "Error on sending meeting respons:" + responseCode);
+            return;
+        }
 
-	onSendError: function _onSendError(aExchangeRequest, aCode, aMsg)
-	{
-		 exchWebService.commonFunctions.LOG("erRemoveDelegateRequest.onSendError: "+aMsg+"\n");
-		this.isRunning = false;
-		if (this.mCbError) {
-			this.mCbError(this, aCode, aMsg);
-		}
-	},
+        rm = null;
+        var delegate = [];
+        delegate[0] = {
+            PrimarySmtpAddress: this.DelegateEmail
+        };
+        if (this.mCbOk) {
+            this.mCbOk(this, delegate);
+        }
+        this.isRunning = false;
+    },
+
+    onSendError: function _onSendError(aExchangeRequest, aCode, aMsg) {
+        exchWebService.commonFunctions.LOG("erRemoveDelegateRequest.onSendError: " + aMsg + "\n");
+        this.isRunning = false;
+        if (this.mCbError) {
+            this.mCbError(this, aCode, aMsg);
+        }
+    },
 };
 
 /*

@@ -47,89 +47,88 @@ Cu.import("resource://exchangecalendar/erForewardItem.js");
 
 //if (! exchWebService) var exchWebService = {};
 
-function exchForewardEvent(aDocument, aWindow)
-{
-	this._document = aDocument;
-	this._window = aWindow;
+function exchForewardEvent(aDocument, aWindow) {
+    this._document = aDocument;
+    this._window = aWindow;
 
-	this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
-				.getService(Ci.mivFunctions);
+    this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
+        .getService(Ci.mivFunctions);
 }
 
 exchForewardEvent.prototype = {
 
-//exchWebService.forewardEvent = {
-	currentView: function _currentView() {
-		    return this._document.getElementById("view-deck").selectedPanel;
-	},
+    //exchWebService.forewardEvent = {
+    currentView: function _currentView() {
+        return this._document.getElementById("view-deck").selectedPanel;
+    },
 
-	onForEve : function _onForEve(){		
-		var item = this.currentView().getSelectedItems({})[0];
-		var calendar = item.calendar;
-		var args = new Object();
-		args.startTime = item.startDate;
-		args.endTime = item.endDate;
-		args.organizer = item.organizer;
-		args.item = item;
-		args.attendees =item.organizer;
-		args.calendar =calendar;
-		args.onOk = this.callOnRightClick;
-		args.opener="exchWebService-onForEve";
-		
-		dump("\nxxxxxxx args"+JSON.stringify(args));
-		
-		this._window.openDialog("chrome://calendar/content/calendar-event-dialog-attendees.xul","_blank", "chrome,titlebar,modal,resizable",args);
+    onForEve: function _onForEve() {
+        var item = this.currentView().getSelectedItems({})[0];
+        var calendar = item.calendar;
+        var args = new Object();
+        args.startTime = item.startDate;
+        args.endTime = item.endDate;
+        args.organizer = item.organizer;
+        args.item = item;
+        args.attendees = item.organizer;
+        args.calendar = calendar;
+        args.onOk = this.callOnRightClick;
+        args.opener = "exchWebService-onForEve";
 
-	},
+        dump("\nxxxxxxx args" + JSON.stringify(args));
 
-	callOnRightClick : function(attendee,organizer,startTime,endTime){		
-		var item = tmpForewardEvent.currentView().getSelectedItems({})[0];
-		var calendar = item.calendar;
-		var calId = calendar.id;
-		var calPrefs = Cc["@mozilla.org/preferences-service;1"]
-		            .getService(Ci.nsIPrefService)
-			    .getBranch("extensions.exchangecalendar@extensions.1st-setup.nl."+calId+".");
-		var tmpObject = new erForewardItemRequest(
-			{user: tmpForewardEvent.globalFunctions.safeGetCharPref(calPrefs, "ecDomain")+"\\"+tmpForewardEvent.globalFunctions.safeGetCharPref(calPrefs, "ecUser"), 
-			 mailbox: tmpForewardEvent.globalFunctions.safeGetCharPref(calPrefs, "ecMailbox"),
-			 serverUrl: tmpForewardEvent.globalFunctions.safeGetCharPref(calPrefs, "ecServer"), item: item, attendees: attendee, 
-			changeKey :  item.changeKey, description : item.getProperty("description")}, 		
-			tmpForewardEvent.erForewardItemRequestOK, tmpForewardEvent.erForewardItemRequestError);
-		return true;
-	},
+        this._window.openDialog("chrome://calendar/content/calendar-event-dialog-attendees.xul", "_blank", "chrome,titlebar,modal,resizable", args);
 
-	erForewardItemRequestOK : function _erForewardItemRequestOK(aForewardItemRequest, aResp)
-	{
-		if(aResp){
-			var title="Forwarding Event";
-			var msg=aResp;
-			 var image = "chrome://exchangecalendar-common/skin/images/notify-icon.png";
-			  var win = Components.classes['@mozilla.org/embedcomp/window-watcher;1'].
-			                      getService(Components.interfaces.nsIWindowWatcher).
-			                      openWindow(null, 'chrome://global/content/alerts/alert.xul',
-			                                  '_blank', 'chrome,titlebar=no,popup=yes', null);
-			  win.arguments = [image,  title, msg, true, ''];
-			  
-		}
-	},
+    },
 
-	erForewardItemRequestError: function _erForewardItemRequestError(aForewardItemRequest, aCode, aMsg)
-	{
-		alert(aCode+":"+aMsg);
-	},
+    callOnRightClick: function (attendee, organizer, startTime, endTime) {
+        var item = tmpForewardEvent.currentView().getSelectedItems({})[0];
+        var calendar = item.calendar;
+        var calId = calendar.id;
+        var calPrefs = Cc["@mozilla.org/preferences-service;1"]
+            .getService(Ci.nsIPrefService)
+            .getBranch("extensions.exchangecalendar@extensions.1st-setup.nl." + calId + ".");
+        var tmpObject = new erForewardItemRequest({
+                user: tmpForewardEvent.globalFunctions.safeGetCharPref(calPrefs, "ecDomain") + "\\" + tmpForewardEvent.globalFunctions.safeGetCharPref(calPrefs, "ecUser"),
+                mailbox: tmpForewardEvent.globalFunctions.safeGetCharPref(calPrefs, "ecMailbox"),
+                serverUrl: tmpForewardEvent.globalFunctions.safeGetCharPref(calPrefs, "ecServer"),
+                item: item,
+                attendees: attendee,
+                changeKey: item.changeKey,
+                description: item.getProperty("description")
+            },
+            tmpForewardEvent.erForewardItemRequestOK, tmpForewardEvent.erForewardItemRequestError);
+        return true;
+    },
 
-	checkAllowForwardItem: function _checkAllowForwardItem()
-	{
-		var item = this.currentView().getSelectedItems({})[0];
-		if ((item.calendar.type == "exchangecalendar") && (item.responseObjects.ForwardItem)) {
-			this._document.getElementById("calendar-item-forward").hidden = false;
-		}
-		else {
-			this._document.getElementById("calendar-item-forward").hidden = true;
-		}
-	},
+    erForewardItemRequestOK: function _erForewardItemRequestOK(aForewardItemRequest, aResp) {
+        if (aResp) {
+            var title = "Forwarding Event";
+            var msg = aResp;
+            var image = "chrome://exchangecalendar-common/skin/images/notify-icon.png";
+            var win = Components.classes['@mozilla.org/embedcomp/window-watcher;1'].
+            getService(Components.interfaces.nsIWindowWatcher).
+            openWindow(null, 'chrome://global/content/alerts/alert.xul',
+                '_blank', 'chrome,titlebar=no,popup=yes', null);
+            win.arguments = [image, title, msg, true, ''];
+
+        }
+    },
+
+    erForewardItemRequestError: function _erForewardItemRequestError(aForewardItemRequest, aCode, aMsg) {
+        alert(aCode + ":" + aMsg);
+    },
+
+    checkAllowForwardItem: function _checkAllowForwardItem() {
+        var item = this.currentView().getSelectedItems({})[0];
+        if ((item.calendar.type == "exchangecalendar") && (item.responseObjects.ForwardItem)) {
+            this._document.getElementById("calendar-item-forward").hidden = false;
+        }
+        else {
+            this._document.getElementById("calendar-item-forward").hidden = true;
+        }
+    },
 
 }
 
 var tmpForewardEvent = new exchForewardEvent(document, window);
-

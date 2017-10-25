@@ -28,77 +28,76 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 function mivExchangeAuthPromptProvider() {
-	//dump("\nmivExchangeAuthPromptProvider.init\n");
-	this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
-				.getService(Ci.mivFunctions);
+    //dump("\nmivExchangeAuthPromptProvider.init\n");
+    this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
+        .getService(Ci.mivFunctions);
 }
 
 var mivExchangeAuthPromptProviderGUID = "1bf6e930-20fc-11e2-81c1-0800200c9a66";
 
 mivExchangeAuthPromptProvider.prototype = {
 
-	/* void QueryInterface(
-	  in nsIIDRef uuid,
-	  [iid_is(uuid),retval] out nsQIResult result
-	);	 */
-	QueryInterface: XPCOMUtils.generateQI([Ci.mivExchangeAuthPromptProvider,
-			Ci.nsISupports]),
+    /* void QueryInterface(
+      in nsIIDRef uuid,
+      [iid_is(uuid),retval] out nsQIResult result
+    );	 */
+    QueryInterface: XPCOMUtils.generateQI([Ci.mivExchangeAuthPromptProvider,
+        Ci.nsISupports
+    ]),
 
-	// Attributes from nsIClassInfo
+    // Attributes from nsIClassInfo
 
-	classDescription: "Exchange Add-on AuthPromptProvider interface",
-	classID: components.ID("{"+mivExchangeAuthPromptProviderGUID+"}"),
-	contractID: "@1st-setup.nl/exchange/authpromptprovider;1",
-	flags: Ci.nsIClassInfo.SINGLETON || Ci.nsIClassInfo.THREADSAFE,
-	implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
+    classDescription: "Exchange Add-on AuthPromptProvider interface",
+    classID: components.ID("{" + mivExchangeAuthPromptProviderGUID + "}"),
+    contractID: "@1st-setup.nl/exchange/authpromptprovider;1",
+    flags: Ci.nsIClassInfo.SINGLETON || Ci.nsIClassInfo.THREADSAFE,
+    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
-	// External methods
+    // External methods
 
-	//void getAuthPrompt(in PRUint32 aPromptReason, in nsIIDRef iid, [iid_is(iid),retval] out nsQIResult result);
-	getAuthPrompt: function _nsIAuthPromptProvider_getAuthPrompt(aPromptReason, iid)
-	{
-		this.logInfo("  --- mivExchangeAuthPromptProvider.getAuthPrompt:aPromptReason:"+aPromptReason+", iid:"+iid);
-		if (iid.equals(Ci.nsIAuthPrompt2)) {    // id == 651395eb-8612-4876-8ac0-a88d4dce9e1e
-			this.logInfo("  --- ecnsIAuthPrompt2.getAuthPrompt: iid=nsIAuthPrompt2");
-			return Cc["@1st-setup.nl/exchange/authprompt2;1"].getService();
-		} 
+    //void getAuthPrompt(in PRUint32 aPromptReason, in nsIIDRef iid, [iid_is(iid),retval] out nsQIResult result);
+    getAuthPrompt: function _nsIAuthPromptProvider_getAuthPrompt(aPromptReason, iid) {
+        this.logInfo("  --- mivExchangeAuthPromptProvider.getAuthPrompt:aPromptReason:" + aPromptReason + ", iid:" + iid);
+        if (iid.equals(Ci.nsIAuthPrompt2)) { // id == 651395eb-8612-4876-8ac0-a88d4dce9e1e
+            this.logInfo("  --- ecnsIAuthPrompt2.getAuthPrompt: iid=nsIAuthPrompt2");
+            return Cc["@1st-setup.nl/exchange/authprompt2;1"].getService();
+        }
 
-		this.logInfo("  --- mivExchangeAuthPromptProvider.getAuthPrompt:aPromptReason:"+aPromptReason+", iid:"+iid);
-		this.globalFunctions.LOG("  >>>>>>>>>>> SUBMIT THIS LINE TO https://github.com/ExchangeCalendar/exchangecalendar/issues: ecnsIAuthPrompt2.getAuthPrompt("+iid+")");
-  
-		return Cr.NS_ERROR_NOT_AVAILABLE;
-	},
+        this.logInfo("  --- mivExchangeAuthPromptProvider.getAuthPrompt:aPromptReason:" + aPromptReason + ", iid:" + iid);
+        this.globalFunctions.LOG("  >>>>>>>>>>> SUBMIT THIS LINE TO https://github.com/ExchangeCalendar/exchangecalendar/issues: ecnsIAuthPrompt2.getAuthPrompt(" + iid + ")");
 
-	// Internal methods.
+        return Cr.NS_ERROR_NOT_AVAILABLE;
+    },
 
-	logInfo: function _logInfo(aMsg, aDebugLevel) 
-	{
-		var prefB = Cc["@mozilla.org/preferences-service;1"]
-			.getService(Ci.nsIPrefBranch);
+    // Internal methods.
 
-		this.debug = this.globalFunctions.safeGetBoolPref(prefB, "extensions.1st-setup.authentication.debug", false, true);
-		if (this.debug) {
-			this.globalFunctions.LOG("mivExchangeAuthPromptProvider: "+aMsg);
-		}
-	},
+    logInfo: function _logInfo(aMsg, aDebugLevel) {
+        var prefB = Cc["@mozilla.org/preferences-service;1"]
+            .getService(Ci.nsIPrefBranch);
+
+        this.debug = this.globalFunctions.safeGetBoolPref(prefB, "extensions.1st-setup.authentication.debug", false, true);
+        if (this.debug) {
+            this.globalFunctions.LOG("mivExchangeAuthPromptProvider: " + aMsg);
+        }
+    },
 
 }
 
 function NSGetFactory(cid) {
 
-	try {
-		if (!NSGetFactory.mivExchangeAuthPromptProvider) {
-			// Load main script from lightning that we need.
-			NSGetFactory.mivExchangeAuthPromptProvider = XPCOMUtils.generateNSGetFactory([mivExchangeAuthPromptProvider]);
-			
-	}
+    try {
+        if (!NSGetFactory.mivExchangeAuthPromptProvider) {
+            // Load main script from lightning that we need.
+            NSGetFactory.mivExchangeAuthPromptProvider = XPCOMUtils.generateNSGetFactory([mivExchangeAuthPromptProvider]);
 
-	} catch(e) {
-		Components.utils.reportError(e);
-		dump(e);
-		throw e;
-	}
+        }
 
-	return NSGetFactory.mivExchangeAuthPromptProvider(cid);
-} 
+    }
+    catch (e) {
+        Components.utils.reportError(e);
+        dump(e);
+        throw e;
+    }
 
+    return NSGetFactory.mivExchangeAuthPromptProvider(cid);
+}
