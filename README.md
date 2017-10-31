@@ -12,4 +12,5 @@ Now using bash we'll compile the addon we need (which are written in wiki)
 
 ## License
 This software is licensed under the [GNU GPL] Version 3 
+
 [GNU GPL]: http://www.gnu.org/licenses/gpl.html
