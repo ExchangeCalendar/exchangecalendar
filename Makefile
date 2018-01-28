@@ -4,7 +4,7 @@ releasebranch = ec-4.0
 update = disable
 xpi = exchangecalendar-v$(version).xpi
 
-.PHONY: build release l10n-get l10n-auto-commit l10n-push dev beautify beautify-xml beautify-js defaults/preferences/update.js $(xpi)
+.PHONY: build l10n-get l10n-auto-commit l10n-push dev beautify beautify-xml beautify-js defaults/preferences/update.js $(xpi)
 
 # Default target is build package
 build: $(xpi)
@@ -18,12 +18,6 @@ install.rdf: install.rdf.template
 
 defaults/preferences/update.js:
 	cp defaults/preferences/update_$(update).txt $@
-
-# Target to publish a new release:
-release: l10n-auto-commit build
-	git tag "v$(version)"
-	@echo 'Translations updated, build done, tag added.'
-	@echo 'Now, if the release is well done, please run one "git push" to publish code and one "git push v$(version)" to publish the new tag.'
 
 # Targets to update translations
 # Requires an already configured Transifex client: https://docs.transifex.com/client/introduction
