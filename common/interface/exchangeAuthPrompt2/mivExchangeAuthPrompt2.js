@@ -102,7 +102,12 @@ mivExchangeAuthPrompt2.prototype = {
 
         this.showPassword = this.globalFunctions.safeGetBoolPref(null, "extensions.1st-setup.authentication.showpassword", false, true);
 
-        //		var realm = aRealm;
+        /*
+         * This realm variable is never used in authentication, it's just used by exchangecalendar to save
+         * credentials in its cache and/or in the Thundebird password manager.
+         * So, this value is fixed to a specific string to avoid having non-valid string in these two systems.
+         */
+        // var realm = aRealm;
         var realm = "Exchange Web Service";
 
         if (!realm) {
@@ -323,25 +328,10 @@ mivExchangeAuthPrompt2.prototype = {
                 this.logInfo("asyncPromptAuthNotifyCallback: username=" + username);
 
                 if (!error) {
-                    // Trying to get realm from response header.
-                    // This is used when basic authentication is available.
-                    var realm = "exchange.server";
-                    try {
-                        var acceptedAuthentications = aChannel.getResponseHeader("WWW-Authenticate");
-                        acceptedAuthentications = acceptedAuthentications.split("\n");
-
-                        for (let acceptAuth of acceptedAuthentications) {
-                            this.logInfo("asyncPromptAuthNotifyCallback: WWW-Authenticate:" + acceptAuth);
-                            if (acceptAuth.indexOf("realm=") > -1) {
-                                realm = acceptAuth.substr(index.indexOf("realm=") + 6);
-                                realm = realm.replace(/"/g, "");
-                                this.logInfo("asyncPromptAuthNotifyCallback: Found a realm going to use it. realm=" + realm);
-                                canUseBasicAuth = true;
-                            }
-                        }
-                    }
-                    catch (err) {
-                        this.logInfo("asyncPromptAuthNotifyCallback: WWW-Authenticate HTTP response header not found !");
+                    // Read response headers, to get the realm argument required for the HTTP Basic authentication method.
+                    var realm = this.getRealm('Basic', aChannel);
+                    if (realm) {
+                        canUseBasicAuth = true;
                     }
 
                     // try to get password.
@@ -560,23 +550,8 @@ mivExchangeAuthPrompt2.prototype = {
             }
             this.logInfo("promptAuth: username=" + username);
 
-            // Trying to get realm from response header. This is used when basic authentication is available.
-            var realm = "exchange.server";
-            try {
-                var acceptedAuthentications = aChannel.getResponseHeader("WWW-Authenticate");
-                acceptedAuthentications = acceptedAuthentications.split("\n");
-                for (let authenticateHeader of acceptedAuthentications) {
-                    this.logInfo("promptAuth: WWW-Authenticate:" + authenticateHeader);
-                    if (authenticateHeader.indexOf("realm=") > -1) {
-                        realm = index.substr(authenticateHeader.indexOf("realm=") + 6);
-                        this.logInfo("promptAuth: Found a realm going to use it. realm=" + realm);
-                    }
-                }
-            }
-            catch (err) {
-                this.logInfo("promptAuth: NO WWW-Authenticate in response header!?");
-            }
-
+            // Read response headers, to get the realm argument required for the HTTP Basic authentication method.
+            let realm = this.getRealm('Basic', aChannel);
             password = this.getPassword(aChannel, username, URL, realm);
             if ((!password) || (password == null)) {
                 this.logInfo("promptAuth: No password.");
@@ -775,6 +750,44 @@ mivExchangeAuthPrompt2.prototype = {
             password: aPassword.value,
             save: aSavePassword.value
         };
+    },
+
+    /* Helper function to retrieve realm from WWW-Authenticate HTTP headers
+     * realm is a string defining the location where the credentials are valid
+     * It's defined by [RFC2617](https://tools.ietf.org/html/rfc2617)
+     * */
+    getRealm: function _getRealm(aChallengeType, aChannel) {
+        let acceptedAuthentications = null;
+        let realm = null;
+
+        try {
+            acceptedAuthentications = aChannel.getResponseHeader("WWW-Authenticate");
+        }
+        catch (err) {
+            this.logInfo("getRealm: Error while looking for WWW-Authenticate HTTP response header: " + err);
+        }
+
+        if (acceptedAuthentications) {
+            // Mozilla's nsHttpHeaderArray.h uses char '\n' to join multiple WWW-Authenticate HTTP response header
+            acceptedAuthentications = acceptedAuthentications.split('\n');
+            for (let authenticateHeader of acceptedAuthentications) {
+                this.logInfo("getRealm: reading header: WWW-Authenticate:" + authenticateHeader);
+
+                // Look only realm in header with the required challenge
+                if (authenticateHeader.search(aChallengeType + ' ') == 0) {
+                    // Look for first realm= position using regular expression, as realm instruction is case insensitive
+                    let realmPosition = authenticateHeader.search('realm=', 'i');
+                    if (realmPosition > -1) {
+                        let firstQuotePosition = authenticateHeader.indexOf('"', realmPosition);
+                        let secondQuotePosition = authenticateHeader.indexOf('"', firstQuotePosition);
+                        realm = authenticateHeader.substring(firstQuotePosition + 1, secondQuotePosition);
+                        this.logInfo("getRealm: Found a realm going to use it. realm=" + realm);
+                    }
+                }
+            }
+        }
+
+        return realm;
     },
 
     logInfo: function _logInfo(aMsg, aDebugLevel) {
