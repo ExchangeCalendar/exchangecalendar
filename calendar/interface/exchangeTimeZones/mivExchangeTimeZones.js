@@ -36,7 +36,7 @@ Cu.import("resource://exchangecalendar/erGetTimeZones.js");
 Cu.import("resource://exchangecommoninterfaces/xml2json/xml2json.js");
 
 function mivExchangeTimeZones() {
-    this._timeZones = {};
+    this._timeZones = [];
 
     this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
         .getService(Ci.mivFunctions);
