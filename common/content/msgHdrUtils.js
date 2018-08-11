@@ -107,40 +107,45 @@ function msgUriToMsgHdr(aUri) {
  * @param {nsIMsgDbHdr} msgHdr The message header to examine
  * @return {bool}
  */
-function msgHdrIsInbox(msgHdr)
-msgHdr.folder.getFlag(nsMsgFolderFlags_Inbox)
+function msgHdrIsInbox(msgHdr) {
+    return msgHdr.folder.getFlag(nsMsgFolderFlags_Inbox);
+}
 
 /**
  * Tells if the message is a draft message
  * @param {nsIMsgDbHdr} msgHdr The message header to examine
  * @return {bool}
  */
-function msgHdrIsDraft(msgHdr)
-msgHdr.folder.getFlag(nsMsgFolderFlags_Drafts)
+function msgHdrIsDraft(msgHdr) {
+    return msgHdr.folder.getFlag(nsMsgFolderFlags_Drafts);
+}
 
 /**
  * Tells if the message is a sent message
  * @param {nsIMsgDbHdr} msgHdr The message header to examine
  * @return {bool}
  */
-function msgHdrIsSent(msgHdr)
-msgHdr.folder.getFlag(nsMsgFolderFlags_SentMail)
+function msgHdrIsSent(msgHdr) {
+    return msgHdr.folder.getFlag(nsMsgFolderFlags_SentMail);
+}
 
 /**
  * Tells if the message is an archived message
  * @param {nsIMsgDbHdr} msgHdr The message header to examine
  * @return {bool}
  */
-function msgHdrIsArchive(msgHdr)
-msgHdr.folder.getFlag(nsMsgFolderFlags_Archive)
+function msgHdrIsArchive(msgHdr) {
+    return msgHdr.folder.getFlag(nsMsgFolderFlags_Archive);
+}
 
 /**
  * Get a nsIMsgDbHdr from a Necko URL.
  * @param {String} The URL
  * @return {nsIMsgDbHdr} The message header.
  */
-function msgHdrFromNeckoUrl(aUrl)
-aUrl.QueryInterface(Ci.nsIMsgMessageUrl).messageHeader
+function msgHdrFromNeckoUrl(aUrl) {
+    return aUrl.QueryInterface(Ci.nsIMsgMessageUrl).messageHeader;
+}
 
 /**
  * Get a string containing the body of a messsage.
@@ -315,24 +320,27 @@ function msgHdrsArchive(msgHdrs) {
  * @param {nsIMsgDbHdr} msgHdr The message header
  * @return {Bool}
  */
-function msgHdrIsRss(msgHdr)
-(msgHdr.folder.server instanceof Ci.nsIRssIncomingServer)
+function msgHdrIsRss(msgHdr) {
+    return (msgHdr.folder.server instanceof Ci.nsIRssIncomingServer);
+}
 
 /**
  * Tell if a message is a NNTP message
  * @param {nsIMsgDbHdr} msgHdr The message header
  * @return {Bool}
  */
-function msgHdrIsNntp(msgHdr)
-(msgHdr.folder.server instanceof Ci.nsINntpIncomingServer)
+function msgHdrIsNntp(msgHdr) {
+    return (msgHdr.folder.server instanceof Ci.nsINntpIncomingServer);
+}
 
 /**
  * Tell if a message has been marked as junk.
  * @param {nsIMsgDbHdr} msgHdr The message header
  * @return {Bool}
  */
-function msgHdrIsJunk(aMsgHdr)
-aMsgHdr.getStringProperty("junkscore") == Ci.nsIJunkMailPlugin.IS_SPAM_SCORE
+function msgHdrIsJunk(aMsgHdr) {
+    return aMsgHdr.getStringProperty("junkscore") == Ci.nsIJunkMailPlugin.IS_SPAM_SCORE;
+}
 
 /**
  * Recycling the HeaderHandlerBase from mimemsg.js
