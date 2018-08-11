@@ -4458,7 +4458,7 @@ calExchangeCalendar.prototype = {
 
         /* can't get parameters of RRULEs... have to do it manually :/ */
         var prop = {};
-        for each(let ps in rrule.icalProperty.value.split(';')) {
+        for (let ps of rrule.icalProperty.value.split(';')) {
             let m = ps.split('=');
             prop[m[0]] = m[1];
         }
@@ -4522,7 +4522,7 @@ calExchangeCalendar.prototype = {
             wr.addChildTag("Interval", "nsTypes", rrule.interval);
             var days = [];
             var daystr = prop["BYDAY"] || dayIdxMap[startDate.weekday];
-            for each(let day in daystr.split(",")) {
+            for (let day of daystr.split(",")) {
                 days.push(dayRevMap[day]);
             }
             wr.addChildTag("DaysOfWeek", "nsTypes", days.join(' '));
@@ -4533,7 +4533,7 @@ calExchangeCalendar.prototype = {
                 wr.addChildTag("Interval", "nsTypes", rrule.interval);
                 var days = [];
                 var daystr = prop["BYDAY"];
-                for each(let day in daystr.split(",")) {
+                for (let day of daystr.split(",")) {
                     days.push(dayRevMap[day]);
                 }
                 wr.addChildTag("DaysOfWeek", "nsTypes", days.join(' '));

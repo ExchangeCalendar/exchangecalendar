@@ -3078,7 +3078,7 @@ mivExchangeBaseItem.prototype = {
 
             /* can't get parameters of RRULEs... have to do it manually :/ */
             var prop = {};
-            for each(let ps in rrule.icalProperty.value.split(';')) {
+            for (let ps of rrule.icalProperty.value.split(';')) {
                 let m = ps.split('=');
                 prop[m[0]] = m[1];
             }
@@ -3144,7 +3144,7 @@ mivExchangeBaseItem.prototype = {
                 wr.addChildTag("Interval", "t", rrule.interval);
                 var days = [];
                 var daystr = prop["BYDAY"] || dayIdxMap[startDate.weekday];
-                for each(let day in daystr.split(",")) {
+                for (let day of daystr.split(",")) {
                     days.push(dayRevMap[day]);
                 }
                 wr.addChildTag("DaysOfWeek", "t", days.join(' '));
@@ -3614,7 +3614,7 @@ mivExchangeBaseItem.prototype = {
             for (var comp of comps2) {
                 switch (comp.tagName) {
                 case 'DaysOfWeek':
-                    for each(let day in xml2json.getValue(comp).split(" ")) {
+                    for (let day of xml2json.getValue(comp).split(" ")) {
                         weekdays = weekdays.concat(dayMap[day]);
                     }
                     break;
@@ -3652,7 +3652,7 @@ mivExchangeBaseItem.prototype = {
 
             let wdtemp = weekdays;
             weekdays = [];
-            for each(let day in wdtemp) {
+            for (let day of wdtemp) {
                 weekdays.push(week + day);
             }
             if (weekdays.length > 0) {

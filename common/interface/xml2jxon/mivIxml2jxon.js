@@ -561,7 +561,7 @@ mivIxml2jxon.prototype = {
         else {
             r = "<" + ns + this.tagName + at + nss + ">" + r + "</" + ns + this.tagName + ">";
         }
-        for each(let s in this._siblings) {
+        for (let s of this._siblings) {
             r = r + s.toString();
         }
         return r;
