@@ -83,8 +83,9 @@ XPCOMUtils.defineLazyGetter(MailServices, "messenger", function () {
  * @param {nsIMsgDbHdr} aMsg The message
  * @return {String}
  */
-function msgHdrGetUri(aMsg)
-aMsg.folder.getUriForMsg(aMsg)
+function msgHdrGetUri(aMsg) {
+    return aMsg.folder.getUriForMsg(aMsg);
+}
 
 /**
  * Get a msgHdr from a message URI (msgHdr.URI).
