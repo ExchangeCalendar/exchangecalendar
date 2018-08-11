@@ -108,7 +108,7 @@
             <method name="beforeUpdate">
                 <body>
 <![CDATA[
-                        for each(var calendar in this._calendars) {
+                        for (var calendar of this._calendars) {
                                 calendar.changed = false;
                         }
                 ]]>
@@ -117,7 +117,7 @@
             <method name="afterUpdate">
                 <body>
 <![CDATA[
-                        for each(var calendar in this._calendars) {
+                        for (var calendar of this._calendars) {
                                 if (calendar.changed === false) {
                                         calendar.row.hidden = true;
                                 }

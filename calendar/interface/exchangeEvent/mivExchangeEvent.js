@@ -284,7 +284,7 @@ mivExchangeEvent.prototype = {
                     .createInstance(Ci.mivIxml2jxon);
                 var categories = this.getCategories({});
                 var first = true;
-                for each(var category in categories) {
+                for (var category of categories) {
                     if (first) {
                         first = false;
                         categoriesXML.processXMLString("<t:String>" + category + "</t:String>", 0, null);
@@ -501,7 +501,7 @@ mivExchangeEvent.prototype = {
                         null: "Unknown"
                     };
 
-                    for each(var attendee in attendees) {
+                    for (var attendee of attendees) {
                         switch (attendee.role) {
                         case "REQ-PARTICIPANT":
                             if (reqAttendeeCount == 0) {

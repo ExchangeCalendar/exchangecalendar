@@ -69,7 +69,7 @@ mivExchangeAccountManager.prototype = {
     getAccounts: function _getAccounts() {
         var result = {};
         var ids = this.getAccountIds()
-        for each(var id in ids) {
+        for (var id of ids) {
 
             if (id != "") {
                 this.logInfo("id:" + id);
@@ -125,7 +125,7 @@ mivExchangeAccountManager.prototype = {
 
     getAccountByServer: function _getAccountByServer(aServer) {
         var accounts = this.getAccounts();
-        for each(var account in accounts) {
+        for (var account of accounts) {
             if ((account.server) && (account.server.value) && (account.server.value.toLowerCase() == aServer.toLowerCase())) {
                 return account;
             }

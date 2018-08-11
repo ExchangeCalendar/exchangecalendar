@@ -115,7 +115,7 @@ mivExchangeTodo.prototype = {
             this._billingInformation = aItem._billingInformation;
             this._companies = [];
             if (aItem._companies) {
-                for each(var company in aItem._companies) {
+                for (var company of aItem._companies) {
                     this._companies.push(company);
                 }
             }
@@ -733,7 +733,7 @@ mivExchangeTodo.prototype = {
                 .createInstance(Ci.mivIxml2jxon);
             var categories = this.getCategories({});
             var first = true;
-            for each(var category in categories) {
+            for (var category of categories) {
                 if (first) {
                     first = false;
                     categoriesXML.processXMLString("<t:String>" + category + "</t:String>", 0, null);
@@ -759,7 +759,7 @@ mivExchangeTodo.prototype = {
             var companies = this.getCompanies({});
             //var companies = this.companies;
             var first = true;
-            for each(var company in companies) {
+            for (var company of companies) {
                 if (first) {
                     first = false;
                     companiesXML.processXMLString("<t:String>" + company + "</t:String>", 0, null);
@@ -1147,7 +1147,7 @@ mivExchangeTodo.prototype = {
         this._companies = [];
         if (this._exchangeData) {
             var tmpStr = xml2json.XPath(this.exchangeData, "/t:Companies/t:String");
-            for each(var string in tmpStr) {
+            for (var string of tmpStr) {
                 this._companies.push(xml2json.getValue(string));
             }
             tmpStr = null;

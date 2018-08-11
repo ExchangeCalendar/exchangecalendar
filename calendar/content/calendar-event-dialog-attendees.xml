@@ -141,7 +141,7 @@
 
                                           var numRowsAdded = 0;
                                           if (attendees.length > 0) {
-                                              for (let attendee in attendees) {
+                                              for (var attendee of attendees) {
                                                   this.appendAttendee(attendee, listbox, template, false);
                                                   numRowsAdded++;
                                               }

@@ -329,12 +329,12 @@ mivExchangeBaseItem.prototype = {
         //dump("CreateProxy aRecurrenceId:"+aRecurrenceId);
 
         var occurrence;
-        for each(var occurrence in this._occurrences) {
+        for (var occurrence of this._occurrences) {
             if (occurrence.recurrenceId.compare(aRecurrenceId) == 0) break;
         }
 
         if (!occurrence) {
-            for each(var occurrence in this._exceptions) {
+            for (var occurrence of this._exceptions) {
                 if (occurrence.recurrenceId.compare(aRecurrenceId) == 0) break;
             }
         }
@@ -461,7 +461,7 @@ mivExchangeBaseItem.prototype = {
 
             this._occurrences = {};
             if (aItem._occurrences) {
-                for each(var occurrence in aItem._occurrences) {
+                for (var occurrence of aItem._occurrences) {
                     //dump("baseClone: aItem._ocurrences 1");
                     //this.removeOccurrence(occurrence);
                     this.addOccurrence(occurrence.clone());
@@ -470,7 +470,7 @@ mivExchangeBaseItem.prototype = {
 
             this._exceptions = {};
             if (aItem._exceptions) {
-                for each(var exception in aItem._exceptions) {
+                for (var exception of aItem._exceptions) {
                     //this.removeException(exception);
                     this.addException(exception.clone());
                 }
@@ -492,20 +492,20 @@ mivExchangeBaseItem.prototype = {
             if (aItem._organizer) this._organizer = aItem._organizer.clone();
             this._attendees = [];
             if (aItem._attendees) {
-                for each(var attendee in aItem._attendees) {
+                for (var attendee of aItem._attendees) {
                     this._attendees.push(attendee.clone());
                 }
             }
             this._hasAttachments = aItem._hasAttachments;
             this._attachments = [];
             if (aItem._attachments) {
-                for each(var attachment in aItem._attachments) {
+                for (var attachment of aItem._attachments) {
                     this._attachments.push(attachment.clone());
                 }
             }
             this._categories = [];
             if (aItem._categories) {
-                for each(var category in aItem._categories) {
+                for (var category of aItem._categories) {
                     this._categories.push(category);
                 }
             }
@@ -545,7 +545,7 @@ mivExchangeBaseItem.prototype = {
     baseClone: function _baseClone(aItem) {
         try {
             //dump("mivExchangeBaseItem: baseClone 1: title:"+this.title+", contractId:"+this.contractID+"\n");
-            for each(var alias in aItem.mailboxAliases) {
+            for (var alias of aItem.mailboxAliases) {
                 this.addMailboxAlias(alias);
             }
             this.cloneToCalEvent(aItem._calEvent);
@@ -603,7 +603,7 @@ mivExchangeBaseItem.prototype = {
             if (aItem._newIsInvitation) this.setProperty("X-MOZ-SEND-INVITATIONS", aItem.getProperty("X-MOZ-SEND-INVITATIONS"));
 
             if (aItem._changedProperties) {
-                for each(var change in aItem._changedProperties) {
+                for (var change of aItem._changedProperties) {
                     switch (change.action) {
                     case "set":
                         this.setProperty(change.name, xml2json.getValue(change));
@@ -617,7 +617,7 @@ mivExchangeBaseItem.prototype = {
             if (aItem._newOrganizer) this.organizer = aItem.organizer.clone();
 
             if (aItem._changesAttendees) {
-                for each(var attendee in aItem._changesAttendees) {
+                for (var attendee of aItem._changesAttendees) {
                     switch (attendee.action) {
                     case "add":
                         this.addAttendee(attendee.attendee);
@@ -631,7 +631,7 @@ mivExchangeBaseItem.prototype = {
             }
 
             if (aItem._changesAttachments) {
-                for each(var attachment in aItem._changesAttachments) {
+                for (var attachment of aItem._changesAttachments) {
                     switch (attachment.action) {
                     case "add":
                         this.addAttachment(attachment.attachment);
@@ -1073,9 +1073,9 @@ mivExchangeBaseItem.prototype = {
                     var newRecurrenceItems = aValue.getRecurrenceItems({});
                     // See if the oldReccurrenceItems exists in the new
                     var allOldExist = true;
-                    for each(var oldRecurrenceItem in oldRecurrenceItems) {
+                    for (var oldRecurrenceItem of oldRecurrenceItems) {
                         var oldExists = false;
-                        for each(var newRecurrenceItem in newRecurrenceItems) {
+                        for (var newRecurrenceItem of newRecurrenceItems) {
                             if (newRecurrenceItem.icalString == oldRecurrenceItem.icalString) {
                                 oldExists = true;
                                 break;
@@ -1523,7 +1523,7 @@ mivExchangeBaseItem.prototype = {
     },
 
     attendeeIsInList: function _attendeeIsInList(attendee) {
-        for each(var tmpAttendee in this.getAttendees({})) {
+        for (var tmpAttendee of this.getAttendees({})) {
             if ((tmpAttendee) && (tmpAttendee.id == attendee.id)) {
                 return tmpAttendee;
             }
@@ -1532,7 +1532,7 @@ mivExchangeBaseItem.prototype = {
     },
 
     attendeeIsInChangesList: function _attendeeIsInChangesList(attendee) {
-        for each(var tmpAttendee in this._changesAttendees) {
+        for (var tmpAttendee of this._changesAttendees) {
             if ((tmpAttendee.attendee) && (tmpAttendee.attendee.id == attendee.id)) {
                 return tmpAttendee;
             }
@@ -1543,7 +1543,7 @@ mivExchangeBaseItem.prototype = {
     removeAttendeeFromChangesList: function _removeAttendeeFromChangesList(attendee) {
         var newChangesList = [];
 
-        for each(var tmpAttendee in this._changesAttendees) {
+        for (var tmpAttendee of this._changesAttendees) {
             if ((tmpAttendee.attendee) && (tmpAttendee.attendee.id != attendee.id)) {
                 newChangesList.push(tmpAttendee);
             }
@@ -1627,7 +1627,7 @@ mivExchangeBaseItem.prototype = {
     removeAllAttendees: function _removeAllAttendees() {
         //dump("removeAllAttendees: title:"+this.title+"\n");
         var allAttendees = this.getAttendees({});
-        for each(var attendee in allAttendees) {
+        for (var attendee of allAttendees) {
 
             var attendeeExists = this.attendeeIsInChangesList(attendee);
             if (attendeeExists != null) {
@@ -1691,7 +1691,7 @@ mivExchangeBaseItem.prototype = {
         //dump("removeAllAttachments: title:"+this.title);
         //		var allAttachments = this._calEvent.getAttachments({});
         var allAttachments = this.getAttachments({});
-        for each(var attachment in allAttachments) {
+        for (var attachment of allAttachments) {
             if (!this._changesAttachments) this._changesAttachments = [];
             this._changesAttachments.push({
                 action: "remove",
@@ -1812,7 +1812,7 @@ mivExchangeBaseItem.prototype = {
             }
             break;
         case "RecurringMaster":
-            for each(var exception in this._exceptions) {
+            for (var exception of this._exceptions) {
                 var tmpStartDate = exception.startDate || exception.entryDate;
                 var tmpEndDate = exception.endDate || exception.entryDate;
                 if (((aStartDate === null) || (!tmpStartDate) || (tmpStartDate.compare(aStartDate) >= 0)) && ((aEndDate === null) || (!tmpEndDate) || (tmpEndDate.compare(aEndDate) < 0))) {
@@ -1820,7 +1820,7 @@ mivExchangeBaseItem.prototype = {
                     occurrences.push(exception);
                 }
             }
-            for each(var occurrence in this._occurrences) {
+            for (var occurrence of this._occurrences) {
                 var tmpStartDate = occurrence.startDate || occurrence.entryDate;
                 var tmpEndDate = occurrence.endDate || occurrence.entryDate;
                 if (((aStartDate === null) || (!tmpStartDate) || (tmpStartDate.compare(aStartDate) >= 0)) && ((aEndDate === null) || (!tmpEndDate) || (tmpEndDate.compare(aEndDate) < 0))) {
@@ -2204,7 +2204,7 @@ mivExchangeBaseItem.prototype = {
     //	      [array,size_is(count),retval] out mivExchangeBaseItem aException);
     getExceptions: function _getExceptions(aCount) {
         var result = [];
-        for each(var exception in this._exceptions) {
+        for (var exception of this._exceptions) {
             result.push(exception);
         }
         aCount.value = result.length;
@@ -2294,7 +2294,7 @@ mivExchangeBaseItem.prototype = {
     removeExceptionAt: function _removeExceptionAt(aRecurrenceId) {
         // Find item.
         var item = null;
-        for each(var exception in this._exceptions) {
+        for (var exception of this._exceptions) {
             if (exception.recurrenceId.compare(aRecurrenceId) == 0) {
                 item = exception;
                 break;
@@ -2310,7 +2310,7 @@ mivExchangeBaseItem.prototype = {
     //void getOccurrences(out uint32_t count, [array,size_is(count),retval] out mivExchangeBaseItem aOccurrence);
     getOccurrences: function _getOccurrences(aCount) {
         var result = [];
-        for each(var occurrence in this._occurrences) {
+        for (var occurrence of this._occurrences) {
             //dump("getOccurrences: occurrence.title:"+occurrence.title+", startDate:"+occurrence.startDate.toString()+"\n");
             result.push(occurrence);
         }
@@ -2361,7 +2361,7 @@ mivExchangeBaseItem.prototype = {
         //dump("removeOccurrenceAt this._cloneCount:"+this._cloneCount+"\n");
         // Find item.
         var item = null;
-        for each(var occurrence in this._occurrences) {
+        for (var occurrence of this._occurrences) {
             if (occurrence.recurrenceId.compare(aRecurrenceId) == 0) {
                 item = occurrence;
                 break;
@@ -2794,7 +2794,7 @@ mivExchangeBaseItem.prototype = {
         this._responseObjects = {};
 
         var responseObjects = this.XPath("/t:ResponseObjects/*");
-        for each(var prop in responseObjects) {
+        for (var prop of responseObjects) {
             this._responseObjects[prop.tagName] = true;
         }
         responseObjects = null;
@@ -2824,7 +2824,7 @@ mivExchangeBaseItem.prototype = {
         this._calEvent.removeAllAttendees();
 
         var attendees = this.XPath("/t:RequiredAttendees/t:Attendee")
-        for each(var at in attendees) {
+        for (var at of attendees) {
             tmpAttendee = this.createAttendee(at, "REQ-PARTICIPANT");
             this._calEvent.addAttendee(tmpAttendee);
             //dump("getAttendees: title:"+this.title+", adding required attendee.id:"+tmpAttendee.id+"\n");
@@ -2833,7 +2833,7 @@ mivExchangeBaseItem.prototype = {
         }
         attendees = null;
         attendees = this.XPath("/t:OptionalAttendees/t:Attendee")
-        for each(var at in attendees) {
+        for (var at of attendees) {
             tmpAttendee = this.createAttendee(at, "OPT-PARTICIPANT");
             this._calEvent.addAttendee(tmpAttendee);
             //dump("getAttendees: title:"+this.title+", adding optional attendee.id:"+tmpAttendee.id+"\n");
@@ -2847,7 +2847,7 @@ mivExchangeBaseItem.prototype = {
         this._attachments = [];
         if (this.hasAttachments) {
             var fileAttachments = this.XPath("/t:Attachments/t:FileAttachment");
-            for each(var fileAttachment in fileAttachments) {
+            for (var fileAttachment of fileAttachments) {
                 var newAttachment = cal.createAttachment();
                 newAttachment.setParameter("X-AttachmentId", xml2json.getAttributeByTag(fileAttachment, "t:AttachmentId", "Id"));
                 newAttachment.uri = cal.makeURL("http://somewhere/?id=" + encodeURIComponent(xml2json.getAttributeByTag(fileAttachment, "t:AttachmentId", "Id")) + "&name=" + encodeURIComponent(xml2json.getTagValue(fileAttachment, "t:Name")) + "&size=" + encodeURIComponent(xml2json.getTagValue(fileAttachment, "t:Size", "")) + "&calendarid=" + encodeURIComponent(this.calendar.id) + "&isinline=" + encodeURIComponent(xml2json.getTagValue(fileAttachment, "t:IsInline", "false")) + "&contentid=" + encodeURIComponent(xml2json.getTagValue(fileAttachment, "t:ContentId", "<NOPE>")));
@@ -2860,7 +2860,7 @@ mivExchangeBaseItem.prototype = {
 
         this._categories = [];
         var strings = this.XPath("/t:Categories/t:String");
-        for each(var cat in strings) {
+        for (var cat of strings) {
             this._categories.push(xml2json.getValue(cat));
         }
         strings = null;
@@ -3059,7 +3059,7 @@ mivExchangeBaseItem.prototype = {
 
             var recurrenceItems = this.recurrenceInfo.getRecurrenceItems({});
             var rrule = null;
-            for each(var ritem in recurrenceItems) {
+            for (var ritem of recurrenceItems) {
                 if (ritem instanceof Ci.calIRecurrenceRule) {
                     rrule = ritem;
                     break;
@@ -3581,7 +3581,7 @@ mivExchangeBaseItem.prototype = {
 
         var comps = {};
 
-        for each(var rec in aElement) {
+        for (var rec of aElement) {
             switch (rec.tagName) {
             case "RelativeYearlyRecurrence":
             case "AbsoluteYearlyRecurrence":
@@ -3611,7 +3611,7 @@ mivExchangeBaseItem.prototype = {
             var weekdays = [];
             var week = [];
             var comps2 = xml2json.XPath(rec, "/*");
-            for each(var comp in comps2) {
+            for (var comp of comps2) {
                 switch (comp.tagName) {
                 case 'DaysOfWeek':
                     for each(let day in xml2json.getValue(comp).split(" ")) {
@@ -3704,7 +3704,7 @@ mivExchangeBaseItem.prototype = {
         		}
 
         		var me = false;
-        		for each(var alias in this.mailboxAliases) {
+        		for (var alias of this.mailboxAliases) {
         			if (xml2json.getTagValue(mbox, "t:EmailAddress","unknown").toLowerCase() == alias.toLowerCase()) {
         				me = true;
         				//dump("createAttendee: Title:"+this.title+", email:"+xml2json.getTagValue(mbox, "t:EmailAddress","unknown")+". This address is mine ("+alias+").\n");

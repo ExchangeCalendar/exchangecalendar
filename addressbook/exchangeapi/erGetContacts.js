@@ -103,7 +103,7 @@ erGetContactsRequest.prototype = {
         itemids = null;
 
         var itemids = req.addChildTag("ItemIds", "nsMessages", null);
-        for each(var item in this.ids) {
+        for (var item of this.ids) {
             var itemId = itemids.addChildTag("ItemId", "nsTypes", null);
             itemId.setAttribute("Id", item.Id);
             if (item.ChangeKey) {

@@ -380,7 +380,7 @@ exchangeAbRootDirectory.prototype = {
         var results = [];
         if (accounts.length > 0) {
             var dir;
-            for each(var account in accounts) {
+            for (var account of accounts) {
                 if (account != "") {
                     var dirName = this.childNodeURI + "id=" + encodeURI(account) + "&type=basefolder";
                     try {
