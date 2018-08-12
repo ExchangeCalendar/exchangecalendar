@@ -27,6 +27,8 @@ var components = Components;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
+Cu.importGlobalProperties(["XMLHttpRequest"]);
+
 function installListener(aUpdater) {
     this._updater = aUpdater;
 }

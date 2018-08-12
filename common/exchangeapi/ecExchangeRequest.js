@@ -50,6 +50,8 @@ Cu.import("resource://exchangecommon/ecFunctions.js");
 Cu.import("resource://exchangecommoninterfaces/xml2jxon/mivIxml2jxon.js");
 Cu.import("resource://exchangecommoninterfaces/xml2json/xml2json.js");
 
+Cu.importGlobalProperties(["XMLHttpRequest"]);
+
 var EXPORTED_SYMBOLS = ["ExchangeRequest", "nsSoapStr", "nsTypesStr", "nsMessagesStr", "nsAutodiscoverResponseStr1", "nsAutodiscoverResponseStr2", "nsAutodiscover2010Str", "nsErrors", "nsWSAStr", "nsXSIStr", "xml_tag"];
 
 var xml_tag = '<?xml version="1.0" encoding="utf-8"?>\n';
