@@ -194,8 +194,8 @@ erFindOccurrencesRequest.prototype = {
                 var tmpItems = xml2json.XPath(e, "/m:Items/*");
                 for (var tmpItem of tmpItems) {
                     this.currentRealIndex++;
-                    var startDate = cal.fromRFC3339(xml2json.getTagValue(tmpItem, "t:Start"), cal.dtz.UTC).getInTimezone(cal.dtz.UTC);
-                    var endDate = cal.fromRFC3339(xml2json.getTagValue(tmpItem, "t:End"), cal.dtz.UTC).getInTimezone(cal.dtz.UTC);
+                    var startDate = cal.dtz.fromRFC3339(xml2json.getTagValue(tmpItem, "t:Start"), cal.dtz.UTC).getInTimezone(cal.dtz.UTC);
+                    var endDate = cal.dtz.fromRFC3339(xml2json.getTagValue(tmpItem, "t:End"), cal.dtz.UTC).getInTimezone(cal.dtz.UTC);
                     if ((this.startDate.compare(endDate) < 1)
                         && (this.endDate.compare(startDate) > -1)) {
                         // We found our occurrence

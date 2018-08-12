@@ -109,7 +109,7 @@ exchTaskDelegation.prototype = {
                 let dtFormat = Cc["@mozilla.org/calendar/datetime-formatter;1"]
                     .getService(Ci.calIDateTimeFormatter);
 
-                var tmpDate = cal.fromRFC3339(task.getProperty("exchWebService-PidLidTaskLastUpdate"), this.globalFunctions.ecTZService().UTC).getInTimezone(this.globalFunctions.ecDefaultTimeZone());
+                var tmpDate = cal.dtz.fromRFC3339(task.getProperty("exchWebService-PidLidTaskLastUpdate"), this.globalFunctions.ecTZService().UTC).getInTimezone(this.globalFunctions.ecDefaultTimeZone());
 
                 var lastChange = task.getProperty("exchWebService-PidLidTaskHistory");
                 switch (lastChange) {

@@ -191,7 +191,7 @@ erFindCalendarItemsRequest.prototype = {
 
                     if (xml2json.getTagValue(calItem, "t:Start").substr(0, 10) == xml2json.getTagValue(calItem, "t:End").substr(0, 10)) {
                         var tmpDateStr = xml2json.getTagValue(calItem, "t:End");
-                        var tmpDateObj = cal.fromRFC3339(tmpDateStr, exchWebService.commonFunctions.ecTZService().UTC).getInTimezone(exchWebService.commonFunctions.ecDefaultTimeZone());
+                        var tmpDateObj = cal.dtz.fromRFC3339(tmpDateStr, exchWebService.commonFunctions.ecTZService().UTC).getInTimezone(exchWebService.commonFunctions.ecDefaultTimeZone());
                         var offset = cal.createDuration();
                         offset.seconds = 1;
                         tmpDateObj.addDuration(offset);

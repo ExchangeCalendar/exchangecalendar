@@ -3635,7 +3635,7 @@ mivExchangeBaseItem.prototype = {
                     break;
                 case 'StartDate':
                     /* Dunno what to do with this for iCal; no place to set */
-                    this._recurrenceStartDate = cal.fromRFC3339(xml2json.getValue(comp).substr(0, 10) + "T00:00:00Z", exchGlobalFunctions.ecTZService().UTC);
+                    this._recurrenceStartDate = cal.dtz.fromRFC3339(xml2json.getValue(comp).substr(0, 10) + "T00:00:00Z", exchGlobalFunctions.ecTZService().UTC);
                     this._recurrenceStartDate.isDate = true;
                     break;
                 case 'EndDate':
@@ -3750,10 +3750,10 @@ mivExchangeBaseItem.prototype = {
     tryToSetDateValueUTC: function _tryToSetDateValueUTC(ewsvalue, aDefault) {
         if ((ewsvalue) && (ewsvalue.toString().length)) {
             if (ewsvalue.indexOf("Z") > -1) {
-                return cal.fromRFC3339(ewsvalue, exchGlobalFunctions.ecTZService().UTC);
+                return cal.dtz.fromRFC3339(ewsvalue, exchGlobalFunctions.ecTZService().UTC);
             }
             else {
-                return cal.fromRFC3339(ewsvalue, exchGlobalFunctions.ecDefaultTimeZone()).getInTimezone(exchGlobalFunctions.ecTZService().UTC);
+                return cal.dtz.fromRFC3339(ewsvalue, exchGlobalFunctions.ecDefaultTimeZone()).getInTimezone(exchGlobalFunctions.ecTZService().UTC);
             }
         }
 
@@ -3762,7 +3762,7 @@ mivExchangeBaseItem.prototype = {
 
     tryToSetDateValueDefaultTZ: function _tryToSetDateValueDefaultTZ(ewsvalue, aDefault) {
         if ((ewsvalue) && (ewsvalue.toString().length)) {
-            return cal.fromRFC3339(ewsvalue, exchGlobalFunctions.ecDefaultTimeZone());
+            return cal.dtz.fromRFC3339(ewsvalue, exchGlobalFunctions.ecDefaultTimeZone());
         }
 
         return aDefault;
@@ -3770,7 +3770,7 @@ mivExchangeBaseItem.prototype = {
 
     tryToSetDateValue: function _TryToSetDateValue(ewsvalue, aDefault) {
         if ((ewsvalue) && (ewsvalue.toString().length)) {
-            return cal.fromRFC3339(ewsvalue, exchGlobalFunctions.ecTZService().UTC).getInTimezone(exchGlobalFunctions.ecDefaultTimeZone());
+            return cal.dtz.fromRFC3339(ewsvalue, exchGlobalFunctions.ecTZService().UTC).getInTimezone(exchGlobalFunctions.ecDefaultTimeZone());
         }
 
         return aDefault;

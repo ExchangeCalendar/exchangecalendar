@@ -4162,20 +4162,20 @@ calExchangeCalendar.prototype = {
         var start = null;
         if (xml2json.getTagValue(aCi, "t:StartTime", null)) {
             if (this.isVersion2007) {
-                start = cal.fromRFC3339(xml2json.getTagValue(aCi, "t:StartTime", null), this.globalFunctions.ecUTC());
+                start = cal.dtz.fromRFC3339(xml2json.getTagValue(aCi, "t:StartTime", null), this.globalFunctions.ecUTC());
             }
             else {
-                start = cal.fromRFC3339(xml2json.getTagValue(aCi, "t:StartTime", null), this.globalFunctions.ecDefaultTimeZone());
+                start = cal.dtz.fromRFC3339(xml2json.getTagValue(aCi, "t:StartTime", null), this.globalFunctions.ecDefaultTimeZone());
             }
         }
 
         var end = null;
         if (xml2json.getTagValue(aCi, "t:EndTime", null)) {
             if (this.isVersion2007) {
-                end = cal.fromRFC3339(xml2json.getTagValue(aCi, "t:EndTime", null), this.globalFunctions.ecUTC());
+                end = cal.dtz.fromRFC3339(xml2json.getTagValue(aCi, "t:EndTime", null), this.globalFunctions.ecUTC());
             }
             else {
-                end = cal.fromRFC3339(xml2json.getTagValue(aCi, "t:EndTime", null), this.globalFunctions.ecDefaultTimeZone());
+                end = cal.dtz.fromRFC3339(xml2json.getTagValue(aCi, "t:EndTime", null), this.globalFunctions.ecDefaultTimeZone());
             }
         }
 
@@ -6404,7 +6404,7 @@ calExchangeCalendar.prototype = {
 
     tryToSetDateValue: function _TryToSetDateValue(ewsvalue, aDefault) {
         if ((ewsvalue) && (ewsvalue.toString().length)) {
-            return cal.fromRFC3339(ewsvalue, this.globalFunctions.ecTZService().UTC).getInTimezone(this.globalFunctions.ecDefaultTimeZone());
+            return cal.dtz.fromRFC3339(ewsvalue, this.globalFunctions.ecTZService().UTC).getInTimezone(this.globalFunctions.ecDefaultTimeZone());
         }
 
         return aDefault;
@@ -7416,10 +7416,10 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         item.startDate = null;
         if (xml2json.getTagValue(aCalendarEvent, "t:StartTime", null)) {
             if (this.isVersion2007) {
-                item.startDate = cal.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:StartTime", null), this.globalFunctions.ecUTC());
+                item.startDate = cal.dtz.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:StartTime", null), this.globalFunctions.ecUTC());
             }
             else {
-                item.startDate = cal.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:StartTime", null), this.globalFunctions.ecDefaultTimeZone());
+                item.startDate = cal.dtz.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:StartTime", null), this.globalFunctions.ecDefaultTimeZone());
             }
         }
 
@@ -7433,10 +7433,10 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         item.endDate = null;
         if (xml2json.getTagValue(aCalendarEvent, "t:EndTime", null)) {
             if (this.isVersion2007) {
-                item.endDate = cal.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:EndTime", null), this.globalFunctions.ecUTC());
+                item.endDate = cal.dtz.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:EndTime", null), this.globalFunctions.ecUTC());
             }
             else {
-                item.endDate = cal.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:EndTime", null), this.globalFunctions.ecDefaultTimeZone());
+                item.endDate = cal.dtz.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:EndTime", null), this.globalFunctions.ecDefaultTimeZone());
             }
         }
 
