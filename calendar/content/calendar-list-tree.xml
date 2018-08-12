@@ -109,7 +109,7 @@
                   aProps.AppendElement(cal.getAtomFromService(bgColorProp));
 
                   // Set a property to get the contrasting text color (foreground)
-                  let fgColorProp = cal.getContrastingTextColor(color || "a8c2e1");
+                  let fgColorProp = cal.view.getContrastingTextColor(color || "a8c2e1");
                   aProps.AppendElement(cal.getAtomFromService(fgColorProp));
 
                   if (calendar.type == "exchangecalendar") {
@@ -154,7 +154,7 @@
                   properties.push("color-" + (color || "default"));
 
                   // Set a property to get the contrasting text color (foreground)
-                  properties.push(cal.getContrastingTextColor(color || "a8c2e1"));
+                  properties.push(cal.view.getContrastingTextColor(color || "a8c2e1"));
 
                   if (calendar.type == "exchangecalendar") {
                           let exchangeCurrentStatus = calendar.getProperty("exchangeCurrentStatus");
