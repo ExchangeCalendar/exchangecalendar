@@ -147,7 +147,7 @@ exchTaskDelegation.prototype = {
         var task = this._document.getElementById("calendar-task-tree").currentTask;
         if (task) {
             var newTask = task.clone();
-            newTask.setProperty("exchWebService-PidLidTaskLastUpdate", cal.toRFC3339(cal.dtz.now()));
+            newTask.setProperty("exchWebService-PidLidTaskLastUpdate", cal.dtz.toRFC3339(cal.dtz.now()));
             newTask.setProperty("exchWebService-PidLidTaskHistory", "1")
             newTask.setProperty("exchWebService-PidLidTaskAccepted", "true")
             task.calendar.modifyItem(newTask, task, null);
@@ -159,7 +159,7 @@ exchTaskDelegation.prototype = {
         var task = this._document.getElementById("calendar-task-tree").currentTask;
         if (task) {
             var newTask = task.clone();
-            newTask.setProperty("exchWebService-PidLidTaskLastUpdate", cal.toRFC3339(cal.dtz.now()));
+            newTask.setProperty("exchWebService-PidLidTaskLastUpdate", cal.dtz.toRFC3339(cal.dtz.now()));
             newTask.setProperty("exchWebService-PidLidTaskHistory", "2")
             newTask.setProperty("exchWebService-PidLidTaskAccepted", "true")
             task.calendar.modifyItem(newTask, task, null);

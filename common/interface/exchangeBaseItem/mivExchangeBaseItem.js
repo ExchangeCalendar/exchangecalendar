@@ -3156,15 +3156,15 @@ mivExchangeBaseItem.prototype = {
             }
 
             if (cal.item.isEvent(this)) {
-                //			var startDateStr = cal.toRFC3339(startDate.getInTimezone(exchGlobalFunctions.ecUTC()))+"Z";
-                var startDateStr = cal.toRFC3339(startDate.getInTimezone(exchGlobalFunctions.ecUTC()));
-                //var startDateStr = cal.toRFC3339(originalDate.getInTimezone(exchGlobalFunctions.ecUTC()));
+                //			var startDateStr = cal.dtz.toRFC3339(startDate.getInTimezone(exchGlobalFunctions.ecUTC()))+"Z";
+                var startDateStr = cal.dtz.toRFC3339(startDate.getInTimezone(exchGlobalFunctions.ecUTC()));
+                //var startDateStr = cal.dtz.toRFC3339(originalDate.getInTimezone(exchGlobalFunctions.ecUTC()));
             }
             else {
                 // We make a non-UTC datetime value for exchGlobalFunctions.
                 // EWS will use the MeetingTimeZone or StartTimeZone and EndTimeZone to convert.
-                //LOG("  ==== tmpStart:"+cal.toRFC3339(tmpStart));
-                var startDateStr = cal.toRFC3339(startDate).substr(0, 19); //cal.toRFC3339(tmpStart).length-6);
+                //LOG("  ==== tmpStart:"+cal.dtz.toRFC3339(tmpStart));
+                var startDateStr = cal.dtz.toRFC3339(startDate).substr(0, 19); //cal.dtz.toRFC3339(tmpStart).length-6);
             }
 
             if (rrule.isByCount && rrule.count != -1) {
@@ -3177,7 +3177,7 @@ mivExchangeBaseItem.prototype = {
                 var endDate = rrule.untilDate.clone();
                 if (cal.item.isEvent(this)) {
                     endDate.isDate = true;
-                    var endDateStr = cal.toRFC3339(endDate.getInTimezone(exchGlobalFunctions.ecUTC()));
+                    var endDateStr = cal.dtz.toRFC3339(endDate.getInTimezone(exchGlobalFunctions.ecUTC()));
                 }
                 else {
                     if (!endDate.isDate) {
@@ -3189,7 +3189,7 @@ mivExchangeBaseItem.prototype = {
 
                         endDate.isDate = true;
                     }
-                    var endDateStr = cal.toRFC3339(endDate).substr(0, 19); //cal.toRFC3339(tmpEnd).length-6);
+                    var endDateStr = cal.dtz.toRFC3339(endDate).substr(0, 19); //cal.dtz.toRFC3339(tmpEnd).length-6);
                 }
                 var edr = r.addChildTag("EndDateRecurrence", "t", null);
                 edr.addChildTag("StartDate", "t", startDateStr);
@@ -3305,7 +3305,7 @@ mivExchangeBaseItem.prototype = {
                             var offset = newAlarmTime.subtractDate(referenceDate);
                             break;
                         }
-                        this.addSetItemField(updates, "ReminderDueBy", cal.toRFC3339(referenceDate));
+                        this.addSetItemField(updates, "ReminderDueBy", cal.dtz.toRFC3339(referenceDate));
 
                         if ((offset) && (offset.inSeconds != 0)) {
                             this.addSetItemField(updates, "ReminderMinutesBeforeStart", String((offset.inSeconds / 60) * -1));
@@ -3531,7 +3531,7 @@ mivExchangeBaseItem.prototype = {
             newSnoozeTime = newSnoozeTime.getInTimezone(cal.dtz.UTC);
             const MAPI_PidLidReminderSignalTime = "34144";
 
-            this.addSetItemField(updates, "ExtendedFieldURI", cal.toRFC3339(newSnoozeTime), {
+            this.addSetItemField(updates, "ExtendedFieldURI", cal.dtz.toRFC3339(newSnoozeTime), {
                 DistinguishedPropertySetId: "Common",
                 PropertyId: MAPI_PidLidReminderSignalTime,
                 PropertyType: "SystemTime"

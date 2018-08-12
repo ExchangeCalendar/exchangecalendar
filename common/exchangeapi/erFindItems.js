@@ -27,7 +27,7 @@ function convDate(aDate) {
         var d = aDate.clone();
 
         d.isDate = false;
-        return cal.toRFC3339(d);
+        return cal.dtz.toRFC3339(d);
     }
 
     return null;

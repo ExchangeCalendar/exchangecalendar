@@ -366,13 +366,13 @@ mivExchangeEvent.prototype = {
 
                     // We make a non-UTC datetime value for exchGlobalFunctions.
                     // EWS will use the MeetingTimeZone or StartTimeZone and EndTimeZone to convert.
-                    //					var exchStart = cal.toRFC3339(tmpStart).substr(0, 19)+"Z"; //cal.toRFC3339(tmpStart).length-6);
-                    var exchStart = cal.toRFC3339(tmpStart).substr(0, 19); //cal.toRFC3339(tmpStart).length-6);
+                    //					var exchStart = cal.dtz.toRFC3339(tmpStart).substr(0, 19)+"Z"; //cal.dtz.toRFC3339(tmpStart).length-6);
+                    var exchStart = cal.dtz.toRFC3339(tmpStart).substr(0, 19); //cal.dtz.toRFC3339(tmpStart).length-6);
                 }
                 else {
                     // We set in bias advanced to UCT datetime values for exchGlobalFunctions.
-                    //					var exchStart = cal.toRFC3339(tmpStart.getInTimezone(cal.dtz.UTC));
-                    var exchStart = cal.toRFC3339(tmpStart).substr(0, 19);
+                    //					var exchStart = cal.dtz.toRFC3339(tmpStart.getInTimezone(cal.dtz.UTC));
+                    var exchStart = cal.dtz.toRFC3339(tmpStart).substr(0, 19);
                 }
                 this._nonPersonalDataChanged = true;
                 this.addSetItemField(updates, "Start", exchStart);
@@ -409,13 +409,13 @@ mivExchangeEvent.prototype = {
 
                     // We make a non-UTC datetime value for exchGlobalFunctions.
                     // EWS will use the MeetingTimeZone or StartTimeZone and EndTimeZone to convert.
-                    //					var exchEnd = cal.toRFC3339(tmpEnd).substr(0, 19)+"Z"; //cal.toRFC3339(tmpEnd).length-6);
-                    var exchEnd = cal.toRFC3339(tmpEnd).substr(0, 19); //cal.toRFC3339(tmpEnd).length-6);
+                    //					var exchEnd = cal.dtz.toRFC3339(tmpEnd).substr(0, 19)+"Z"; //cal.dtz.toRFC3339(tmpEnd).length-6);
+                    var exchEnd = cal.dtz.toRFC3339(tmpEnd).substr(0, 19); //cal.dtz.toRFC3339(tmpEnd).length-6);
                 }
                 else {
                     // We set in bias advanced to UCT datetime values for exchGlobalFunctions.
-                    //					var exchEnd = cal.toRFC3339(tmpEnd.getInTimezone(cal.dtz.UTC));
-                    var exchEnd = cal.toRFC3339(tmpEnd).substr(0, 19);
+                    //					var exchEnd = cal.dtz.toRFC3339(tmpEnd.getInTimezone(cal.dtz.UTC));
+                    var exchEnd = cal.dtz.toRFC3339(tmpEnd).substr(0, 19);
                 }
                 this._nonPersonalDataChanged = true;
                 this.addSetItemField(updates, "End", exchEnd);

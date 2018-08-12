@@ -92,8 +92,8 @@ erSetUserOofSettingsRequest.prototype = {
         userOofSettings.addChildTag("ExternalAudience", "nsTypes", this.externalAudience);
 
         var duration = userOofSettings.addChildTag("Duration", "nsTypes", null);
-        duration.addChildTag("StartTime", "nsTypes", cal.toRFC3339(this.startTime));
-        duration.addChildTag("EndTime", "nsTypes", cal.toRFC3339(this.endTime));
+        duration.addChildTag("StartTime", "nsTypes", cal.dtz.toRFC3339(this.startTime));
+        duration.addChildTag("EndTime", "nsTypes", cal.dtz.toRFC3339(this.endTime));
 
         userOofSettings.addChildTag("InternalReply", "nsTypes", null).addChildTag("Message", "nsTypes", this.internalReply);
         userOofSettings.addChildTag("ExternalReply", "nsTypes", null).addChildTag("Message", "nsTypes", this.externalReply);
