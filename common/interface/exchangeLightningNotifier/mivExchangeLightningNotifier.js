@@ -80,15 +80,15 @@ mivExchangeLightningNotifier.prototype = {
     },
 
     processQueue: function _processQueue() {
-        cal.ProviderBase.startBatch();
+        //dump("mivExchangeLightningNotifier: processQueue\n");
+        cal.provider.BaseClass.startBatch();
 
         for (var counter = 0;
             ((counter < 100) && (this.queue.length > 0)); counter++) {
             var notification = this.queue.shift();
             notification.calendar.notifyObservers.notify(notification.cmd, notification.arg);
         }
-
-        cal.ProviderBase.endBatch();
+        cal.provider.BaseClass.endBatch();
 
         if (this.queue.length == 0) {
             this.timer.cancel();

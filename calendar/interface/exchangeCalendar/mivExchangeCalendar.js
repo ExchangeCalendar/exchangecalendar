@@ -438,7 +438,7 @@ calExchangeCalendar.prototype = {
         return elapsed;
     },
 
-    __proto__: cal.ProviderBase.prototype,
+    __proto__: cal.provider.BaseClass.prototype,
 
     // Begin nsIClassInfo
     classID: components.ID("{" + calExchangeCalendarGUID + "}"),
