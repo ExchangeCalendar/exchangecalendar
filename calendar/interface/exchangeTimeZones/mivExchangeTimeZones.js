@@ -420,35 +420,35 @@ mivExchangeTimeZones.prototype = {
     },
 
     load_timezonedefinitions_file: function _load_timezonedefinitions_file() {
-        var somefile = this.globalFunctions.chromeToPath("chrome://exchangeTimeZones/content/ewsTimesZoneDefinitions_2007.xml");
-        var file = Components.classes["@mozilla.org/file/local;1"]
-            .createInstance(Components.interfaces.nsIFile);
+        // var somefile = this.globalFunctions.chromeToPath("chrome://exchangeTimeZones/content/ewsTimesZoneDefinitions_2007.xml");
+        // var file = Components.classes["@mozilla.org/file/local;1"]
+        //     .createInstance(Components.interfaces.nsIFile);
 
-        file.initWithPath(somefile);
+        // file.initWithPath(somefile);
 
-        var istream = Components.classes["@mozilla.org/network/file-input-stream;1"].
-        createInstance(Components.interfaces.nsIFileInputStream);
-        istream.init(file, -1, -1, 0);
-        istream.QueryInterface(Components.interfaces.nsILineInputStream);
+        // var istream = Components.classes["@mozilla.org/network/file-input-stream;1"].
+        // createInstance(Components.interfaces.nsIFileInputStream);
+        // istream.init(file, -1, -1, 0);
+        // istream.QueryInterface(Components.interfaces.nsILineInputStream);
 
-        // read lines into array  
-        var line = {},
-            lines = "",
-            hasmore;
-        do {
-            hasmore = istream.readLine(line);
-            lines += line.value;
-        } while (hasmore);
+        // // read lines into array  
+        // var line = {},
+        //     lines = "",
+        //     hasmore;
+        // do {
+        //     hasmore = istream.readLine(line);
+        //     lines += line.value;
+        // } while (hasmore);
 
-        istream.close();
+        // istream.close();
         var root = xml2json.newJSON();
-        xml2json.parseXML(root, lines);
-        var timezonedefinitions = root[telements][0];
+        // xml2json.parseXML(root, lines);
+        // var timezonedefinitions = root[telements][0];
         this.addExchangeTimeZones(root, "Exchange2007_SP1");
 
-        timezonedefinitions = null;
-        lines = null;
-        line = null;
+        // timezonedefinitions = null;
+        // lines = null;
+        // line = null;
     },
 
 }
