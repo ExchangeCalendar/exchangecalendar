@@ -10995,7 +10995,6 @@ function NSGetFactory(cid) {
             // Load main script from lightning that we need.
             convertToVersion1();
 
-            Services.scriptloader.loadSubScript("resource://calendar/calendar-js/calUtils.js", Cu.getGlobalForObject(this));
             NSGetFactory.mainEC = XPCOMUtils.generateNSGetFactory([calExchangeCalendar]);
 
         }
