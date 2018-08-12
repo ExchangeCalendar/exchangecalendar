@@ -94,7 +94,7 @@ erCreateItemRequest.prototype = {
             }
         }
 
-        if (cal.isEvent(this.argument.item)) {
+        if (cal.item.isEvent(this.argument.item)) {
             req.setAttribute("SendMeetingInvitations", SendMeetingInvitations);
         }
 

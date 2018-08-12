@@ -48,7 +48,7 @@ function exchChangeCalendarPropertiesReminder(aDocument, aWindow, aArgument) {
 exchChangeCalendarPropertiesReminder.prototype = {
     onLoad: function _onLoad() {
 
-        if ((!cal.isEvent(this._argument.item)) && (this._argument.calendar.type == "exchangecalendar")) {
+        if ((!cal.item.isEvent(this._argument.item)) && (this._argument.calendar.type == "exchangecalendar")) {
             this._document.getElementById("reminder-relative-box").hidden = true;
 
             //this._document.getElementById("reminder-relative-radio").checked = false;
@@ -61,7 +61,7 @@ exchChangeCalendarPropertiesReminder.prototype = {
 
         dump(" WHAT is this:" + this._argument.calendar.type + "\n");
 
-        if ((cal.isEvent(this._argument.item)) && (this._argument.calendar.type == "exchangecalendar")) {
+        if ((cal.item.isEvent(this._argument.item)) && (this._argument.calendar.type == "exchangecalendar")) {
             this._document.getElementById("reminder-relation-origin").hidden = true;
             this._document.getElementById("exchWebService-reminder-relation-origin").hidden = false;
         }
@@ -73,8 +73,8 @@ exchChangeCalendarPropertiesReminder.prototype = {
     },
 
     onNewReminder: function _onNewReminder() {
-        if ((!cal.isEvent(this._argument.item)) && (this._argument.calendar.type == "exchangecalendar")) {
-            let itemType = (cal.isEvent(this._argument.item) ? "event" : "todo");
+        if ((!cal.item.isEvent(this._argument.item)) && (this._argument.calendar.type == "exchangecalendar")) {
+            let itemType = (cal.item.isEvent(this._argument.item) ? "event" : "todo");
             let listbox = this._document.getElementById("reminder-listbox");
 
             let reminder = cal.createAlarm();

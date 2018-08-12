@@ -3085,7 +3085,7 @@ mivExchangeBaseItem.prototype = {
 
             var startDate;
             var originalDate;
-            if (cal.isEvent(this)) {
+            if (cal.item.isEvent(this)) {
                 //dump(" GoGo 2\n");
                 startDate = this.startDate.clone();
                 originalDate = this.startDate.clone();
@@ -3155,7 +3155,7 @@ mivExchangeBaseItem.prototype = {
                 break;
             }
 
-            if (cal.isEvent(this)) {
+            if (cal.item.isEvent(this)) {
                 //			var startDateStr = cal.toRFC3339(startDate.getInTimezone(exchGlobalFunctions.ecUTC()))+"Z";
                 var startDateStr = cal.toRFC3339(startDate.getInTimezone(exchGlobalFunctions.ecUTC()));
                 //var startDateStr = cal.toRFC3339(originalDate.getInTimezone(exchGlobalFunctions.ecUTC()));
@@ -3175,7 +3175,7 @@ mivExchangeBaseItem.prototype = {
             else if (!rrule.isByCount && rrule.untilDate) {
 
                 var endDate = rrule.untilDate.clone();
-                if (cal.isEvent(this)) {
+                if (cal.item.isEvent(this)) {
                     endDate.isDate = true;
                     var endDateStr = cal.toRFC3339(endDate.getInTimezone(exchGlobalFunctions.ecUTC()));
                 }

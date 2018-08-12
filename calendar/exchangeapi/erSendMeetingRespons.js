@@ -91,7 +91,7 @@ erSendMeetingResponsRequest.prototype = {
 
         var SendMeetingInvitations = "SendToAllAndSaveCopy";
 
-        if ((cal.isEvent(this.argument.item)) && (!this.messageDisposition)) {
+        if ((cal.item.isEvent(this.argument.item)) && (!this.messageDisposition)) {
             req.setAttribute('SendMeetingInvitations', SendMeetingInvitations);
         }
 

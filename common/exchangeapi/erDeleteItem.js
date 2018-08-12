@@ -149,7 +149,7 @@ erDeleteItemRequest.prototype = {
 
         var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:DeleteItem DeleteType="HardDelete" xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
 
-        if ((this.itemType != "meeting") && (cal.isEvent(this.argument.item))) {
+        if ((this.itemType != "meeting") && (cal.item.isEvent(this.argument.item))) {
             req.setAttribute("SendMeetingCancellations", sendMeetingCancellations);
         }
 
