@@ -74,7 +74,7 @@ exchChangeCalendarPropertiesReminder.prototype = {
 
     onNewReminder: function _onNewReminder() {
         if ((!cal.isEvent(this._argument.item)) && (this._argument.calendar.type == "exchangecalendar")) {
-            let itemType = (isEvent(this._argument.item) ? "event" : "todo");
+            let itemType = (cal.isEvent(this._argument.item) ? "event" : "todo");
             let listbox = this._document.getElementById("reminder-listbox");
 
             let reminder = cal.createAlarm();
