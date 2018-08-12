@@ -227,7 +227,7 @@ mivUpdater.prototype = {
             this._addon = aAddon;
             this._updateURL = this.safeGetCharPref(null, EXTENSION_MAINPART + this._extensionID, url, true);
             this._updateURL = url;
-            this.xmlReq = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance();
+            this.xmlReq = new XMLHttpRequest();
 
             this.preRelease = this.safeGetBoolPref(null, "extensions.1st-setup.others.warnAboutPrereleaseVersion", true, true);
             var tmp = this;

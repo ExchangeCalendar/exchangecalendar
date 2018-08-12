@@ -321,7 +321,7 @@ ExchangeRequest.prototype = {
         // http://dvcs.w3.org/hg/progress/raw-file/tip/Overview.html
         // https://developer.mozilla.org/en/XPCOM_Interface_Reference/nsIXMLHttpRequestEventTarget
 
-        this.xmlReq = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance();
+        this.xmlReq = new XMLHttpRequest();
         this.mXmlReq = this.xmlReq;
 
         var currentEcRequest = this;
