@@ -494,7 +494,7 @@ calExchangeCalendar.prototype = {
 
     get displayName() {
         if (this.debug) this.logInfo("get displayName()");
-        return calGetString("calExchangeCalendar", "displayName", null, "exchangecommon");
+        return cal.calGetString("calExchangeCalendar", "displayName", null, "exchangecommon");
     },
 
     //  void createCalendar(in AUTF8String aName, in nsIURI aURL,
@@ -3746,17 +3746,17 @@ calExchangeCalendar.prototype = {
         this.saveCredentials(erSyncFolderItemsRequest.argument);
 
         if ((creations.meetingrequests.length > 0) || (updates.meetingrequests.length > 0) || (deletions.meetingrequests.length > 0)) {
-            this.addActivity(calGetString("calExchangeCalendar", "syncInboxRequests", [creations.meetingrequests.length, updates.meetingrequests.length, deletions.meetingrequests.length, this.name], "exchangecommon"), "", erSyncInboxRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.calGetString("calExchangeCalendar", "syncInboxRequests", [creations.meetingrequests.length, updates.meetingrequests.length, deletions.meetingrequests.length, this.name], "exchangecommon"), "", erSyncInboxRequest.argument.actionStart, Date.now());
             this.refresh();
         }
 
         if ((creations.meetingCancellations.length > 0) || (updates.meetingCancellations.length > 0) || (deletions.meetingCancellations.length > 0)) {
-            this.addActivity(calGetString("calExchangeCalendar", "syncInboxCancelations", [creations.meetingCancellations.length, updates.meetingCancellations.length, deletions.meetingCancellations.length, this.name], "exchangecommon"), "", erSyncInboxRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.calGetString("calExchangeCalendar", "syncInboxCancelations", [creations.meetingCancellations.length, updates.meetingCancellations.length, deletions.meetingCancellations.length, this.name], "exchangecommon"), "", erSyncInboxRequest.argument.actionStart, Date.now());
             this.refresh();
         }
 
         if ((creations.meetingResponses.length > 0) || (updates.meetingResponses.length > 0) || (deletions.meetingResponses.length > 0)) {
-            this.addActivity(calGetString("calExchangeCalendar", "syncInboxResponses", [creations.meetingResponses.length, updates.meetingResponses.length, deletions.meetingResponses.length, this.name], "exchangecommon"), "", erSyncInboxRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.calGetString("calExchangeCalendar", "syncInboxResponses", [creations.meetingResponses.length, updates.meetingResponses.length, deletions.meetingResponses.length, this.name], "exchangecommon"), "", erSyncInboxRequest.argument.actionStart, Date.now());
             this.refresh();
         }
 
@@ -3918,7 +3918,7 @@ calExchangeCalendar.prototype = {
                         var bodyText = null;
                         if (this.sendAutoRespondMeetingRequestMessage) {
                             bodyText = this.autoRespondMeetingRequestMessage;
-                            this.addActivity(calGetString("calExchangeCalendar", "sendAutoRespondMeetingRequestMessage", [index.title, this.name], "exchangecommon"), "", Date.now(), Date.now());
+                            this.addActivity(cal.calGetString("calExchangeCalendar", "sendAutoRespondMeetingRequestMessage", [index.title, this.name], "exchangecommon"), "", Date.now(), Date.now());
 
                         }
 
@@ -4030,7 +4030,7 @@ calExchangeCalendar.prototype = {
                                 // Remove calendar item and cancellation message
                                 // because user specified so in the EWS settings.
                                 // We remove it from the real calendar and in the inbox.
-                                this.addActivity(calGetString("calExchangeCalendar", "autoRemoveConfirmedInvitationOnCancellation", [inCalendar.title, this.name], "exchangecommon"), "", Date.now(), Date.now());
+                                this.addActivity(cal.calGetString("calExchangeCalendar", "autoRemoveConfirmedInvitationOnCancellation", [inCalendar.title, this.name], "exchangecommon"), "", Date.now(), Date.now());
                                 inCalendar.setProperty("X-IsCancelled", true);
                                 this.deleteItem(inCalendar);
                                 this.removeMeetingItem(index);
@@ -4407,7 +4407,7 @@ calExchangeCalendar.prototype = {
             + Ci.calICalendar.ITEM_FILTER_TYPE_EVENT, 0, oldBeginDate, oldEndDate, null);
 
         // Make an event for thistory.
-        this.addActivity(calGetString("calExchangeCalendar", "resetEventMessage", [this.name], "exchangecommon"), "", this.resetStart, Date.now());
+        this.addActivity(cal.calGetString("calExchangeCalendar", "resetEventMessage", [this.name], "exchangecommon"), "", this.resetStart, Date.now());
         if (this.debug) this.logInfo(" performReset 2");
     },
 
@@ -5437,11 +5437,11 @@ calExchangeCalendar.prototype = {
 
         // Make an event for thistory.
         if (cal.item.isEvent(erCreateItemRequest.argument.item)) {
-            this.addActivity(calGetString("calExchangeCalendar", "addCalendarEventMessage", [erCreateItemRequest.argument.item.title, this.name], "exchangecommon"), "", erCreateItemRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.calGetString("calExchangeCalendar", "addCalendarEventMessage", [erCreateItemRequest.argument.item.title, this.name], "exchangecommon"), "", erCreateItemRequest.argument.actionStart, Date.now());
         }
         else {
             //this.notifyTheObservers("onAddItem", [newItem]);
-            this.addActivity(calGetString("calExchangeCalendar", "addTaskEventMessage", [erCreateItemRequest.argument.item.title, this.name], "exchangecommon"), "", erCreateItemRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.calGetString("calExchangeCalendar", "addTaskEventMessage", [erCreateItemRequest.argument.item.title, this.name], "exchangecommon"), "", erCreateItemRequest.argument.actionStart, Date.now());
         }
 
 
@@ -5743,7 +5743,7 @@ calExchangeCalendar.prototype = {
             //this.meetingrequestAnswered[erSendMeetingResponsRequest.argument.item.uid] = false;
         }
 
-        this.addActivity(calGetString("calExchangeCalendar", "ewsMeetingResponsEventMessage", [erSendMeetingResponsRequest.argument.item.title, erSendMeetingResponsRequest.argument.response, this.name], "exchangecommon"), erSendMeetingResponsRequest.argument.bodyText, erSendMeetingResponsRequest.argument.actionStart, Date.now());
+        this.addActivity(cal.calGetString("calExchangeCalendar", "ewsMeetingResponsEventMessage", [erSendMeetingResponsRequest.argument.item.title, erSendMeetingResponsRequest.argument.response, this.name], "exchangecommon"), erSendMeetingResponsRequest.argument.bodyText, erSendMeetingResponsRequest.argument.actionStart, Date.now());
         this.refresh();
     },
 
@@ -5870,7 +5870,7 @@ calExchangeCalendar.prototype = {
             }
         }
         else {
-            this.addActivity(calGetString("calExchangeCalendar", "ewsErrorEventMessage", [this.name, aMsg, aCode], "exchangecommon"), aMsg, erGetOccurrenceIndexRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.calGetString("calExchangeCalendar", "ewsErrorEventMessage", [this.name, aMsg, aCode], "exchangecommon"), aMsg, erGetOccurrenceIndexRequest.argument.actionStart, Date.now());
 
             var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                 .getService(Components.interfaces.nsIPromptService);
@@ -6006,10 +6006,10 @@ calExchangeCalendar.prototype = {
 
         // Make an event for thistory.
         if (cal.item.isEvent(erUpdateItemRequest.argument.newItem)) {
-            this.addActivity(calGetString("calExchangeCalendar", "updateCalendarEventMessage", [erUpdateItemRequest.argument.newItem.title, this.name], "exchangecommon"), "", erUpdateItemRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.calGetString("calExchangeCalendar", "updateCalendarEventMessage", [erUpdateItemRequest.argument.newItem.title, this.name], "exchangecommon"), "", erUpdateItemRequest.argument.actionStart, Date.now());
         }
         else {
-            this.addActivity(calGetString("calExchangeCalendar", "updateTaskEventMessage", [erUpdateItemRequest.argument.newItem.title, this.name], "exchangecommon"), "", erUpdateItemRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.calGetString("calExchangeCalendar", "updateTaskEventMessage", [erUpdateItemRequest.argument.newItem.title, this.name], "exchangecommon"), "", erUpdateItemRequest.argument.actionStart, Date.now());
         }
 
         if (!this.doAttachmentUpdates(erUpdateItemRequest.argument.attachmentsUpdates, erUpdateItemRequest.argument.item, erUpdateItemRequest.argument.sendto, erUpdateItemRequest.listener)) {
@@ -6111,10 +6111,10 @@ calExchangeCalendar.prototype = {
 
 
         if (cal.item.isEvent(erDeleteItemRequest.argument.item)) {
-            this.addActivity(calGetString("calExchangeCalendar", "deleteCalendarEventMessage", [erDeleteItemRequest.argument.item.title, this.name], "exchangecommon"), "", erDeleteItemRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.calGetString("calExchangeCalendar", "deleteCalendarEventMessage", [erDeleteItemRequest.argument.item.title, this.name], "exchangecommon"), "", erDeleteItemRequest.argument.actionStart, Date.now());
         }
         else {
-            this.addActivity(calGetString("calExchangeCalendar", "deleteTaskEventMessage", [erDeleteItemRequest.argument.item.title, this.name], "exchangecommon"), "", erDeleteItemRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.calGetString("calExchangeCalendar", "deleteTaskEventMessage", [erDeleteItemRequest.argument.item.title, this.name], "exchangecommon"), "", erDeleteItemRequest.argument.actionStart, Date.now());
         }
 
         //delete erDeleteItemRequest.argument.item;
@@ -8270,7 +8270,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         if (this.debug) this.logInfo("syncFolderItemsOK: Folderbase: " + erSyncFolderItemsRequest.folderBase + ", Creation:" + creations.length + ", Updates:" + updates.length + ", Deletions:" + deletions.length + ", syncState:" + syncState);
 
         if ((creations.length > 0) || (updates.length > 0) || (deletions.length > 0)) {
-            this.addActivity(calGetString("calExchangeCalendar", "syncFolderEventMessage", [creations.length, updates.length, deletions.length, this.name], "exchangecommon"), "", erSyncFolderItemsRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.calGetString("calExchangeCalendar", "syncFolderEventMessage", [creations.length, updates.length, deletions.length, this.name], "exchangecommon"), "", erSyncFolderItemsRequest.argument.actionStart, Date.now());
         }
 
         if (syncState) {
