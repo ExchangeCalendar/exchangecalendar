@@ -29,7 +29,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://exchangecommon/ecExchangeRequest.js");
 
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
+Cu.import("resource://calendar/modules/calUtils.jsm");
 
 Cu.import("resource://interfacescalendartask/exchangeAttendee/mivExchangeAttendee.js");
 
