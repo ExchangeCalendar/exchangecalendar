@@ -311,7 +311,7 @@ function msgHdrsArchive(msgHdrs) {
     let mail3PaneWindow = getMail3Pane();
     let batchMover = new mail3PaneWindow.BatchMessageMover();
     batchMover.archiveMessages(msgHdrs.filter(
-        function (x) !msgHdrIsArchive(x) && getMail3Pane().getIdentityForHeader(x).archiveEnabled
+        function (x) { return !msgHdrIsArchive(x) && getMail3Pane().getIdentityForHeader(x).archiveEnabled;}
     ));
 }
 
@@ -388,12 +388,13 @@ function msgHdrGetHeaders(aMsgHdr, k) {
     let uri = msgHdrGetUri(aMsgHdr);
     let messageService = MailServices.messenger.messageServiceFromURI(uri);
 
-    let fallback = function ()
-    MsgHdrToMimeMessage(aMsgHdr, null, function (aMsgHdr, aMimeMsg) {
-        k(aMimeMsg);
-    }, true, {
-        partsOnDemand: true,
-    });
+    let fallback = function () {
+        return MsgHdrToMimeMessage(aMsgHdr, null, function (aMsgHdr, aMimeMsg) {
+            k(aMimeMsg);
+        }, true, {
+            partsOnDemand: true,
+        });
+    }
 
     if ("streamHeaders" in messageService) {
         try {
