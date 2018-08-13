@@ -325,7 +325,7 @@ mivIxml2jxon.prototype = {
             index = "_default_";
         }
         this.nameSpaces[index] = nameSpaceMgr.addNameSpace(index, b);
-        for (var child of this.tags) {
+        for (var child in this.tags) {
             child.addNameSpace(index, b);
         }
     },
@@ -527,7 +527,7 @@ mivIxml2jxon.prototype = {
         for (let index in this.tags) {
             cc++;
             if (isArray(this.tags[index])) {
-                for each(let tag in this.tags[index]) {
+                for (let tag in this.tags[index]) {
                     r += tag.toString(nss);
                 }
             }
