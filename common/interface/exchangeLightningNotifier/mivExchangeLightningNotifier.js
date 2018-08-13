@@ -20,12 +20,13 @@
 
 var Cc = Components.classes;
 var Ci = Components.interfaces;
+var Cu = Components.utils;
 var Cr = Components.results;
 var components = Components;
 
-ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
-ChromeUtils.import("resource://gre/modules/Services.jsm");
-ChromeUtils.import("resource://calendar/modules/calUtils.jsm");
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://calendar/modules/calUtils.jsm");
 
 function mivExchangeLightningNotifier() {
     this.queue = [];
@@ -81,14 +82,16 @@ mivExchangeLightningNotifier.prototype = {
 
     processQueue: function _processQueue() {
         //dump("mivExchangeLightningNotifier: processQueue\n");
-        cal.provider.BaseClass.startBatch();
+        // FIXME
+        // cal.provider.BaseClass.startBatch();
 
         for (var counter = 0;
             ((counter < 100) && (this.queue.length > 0)); counter++) {
             var notification = this.queue.shift();
             notification.calendar.notifyObservers.notify(notification.cmd, notification.arg);
         }
-        cal.provider.BaseClass.endBatch();
+        // FIXME
+        // cal.provider.BaseClass.endBatch();
 
         if (this.queue.length == 0) {
             this.timer.cancel();
