@@ -92,7 +92,7 @@ erFindFollowupItemsRequest.prototype = {
         var Restriction = req.addChildTag("Restriction", "nsMessages", null);
         var Or = Restriction.addChildTag("Or", "nsTypes", null);
 
-        for (let i of ["1", "2"]) {
+        for each(var i in ["1", "2"]) {
             var IsEqualTo = Or.addChildTag("IsEqualTo", "nsTypes", null);
             var ExtendedFieldURI = IsEqualTo.addChildTag("ExtendedFieldURI", "nsTypes", null);
             ExtendedFieldURI.setAttribute("PropertyTag", "0x1090");
@@ -120,7 +120,7 @@ erFindFollowupItemsRequest.prototype = {
 
         var rm = aResp.XPath("/s:Envelope/s:Body/m:FindItemResponse/m:ResponseMessages/m:FindItemResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']/m:RootFolder/t:Items/t:Message");
 
-        for (let e of rm) {
+        for each(var e in rm) {
             ids.push({
                 Id: e.getAttributeByTag("t:ItemId", "Id"),
                 ChangeKey: e.getAttributeByTag("t:ItemId", "ChangeKey")

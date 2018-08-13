@@ -113,7 +113,7 @@ mivNameSpaces.prototype = {
     },
 
     findNameSpaceByAlias: function _findNameSpaceByAlias(aAlias) {
-        for (let record of this.nameSpaces) {
+        for each(var record in this.nameSpaces) {
                 if (record.alias == aAlias) {
                     return record.value;
                 }

@@ -108,7 +108,7 @@ erFindTaskItemsRequest.prototype = {
 
         var rm = aResp.XPath("/s:Envelope/s:Body/m:FindItemResponse/m:ResponseMessages/m:FindItemResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']/m:RootFolder/t:Items/t:Task");
 
-        for (let e of rm) {
+        for each(var e in rm) {
             ids.push({
                 Id: e.getAttributeByTag("t:ItemId", "Id"),
                 ChangeKey: e.getAttributeByTag("t:ItemId", "ChangeKey")

@@ -159,7 +159,7 @@ erCreateAttachmentRequest.prototype = {
         var errorCount = 0;
         var okCount = 0;
 
-        for (let createAttachmentResponseMessage of createAttachmentResponseMessages) {
+        for each(var createAttachmentResponseMessage in createAttachmentResponseMessages) {
             if (createAttachmentResponseMessage.getAttribute("ResponseClass") != "Success") {
                 weHaveAnError = true;
                 errorCount++;

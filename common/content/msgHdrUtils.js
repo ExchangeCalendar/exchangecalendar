@@ -237,7 +237,7 @@ function msgHdrSetTags(aMsgHdr, aTags) {
  */
 function msgHdrsMarkAsRead(msgHdrs, read) {
     let pending = {};
-    for (let msgHdr of msgHdrs) {
+    for each(let msgHdr in msgHdrs) {
         if (msgHdr.isRead == read)
             continue;
         if (!pending[msgHdr.folder.URI]) {
@@ -263,7 +263,7 @@ function msgHdrsMarkAsRead(msgHdrs, read) {
  */
 function msgHdrsDelete(msgHdrs) {
     let pending = {};
-    for (let msgHdr of msgHdrs) {
+    for each(let msgHdr in msgHdrs) {
         if (!pending[msgHdr.folder.URI]) {
             pending[msgHdr.folder.URI] = {
                 folder: msgHdr.folder,
@@ -394,7 +394,7 @@ function msgHdrGetHeaders(aMsgHdr, k) {
                 let str = aRawString.replace(re, " ");
                 let lines = str.split(/\r?\n/);
                 let obj = {};
-                for (let [, line] of Iterator(lines)) {
+                for each(let [, line] in Iterator(lines)) {
                     let i = line.indexOf(":");
                     if (i < 0)
                         continue;

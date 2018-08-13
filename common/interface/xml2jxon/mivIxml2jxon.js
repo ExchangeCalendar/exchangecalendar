@@ -325,7 +325,7 @@ mivIxml2jxon.prototype = {
             index = "_default_";
         }
         this.nameSpaces[index] = nameSpaceMgr.addNameSpace(index, b);
-        for (let child of this.tags) {
+        for each(var child in this.tags) {
             child.addNameSpace(index, b);
         }
     },
@@ -527,7 +527,7 @@ mivIxml2jxon.prototype = {
         for (let index in this.tags) {
             cc++;
             if (isArray(this.tags[index])) {
-                for (let tag of this.tags[index]) {
+                for each(let tag in this.tags[index]) {
                     r += tag.toString(nss);
                 }
             }
@@ -561,7 +561,7 @@ mivIxml2jxon.prototype = {
         else {
             r = "<" + ns + this.tagName + at + nss + ">" + r + "</" + ns + this.tagName + ">";
         }
-        for (let s of this._siblings) {
+        for each(let s in this._siblings) {
             r = r + s.toString();
         }
         return r;

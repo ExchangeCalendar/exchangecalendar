@@ -142,8 +142,8 @@ erSyncContactsFolderRequest.prototype = {
 
             var lastItemInRange = rm[0].getTagValue("m:IncludesLastItemInRange");
 
-            for (let creation of rm[0].XPath("/m:Changes/t:Create")) {
-                for (let contact of creation.XPath("/t:Contact")) {
+            for each(var creation in rm[0].XPath("/m:Changes/t:Create")) {
+                for each(var contact in creation.XPath("/t:Contact")) {
                     //this.creations.contacts.push(contact);
                     this.creations.contacts.push({
                         Id: contact.getAttributeByTag("t:ItemId", "Id"),
@@ -152,7 +152,7 @@ erSyncContactsFolderRequest.prototype = {
                         displayName: contact.getTagValue("t:DisplayName")
                     });
                 }
-                for (let distlist of creation.XPath("/t:DistributionList")) {
+                for each(var distlist in creation.XPath("/t:DistributionList")) {
                     //this.creations.distlists.push(distlist);
                     this.creations.distlists.push({
                         Id: distlist.getAttributeByTag("t:ItemId", "Id"),
@@ -163,8 +163,8 @@ erSyncContactsFolderRequest.prototype = {
                 }
             }
 
-            for (let update of rm[0].XPath("/m:Changes/t:Update")) {
-                for (let contact of update.XPath("/t:Contact")) {
+            for each(var update in rm[0].XPath("/m:Changes/t:Update")) {
+                for each(var contact in update.XPath("/t:Contact")) {
                     //this.updates.contacts.push(contact);
                     this.updates.contacts.push({
                         Id: contact.getAttributeByTag("t:ItemId", "Id"),
@@ -173,7 +173,7 @@ erSyncContactsFolderRequest.prototype = {
                         displayName: contact.getTagValue("t:DisplayName")
                     });
                 }
-                for (let distlist of update.XPath("/t:DistributionList")) {
+                for each(var distlist in update.XPath("/t:DistributionList")) {
                     //this.updates.distlists.push(distlist);
                     this.updates.distlists.push({
                         Id: distlist.getAttributeByTag("t:ItemId", "Id"),
@@ -184,7 +184,7 @@ erSyncContactsFolderRequest.prototype = {
                 }
             }
 
-            for (let deleted of rm[0].XPath("/m:Changes/t:Delete")) {
+            for each(var deleted in rm[0].XPath("/m:Changes/t:Delete")) {
                 this.deletions.contacts.push(deleted);
             }
 

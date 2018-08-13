@@ -144,7 +144,7 @@ mivExchangeTimeZone.prototype = {
         var absoluteDateTransitions = xml2json.XPath(aValue, "/t:Transitions/t:AbsoluteDateTransition");
         var lastDate = "1900-01-01T00:00:00";
         var transitionIndex = 0;
-        for (let absoluteDateTransition of absoluteDateTransitions) {
+        for each(var absoluteDateTransition in absoluteDateTransitions) {
             var newDate = xml2json.getTagValue(absoluteDateTransition, "t:DateTime", lastDate);
             if ((newDate >= lastDate) && (newDate <= indexDateStr)) {
                 lastDate = xml2json.getTagValue(absoluteDateTransition, "t:DateTime", lastDate);
@@ -161,7 +161,7 @@ mivExchangeTimeZone.prototype = {
         // Get Standard and Daylight transitionId's
         var standardTransition = null;
         var daylightTransition = null;
-        for (let transition of transitions) {
+        for each(var transition in transitions) {
             var tmpId = xml2json.getTagValue(transition, "t:To", "");
             if (tmpId.indexOf("-Standard") >= 0) {
                 standardTransition = transition;
@@ -237,7 +237,7 @@ mivExchangeTimeZone.prototype = {
         var tmpNames = aValue.tzid.split("/");
 
         this._names = new Array();
-        for (let name of tmpNames) {
+        for each(var name in tmpNames) {
                 this._names.push(name);
             }
             //dump(" setCalTimezone: this._names:"+this._names+"\n");

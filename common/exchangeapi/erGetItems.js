@@ -402,7 +402,7 @@ erGetItemsRequest.prototype = {
         */
 
         var itemids = xml2json.addTag(req, "ItemIds", "nsMessages", null);
-        for (let item of this.ids) {
+        for each(var item in this.ids) {
             var itemId = xml2json.addTag(itemids, "ItemId", "nsTypes", null);
             xml2json.setAttribute(itemId, "Id", item.Id);
             this.requestedItemId.push(item.Id);

@@ -106,7 +106,7 @@ erDeleteAttachmentRequest.prototype = {
         var errorCount = 0;
         var okCount = 0;
 
-        for (let deleteAttachmentResponseMessage of deleteAttachmentResponseMessages) {
+        for each(var deleteAttachmentResponseMessage in deleteAttachmentResponseMessages) {
             if (deleteAttachmentResponseMessage.getAttribute("ResponseClass") != "Success") {
                 weHaveAnError = true;
                 errorCount++;

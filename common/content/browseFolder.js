@@ -146,7 +146,7 @@ exchWebService_browseTreeView.prototype = {
     openFolder: function (idx) {
         var insertedRows = 0;
         var index = idx + 1;
-        for (let child of this.folders[idx].children) {
+        for each(var child in this.folders[idx].children) {
             this.folders.splice(index, 0, child); // Add one
 
             if ((child.isContainer) && (child.isContainerOpen)) {
@@ -290,7 +290,7 @@ exchWebService_browseTreeView.prototype = {
         var parentIndex = this.getItemIndex(erBrowseFolderRequest.argument);
         if (parentIndex > -1) {
             var parent = this.folders[parentIndex];
-            for (let folder of childFolders) {
+            for each(var folder in childFolders) {
                 this.addChild(parent, folder);
             }
         }

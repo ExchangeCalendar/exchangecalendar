@@ -86,7 +86,7 @@ erForewardItemRequest.prototype = {
         var forwardItem = req.addChildTag("Items", "nsMessages", null).addChildTag("ForwardItem", "nsTypes", null);
         var toRecipients = forwardItem.addChildTag("ToRecipients", "nsTypes", null);
 
-        for (let emailId of this.argument.attendees) {
+        for each(let emailId in this.argument.attendees) {
             var email = new String(emailId);
             var start = email.indexOf('<');
             if (start < 0) {

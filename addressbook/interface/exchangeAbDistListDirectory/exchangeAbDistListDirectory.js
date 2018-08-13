@@ -416,7 +416,7 @@ exchangeAbDistListDirectory.prototype = {
         var result = [];
 
         if (this.distLists.length > 0) {
-            for (let distList of this.distLists) {
+            for each(var distList in this.distLists) {
                 result.push(distList);
             }
         }
@@ -475,7 +475,7 @@ exchangeAbDistListDirectory.prototype = {
                     // Remove cards.
                     var oldList = this.contacts;
                     this.contacts = {};
-                    for (let contact of oldList) {
+                    for each(var contact in oldList) {
                         exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: '" + this.dirName + "' removed contact:" + contact.getProperty("DisplayName", ""));
                         MailServices.ab.notifyDirectoryItemDeleted(this, contact);
                         MailServices.ab.notifyDirectoryDeleted(this, contact);
@@ -484,7 +484,7 @@ exchangeAbDistListDirectory.prototype = {
                     // Remove distLists.
                     var oldList = this.distLists;
                     this.distLists = new Array();
-                    for (let distList of oldList) {
+                    for each(var distList in oldList) {
                         exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: '" + this.dirName + "' removed distList:" + distList.dirName);
                         MailServices.ab.notifyDirectoryDeleted(this, distList);
                     }
@@ -557,7 +557,7 @@ exchangeAbDistListDirectory.prototype = {
 
                     this.observerService.notifyObservers(this, "onExchangeGALSearchStart", this._searchQuery);
 
-                    for (let contact of this.contacts) {
+                    for each(var contact in this.contacts) {
                         exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: Adding sub child A '" + contact.displayName + "' to contacts. dirName:" + this.dirName);
                         MailServices.ab.notifyDirectoryItemAdded(this, contact);
                     }
@@ -1144,7 +1144,7 @@ exchangeAbDistListDirectory.prototype = {
 
         // This will eat performance when the list is long.
         this._addressLists.clear();
-        for (let contact of this.contacts) {
+        for each(var contact in this.contacts) {
             this._addressLists.appendElement(contact, false);
         }
 
@@ -1179,7 +1179,7 @@ exchangeAbDistListDirectory.prototype = {
             var aStoreContacts = new Array();
             var aADContacts = new Array();
             this.distLists = new Array()
-            for (let mailbox of aMailboxes) {
+            for each(var mailbox in aMailboxes) {
                 var calMailbox = this.convertExchangeMailbox(mailbox);
 
                 switch (calMailbox.mailboxType) {
@@ -1311,7 +1311,7 @@ exchangeAbDistListDirectory.prototype = {
     contactsLoadOk: function _contactsLoadOk(erGetContactsRequest, aContacts) {
         exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: contactsLoadOk: contacts:" + aContacts.length);
 
-        for (let contact of aContacts) {
+        for each(var contact in aContacts) {
             //exchWebService.commonAbFunctions.logInfo("Contact card:"+contact.toString(),2);
             exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: new childCards:" + contact.getTagValue("t:DisplayName"));
             this.ecUpdateCard(contact);
@@ -1326,7 +1326,7 @@ exchangeAbDistListDirectory.prototype = {
 
         exchWebService.commonAbFunctions.logInfo("exchangeAbDistListDirectory: resolveNamesOk: contacts:" + aResolutions.length);
 
-        for (let resolution of aResolutions) {
+        for each(var resolution in aResolutions) {
             exchWebService.commonAbFunctions.logInfo("resolution card:" + resolution.toString());
 
             var mailbox = resolution.getTags("t:Mailbox");

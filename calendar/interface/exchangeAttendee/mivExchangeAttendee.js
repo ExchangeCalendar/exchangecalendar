@@ -277,7 +277,7 @@ mivExchangeAttendee.prototype = {
 
         var me = false;
 
-        for (let alias of aParent.mailboxAliases) {
+        for each(var alias in aParent.mailboxAliases) {
             if (xml2json.getTagValue(mbox, "t:EmailAddress", "unknown").toLowerCase() == alias.toLowerCase()) {
                 me = true;
                 //dump("convertFromExchange: Title:"+aParent.title+", email:"+xml2json.getTagValue(mbox, "t:EmailAddress","unknown")+". This address is mine ("+alias+").\n");

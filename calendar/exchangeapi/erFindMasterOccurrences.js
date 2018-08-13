@@ -288,7 +288,7 @@ erFindMasterOccurrencesRequest.prototype = {
 
         itemids = req.addChildTag("ItemIds", "nsMessages", null);
 
-        for (let master of this.occurrences) {
+        for each(var master in this.occurrences) {
             var reccMasterItemId = itemids.addChildTag("RecurringMasterItemId", "nsTypes", null);
             reccMasterItemId.setAttribute("OccurrenceId", master.Id);
             reccMasterItemId.setAttribute("ChangeKey", master.ChangeKey);
@@ -313,7 +313,7 @@ erFindMasterOccurrencesRequest.prototype = {
 
         var items = [];
 
-        for (let e of rm) {
+        for each(var e in rm) {
             var calendarItem = e.XPath("/m:Items/t:CalendarItem");
             if (calendarItem.length > 0) {
                 items.push(calendarItem[0]);

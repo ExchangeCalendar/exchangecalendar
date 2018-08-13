@@ -253,7 +253,7 @@ mivExchangeAutoCompleteResult.prototype = {
     addResult: function _addResult(aCard) {
         // First check if this card is not already in the list
         var cardExists = false;
-        for (let card of this._cards) {
+        for each(var card in this._cards) {
             if (card.localId == aCard.localId) {
 
                 cardExists = true;

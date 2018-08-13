@@ -138,7 +138,7 @@ erGetOccurrenceIndexRequest.prototype = {
 
         var rm = aResp.XPath("/s:Envelope/s:Body/m:GetItemResponse/m:ResponseMessages/m:GetItemResponseMessage");
 
-        for (let e of rm) {
+        for each(var e in rm) {
 
             var responseCode = e.getTagValue("m:ResponseCode");
             switch (responseCode) {
@@ -147,7 +147,7 @@ erGetOccurrenceIndexRequest.prototype = {
                 break;
             case "NoError":
                 var items = e.XPath("/m:Items/*");
-                for (let item of items) {
+                for each(var item in items) {
                     this.currentRealIndex++;
                     if (this.argument.item.id == item.getAttributeByTag("t:ItemId", "Id")) {
                         // We found our occurrence

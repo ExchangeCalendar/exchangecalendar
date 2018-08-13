@@ -955,7 +955,7 @@ calExchangeCalendar.prototype = {
             // If I am invited. Remove myself.
             var attendees = newItem.getAttendees({});
             newItem.removeAllAttendees(); // Need to have this. When we add attendees when we create a new calendaritem we become organizer.
-            for (let attendee of attendees) {
+            for each(var attendee in attendees) {
                 if ((attendee.id.replace(/^mailto:/i, '').toLowerCase() == this.mailbox.toLowerCase())
                     || (attendee.id.replace(/^exchangecalendar:/, '').toLowerCase() == this.mailbox.toLowerCase())) {
                     if (this.debug) this.logInfo("addItem: FOUND myself as an attendee and we are going to remove myself:" + newItem.title);
@@ -1335,7 +1335,7 @@ calExchangeCalendar.prototype = {
         }
 
         // Master was modified so tell the chidlren they have a new parent.
-        for (let item of this.itemCacheById) {
+        for each(var item in this.itemCacheById) {
             //			if ((item) && (item.parentItem.id != item.id) && (item.uid == aModifiedMaster.uid)) {
             if ((item) && (item.uid == aModifiedMaster.uid)) {
                 //var newItem = item.clone();
@@ -3146,8 +3146,8 @@ calExchangeCalendar.prototype = {
         }
 
         // Parse through the attendees
-        let attendees = aItem.getAttendees({});
-        for (let attendee of attendees) {
+        var attendees = aItem.getAttendees({});
+        for each(var attendee in attendees) {
             if (this.debug) this.logInfo("getInvitedAttendee 2:" + attendee.id);
             if ((attendee.id.replace(/^mailto:/i, '').toLowerCase() == this.mailbox.toLowerCase())
                 || (attendee.id.replace(/^exchangecalendar:/, '').toLowerCase() == this.mailbox.toLowerCase())) {
@@ -3281,14 +3281,14 @@ calExchangeCalendar.prototype = {
     getExceptions: function _getExceptions(aRecurrenceItems) {
         var tmpCount = 0;
         var exceptions = {};
-        for (let recurrenceItem of aRecurrenceItems) {
+        for each(var recurrenceItem in aRecurrenceItems) {
             tmpCount++;
             if (this.debug) this.logInfo("getExceptions: nr:" + tmpCount + ", isNegative:" + recurrenceItem.isNegative);
             if (recurrenceItem.isNegative) {
                 // A deletion is an exception and therefore isNegative === true
-                let occurrences = recurrenceItem.getOccurrences(this.startDate, this.startDate, this.endDate, 0, {});
+                var occurrences = recurrenceItem.getOccurrences(this.startDate, this.startDate, this.endDate, 0, {});
                 if (this.debug) this.logInfo("getExceptions: we have occurrences.length=" + occurrences.length);
-                for (let occurrence of occurrences) {
+                for each(var occurrence in occurrences) {
                     exceptions[occurrence.toString()] = occurrence;
                 }
             }
@@ -3311,9 +3311,9 @@ calExchangeCalendar.prototype = {
         if (newCount.value > oldCount.value) {
             if (this.debug) this.logInfo("getRemovedOccurrence: We have less occurrences than before.");
 
-            for (let newOccurrence of newOccurrences) {
+            for each(var newOccurrence in newOccurrences) {
                 var foundOld = false;
-                for (let oldOccurrence of oldOccurrences) {
+                for each(var oldOccurrence in oldOccurrences) {
                     if (oldOccurrence.id == newOccurrence.id) {
                         foundOld = true;
                         break;
@@ -3339,9 +3339,9 @@ calExchangeCalendar.prototype = {
         if (newCount.value > oldCount.value) {
             if (this.debug) this.logInfo("getRemovedOccurrence: We have less exceptions than before.");
 
-            for (let newException of newExceptions) {
+            for each(var newException in newExceptions) {
                 var foundOld = false;
-                for (let oldException of oldExceptions) {
+                for each(var oldException in oldExceptions) {
                     if (oldException.id == newException.id) {
                         foundOld = true;
                         break;
@@ -3785,7 +3785,7 @@ calExchangeCalendar.prototype = {
 
         // Save requests into cache.
         if (creations.meetingrequests.length > 0) {
-            for (let request of creations.meetingrequests) {
+            for each(var request in creations.meetingrequests) {
                 var meetingItem = this.convertExchangeAppointmentToCalAppointment(request, true);
                 if (meetingItem) {
                     if (this.debug) this.logInfo(" -- MeetingRequest creation:" + meetingItem.title + ", UID:" + meetingItem.uid + ",id:" + meetingItem.id + ",changeKey:" + meetingItem.changeKey);
@@ -3798,7 +3798,7 @@ calExchangeCalendar.prototype = {
         }
 
         if (updates.meetingrequests.length > 0) {
-            for (let update of updates.meetingrequests) {
+            for each(var update in updates.meetingrequests) {
                 var meetingItem = this.convertExchangeAppointmentToCalAppointment(update, true);
                 if (meetingItem) {
                     if (this.debug) this.logInfo(" -- MeetingRequest update:" + meetingItem.title + ", UID:" + meetingItem.uid + ",id:" + meetingItem.id + ",changeKey:" + meetingItem.changeKey);
@@ -3817,7 +3817,7 @@ calExchangeCalendar.prototype = {
         }
 
         if (deletions.meetingrequests.length > 0) {
-            for (let deletion of deletions.meetingrequests) {
+            for each(var deletion in deletions.meetingrequests) {
                 var meetingItem = this.convertExchangeAppointmentToCalAppointment(deletion, true);
                 if (meetingItem) {
                     if (this.debug) this.logInfo(" -- MeetingRequest deletion:" + meetingItem.title + ", UID:" + meetingItem.uid + ",id:" + meetingItem.id + ",changeKey:" + meetingItem.changeKey);
@@ -3830,7 +3830,7 @@ calExchangeCalendar.prototype = {
 
         // Save cancelations into cache and remove request for which we received a cancelation.
         if (creations.meetingCancellations.length > 0) {
-            for (let request of creations.meetingCancellations) {
+            for each(var request in creations.meetingCancellations) {
                 var cancelItem = this.convertExchangeAppointmentToCalAppointment(request, true);
                 if (cancelItem) {
                     if (this.debug) this.logInfo(" -- MeetingCancelation creation:" + cancelItem.title + ", UID:" + cancelItem.uid + ",id:" + cancelItem.id + ",changeKey:" + cancelItem.changeKey);
@@ -3841,7 +3841,7 @@ calExchangeCalendar.prototype = {
         }
 
         if (updates.meetingCancellations.length > 0) {
-            for (let update of updates.meetingCancellations) {
+            for each(var update in updates.meetingCancellations) {
                 var cancelItem = this.convertExchangeAppointmentToCalAppointment(update, true);
                 if (cancelItem) {
                     cancelItem.setProperty("X-MEETINGCANCELATION", true);
@@ -3856,7 +3856,7 @@ calExchangeCalendar.prototype = {
         }
 
         if (deletions.meetingCancellations.length > 0) {
-            for (let deletion of deletions.meetingCancellations) {
+            for each(var deletion in deletions.meetingCancellations) {
                 delete this.meetingCancelationsCache[deletion.id];
             }
         }
@@ -3864,7 +3864,7 @@ calExchangeCalendar.prototype = {
         var requestCount = 0;
         var cancelationCount = 0;
         var tmpInCalendarCache = {};
-        for (let index of this.meetingRequestsCache) {
+        for each(var index in this.meetingRequestsCache) {
             if (index) {
                 // Remove request for which we have an calendaritem which is confirmed
                 var tmpID = index.id;
@@ -3878,7 +3878,7 @@ calExchangeCalendar.prototype = {
 
                 // Check single items
                 if (!inCalendar) {
-                    for (let item of this.itemCacheById) {
+                    for each(var item in this.itemCacheById) {
                         if ((item) && (item.uid == tmpUID)) {
                             inCalendar = item;
                             break;
@@ -3947,7 +3947,7 @@ calExchangeCalendar.prototype = {
             }
         }
 
-        for (let index of this.meetingCancelationsCache) {
+        for each(var index in this.meetingCancelationsCache) {
             if (index) {
                 // Remove cancelation for which we do not have an calendaritem.
                 var tmpID = index.id;
@@ -3961,7 +3961,7 @@ calExchangeCalendar.prototype = {
 
                 // Check single items
                 if (!inCalendar) {
-                    for (let item of this.itemCacheById) {
+                    for each(var item in this.itemCacheById) {
                         if ((item) && (item.uid == tmpUID)) {
                             inCalendar = item;
                             break;
@@ -4060,11 +4060,11 @@ calExchangeCalendar.prototype = {
 
         // Process Meetingresponses
         // Save responses into cache and remove request for which we received a cancelation.
-        for (let response of creations.meetingResponses) {
+        for each(var response in creations.meetingResponses) {
             this.meetingResponsesCache[xml2json.getAttributeByTag(response, "t:ItemId", "Id")] = response;
         }
 
-        for (let response of updates.meetingResponses) {
+        for each(var response in updates.meetingResponses) {
             if (this.meetingResponsesCache[xml2json.getAttributeByTag(response, "t:ItemId", "Id")]) {
                 this.meetingResponsesCache[xml2json.getAttributeByTag(response, "t:ItemId", "Id")] = response;
             }
@@ -4073,7 +4073,7 @@ calExchangeCalendar.prototype = {
             }
         }
 
-        for (let response of deletions.meetingResponses) {
+        for each(var response in deletions.meetingResponses) {
             if (this.meetingResponsesCache[xml2json.getAttributeByTag(response, "t:ItemId", "Id")]) {
                 delete this.meetingResponsesCache[xml2json.getAttributeByTag(response, "t:ItemId", "Id")];
             }
@@ -4081,7 +4081,7 @@ calExchangeCalendar.prototype = {
 
 
         if (this.doAutoRemoveInvitationResponse1) {
-            for (let response of this.meetingResponsesCache) {
+            for each(var response in this.meetingResponsesCache) {
                 // Check if we have this meeting 
                 var tmpUID = xml2json.getTagValue(response, "t:UID");
                 var inCalendar = false;
@@ -4093,7 +4093,7 @@ calExchangeCalendar.prototype = {
 
                 // Check single items
                 if (!inCalendar) {
-                    for (let item of this.itemCacheById) {
+                    for each(var item in this.itemCacheById) {
                         if ((item) && (item.uid == tmpUID)) {
                             inCalendar = item;
                             break;
@@ -4443,7 +4443,7 @@ calExchangeCalendar.prototype = {
         }
 
         var rrule = null;
-        for (let ritem of aItem.recurrenceInfo.getRecurrenceItems({})) {
+        for each(var ritem in aItem.recurrenceInfo.getRecurrenceItems({})) {
             if (cal.wrapInstance(ritem, Ci.calIRecurrenceRule)) {
                 rrule = ritem;
                 if (this.debug) this.logInfo(" ;;;; rrule:" + rrule.icalProperty.icalString);
@@ -4461,7 +4461,7 @@ calExchangeCalendar.prototype = {
 
         /* can't get parameters of RRULEs... have to do it manually :/ */
         var prop = {};
-        for (let ps of rrule.icalProperty.value.split(';')) {
+        for each(let ps in rrule.icalProperty.value.split(';')) {
             let m = ps.split('=');
             prop[m[0]] = m[1];
         }
@@ -4525,7 +4525,7 @@ calExchangeCalendar.prototype = {
             wr.addChildTag("Interval", "nsTypes", rrule.interval);
             var days = [];
             var daystr = prop["BYDAY"] || dayIdxMap[startDate.weekday];
-            for (let day of daystr.split(",")) {
+            for each(let day in daystr.split(",")) {
                 days.push(dayRevMap[day]);
             }
             wr.addChildTag("DaysOfWeek", "nsTypes", days.join(' '));
@@ -4536,7 +4536,7 @@ calExchangeCalendar.prototype = {
                 wr.addChildTag("Interval", "nsTypes", rrule.interval);
                 var days = [];
                 var daystr = prop["BYDAY"];
-                for (let day of daystr.split(",")) {
+                for each(let day in daystr.split(",")) {
                     days.push(dayRevMap[day]);
                 }
                 wr.addChildTag("DaysOfWeek", "nsTypes", days.join(' '));
@@ -4910,7 +4910,7 @@ calExchangeCalendar.prototype = {
 
         var categories = aItem.getCategories({});
         var categoriesTag = e.addChildTag("Categories", "nsTypes", null);
-        for (let category of categories) {
+        for each(var category in categories) {
             categoriesTag.addChildTag("String", "nsTypes", category);
         }
 
@@ -5067,7 +5067,7 @@ calExchangeCalendar.prototype = {
             var attendees = aItem.getAttendees({});
             var ae;
 
-            for (let attendee of attendees) {
+            for each(var attendee in attendees) {
                 //dump("attendee.role:"+attendee.role+"\n");
                 switch (attendee.role) {
                 case "REQ-PARTICIPANT":
@@ -5204,7 +5204,7 @@ calExchangeCalendar.prototype = {
 
         var categories = aItem.getCategories({});
         var categoriesTag = null;
-        for (let category of categories) {
+        for each(var category in categories) {
             if (categoriesTag == null) {
                 categoriesTag = e.addChildTag("Categories", "nsTypes", null);
             }
@@ -5313,7 +5313,7 @@ calExchangeCalendar.prototype = {
 
         var companies = aItem.getCompanies({});
         var first = true;
-        for (let company of companies) {
+        for each(var company in companies) {
             companiesTag.addChildTag("String", "nsTypes", company);
         }
 
@@ -6182,7 +6182,7 @@ calExchangeCalendar.prototype = {
         // Removed Single/Master items in the lists which we already have in memory
         var newIdList = new Array();
         //dump("     findCalendarItemsOK: aIds.length:"+aIds.length+"\n");
-        for (let item of aIds) {
+        for each(var item in aIds) {
             if (!doNotCheckCache) {
                 var inItemCache = ((this.itemCacheById[item.Id]) && (this.itemCacheById[item.Id].changeKey == item.ChangeKey));
                 if ((!inItemCache) && (this.useOfflineCache)) {
@@ -6202,7 +6202,7 @@ calExchangeCalendar.prototype = {
         // Remove Occurrence/Exception items in the lists which we already have in memory
         var newOccurrenceList = new Array();
         //dump("     findCalendarItemsOK: aOccurrences.length:"+aOccurrences.length+"\n");
-        for (let item of aOccurrences) {
+        for each(var item in aOccurrences) {
                 if (!this.recurringMasterCache[item.uid]) {
                     newOccurrenceList.push(item);
                 }
@@ -6358,7 +6358,7 @@ calExchangeCalendar.prototype = {
         // Removed Single/Master items in the lists which we already have in memory
         var newIdList = new Array();
         //dump("     findCalendarItemsOK: aIds.length:"+aIds.length+"\n");
-        for (let item of aIds) {
+        for each(var item in aIds) {
             if (!doNotCheckCache) {
                 var inItemCache = ((this.itemCacheById[item.Id]) && (this.itemCacheById[item.Id].changeKey == item.ChangeKey));
                 if ((!inItemCache) && (this.useOfflineCache)) {
@@ -6638,7 +6638,7 @@ calExchangeCalendar.prototype = {
     removeChildrenFromMaster: function _removeChildrenFromMaster(aMaster) {
         if (this.debug) this.logInfo("removeChildrenFromMaster start. Title:" + aMaster.title);
         // Remove children of this master. They will be added later.
-        for (let child of aMaster.getExceptions({})) {
+        for each(var child in aMaster.getExceptions({})) {
             this.notifyTheObservers("onDeleteItem", [child]);
             aMaster.removeException(child);
             /*if (this.itemCacheById[child.id]) {
@@ -6651,7 +6651,7 @@ else { dump("Exception does not exist in cache anymore.\n");}
 
         }
 
-        for (let child of aMaster.getOccurrences({})) {
+        for each(var child in aMaster.getOccurrences({})) {
             this.notifyTheObservers("onDeleteItem", [child]);
             aMaster.removeOccurrence(child);
             /*if (this.itemCacheById[child.id]) {
@@ -6705,7 +6705,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         if (aExchangeItem.getTagValue("t:HasAttachments") == "true") {
             //			if (this.debug) this.logInfo("Title:"+aItem.title+"Attachments:"+aExchangeItem.getTagValue("Attachments"));
             var fileAttachments = aExchangeItem.XPath("/t:Attachments/t:FileAttachment");
-            for (let fileAttachment of fileAttachments) {
+            for each(var fileAttachment in fileAttachments) {
                 //				if (this.debug) this.logInfo(" -- Attachment: name="+fileAttachment.getTagValue("t:Name"));
 
                 var newAttachment = createAttachment();
@@ -7059,7 +7059,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
 
                     let ids = [];
                     let myExceptions = this.recurringMasterCache[item.uid].getExceptions({});
-                    for (let tmpException of myExceptions) {
+                    for each(var tmpException in myExceptions) {
                         ids.push({
                             Id: tmpException.id,
                             type: "Exception",
@@ -7069,7 +7069,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                         });
                     }
                     let myOccurrences = this.recurringMasterCache[item.uid].getOccurrences({});
-                    for (let tmpOccurrence of myOccurrences) {
+                    for each(var tmpOccurrence in myOccurrences) {
                         ids.push({
                             Id: tmpOccurrence.id,
                             type: "Occurrence",
@@ -8298,10 +8298,10 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         var self = this;
 
         var changes = [];
-        for (let creation of creations) {
+        for each(var creation in creations) {
             changes.push(creation);
         }
-        for (let update of updates) {
+        for each(var update in updates) {
             changes.push(update);
         }
         if (changes.length > 0) {
@@ -8339,7 +8339,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         if (!syncState) return;
 
         if (deletions.length > 0) {
-            for (let deleted of deletions) {
+            for each(var deleted in deletions) {
                 var item = this.itemCacheById[deleted.Id];
                 if ((!item) && (this.useOfflineCache)) {
                     // It could be that the item is not yet loaded from offlineCache. We do this now.
@@ -9006,7 +9006,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
 
     findItemInListByDatesAndID: function _findItemInListByDates(aList, aItem) {
         var result = null;
-        for (let listItem of aList) {
+        for each(var listItem in aList) {
             if ((aItem.getProperty("UID") == listItem.uid)
                 && (listItem.startDate.compare(aItem.startDate) == 0)
                 && (listItem.endDate.compare(aItem.endDate) == 0)) {
@@ -9492,7 +9492,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
     },
 
     addAttachmentsToOfflineCache: function _addAttachmentsToOfflineCache(aList) {
-        for (let item of aList) {
+        for each(var item in aList) {
             var attachments = item.calItem.getAttachments({});
             this.removeAttachmentsFromOfflineCache(item.calItem);
             for (var index in attachments) {
@@ -9657,7 +9657,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         //dump(this.name+":addToOfflineCache 1\n");
         var sqlQueries = [];
 
-        for (let item of aList) {
+        for each(var item in aList) {
 
             if (isEvent(item.calItem)) {
                 var startDate = cal.toRFC3339(item.calItem.startDate.getInTimezone(this.globalFunctions.ecUTC()));
@@ -9773,7 +9773,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
             var sqlQueries = [];
             var mastersToBeUpdated = [];
 
-            for (let item of aList) {
+            for each(var item in aList) {
 
                 if (isEvent(item.calItem)) {
                     var startDate = cal.toRFC3339(item.calItem.startDate.getInTimezone(this.globalFunctions.ecUTC()));
@@ -9877,7 +9877,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
             var sqlQueries = [];
             var mastersToBeUpdated = [];
 
-            for (let item of aList) {
+            for each(var item in aList) {
 
                 if (isEvent(item.calItem)) {
                     var startDate = cal.toRFC3339(item.calItem.startDate.getInTimezone(this.globalFunctions.ecUTC()));
@@ -9988,7 +9988,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
             var sqlQueries = [];
             var mastersToBeUpdated = [];
 
-            for (let item of aList) {
+            for each(var item in aList) {
 
 
                 var endDate = cal.toRFC3339(item.endDate.getInTimezone(this.globalFunctions.ecUTC()));

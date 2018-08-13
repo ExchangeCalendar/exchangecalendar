@@ -179,7 +179,7 @@ erGetMeetingRequestByUIDRequest.prototype = {
         var includesLastItemInRange = xml2json.getAttribute(rootFolder[0], "IncludesLastItemInRange", "true");
 
         var aMeetingRequests = [];
-        for (let tmpItem of xml2json.XPath(rootFolder[0], "/t:Items/*")) {
+        for each(var tmpItem in xml2json.XPath(rootFolder[0], "/t:Items/*")) {
             if (xml2json.getTagValue(tmpItem, "t:UID") == this.argument.uid) {
                 aMeetingRequests.push(tmpItem);
             }

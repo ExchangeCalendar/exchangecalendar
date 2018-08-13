@@ -184,7 +184,7 @@ erFindOccurrencesRequest.prototype = {
 
         //var rm = aResp.XPath("/s:Envelope/s:Body/m:GetItemResponse/m:ResponseMessages/m:GetItemResponseMessage");
         var rm = xml2json.XPath(aResp, "/s:Envelope/s:Body/m:GetItemResponse/m:ResponseMessages/m:GetItemResponseMessage");
-        for (let e of rm) {
+        for each(var e in rm) {
             var responseCode = xml2json.getTagValue(e, "m:ResponseCode");
             switch (responseCode) {
             case "ErrorCalendarOccurrenceIsDeletedFromRecurrence":
@@ -192,7 +192,7 @@ erFindOccurrencesRequest.prototype = {
                 break;
             case "NoError":
                 var tmpItems = xml2json.XPath(e, "/m:Items/*");
-                for (let tmpItem of tmpItems) {
+                for each(var tmpItem in tmpItems) {
                     this.currentRealIndex++;
                     var startDate = cal.fromRFC3339(xml2json.getTagValue(tmpItem, "t:Start"), cal.dtz.UTC).getInTimezone(cal.dtz.UTC);
                     var endDate = cal.fromRFC3339(xml2json.getTagValue(tmpItem, "t:End"), cal.dtz.UTC).getInTimezone(cal.dtz.UTC);
