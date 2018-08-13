@@ -1407,7 +1407,9 @@ ExchangeRequest.prototype = {
     makeSoapMessage: function erMakeSoapMessage(aReq) {
         this.originalReq = aReq;
 
-        var msg = new mivIxml2jxon('<nsSoap:Envelope xmlns:nsSoap="' + nsSoapStr + '" xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>', 0, null);
+        var msg = new mivIxml2jxon('<nsSoap:Envelope xmlns:nsSoap="' + nsSoapStr + '"/>', 0, null);
+        msg.addNameSpace("nsMessages", nsMessagesStr);
+        msg.addNameSpace("nsTypes", nsTypesStr);
 
         this.version = this.exchangeStatistics.getServerVersion(this.mArgument.serverUrl);
 
