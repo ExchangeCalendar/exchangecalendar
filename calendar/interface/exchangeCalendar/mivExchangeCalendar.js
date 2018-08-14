@@ -2592,7 +2592,8 @@ calExchangeCalendar.prototype = {
             let offset = cal.createDuration();
             offset.weeks = -5;
 
-            aRangeStart = cal.dtz.now().addDuration(offset);
+            aRangeStart = cal.dtz.now();
+            aRangeStart.addDuration(offset);
 
             // If cache already contains a bigger range, use it
             if (this.startDate
@@ -2609,7 +2610,8 @@ calExchangeCalendar.prototype = {
             let offset = cal.createDuration();
             offset.weeks = 5;
 
-            aRangeEnd = cal.dtz.now().addDuration(offset);
+            aRangeEnd = cal.dtz.now();
+            aRangeEnd.addDuration(offset);
 
             // If cache already contains a bigger range, use it
             if ((this.endDate) && (this.endDate.compare(aRangeEnd) > 0)) {

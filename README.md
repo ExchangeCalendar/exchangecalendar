@@ -3,7 +3,7 @@
 Exchange Calendar is an add-on for [Thunderbird](https://mozilla.org/thunderbird)
 and [Seamonkey](https://www.seamonkey-project.org/).
 
-It extends the [Lightning](https://mozilla.org/calendar) add-on to provide
+It extends the [Lightning](https://addons.mozilla.org/thunderbird/addon/lightning/) add-on to provide
 [Microsoft Exchange](http://microsoft.com/exchange) support.
 
 Exchange Calendar extension can:
