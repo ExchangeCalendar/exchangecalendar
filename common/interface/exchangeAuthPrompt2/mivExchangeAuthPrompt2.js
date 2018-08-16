@@ -349,7 +349,8 @@ mivExchangeAuthPrompt2.prototype = {
                         error = true;
                     }
                     else {
-                        aChannel.originalURI.userPass = encodeURIComponent(username) + ':' + encodeURIComponent(password);
+                        this.logInfo("asyncPromptAuthNotifyCallback: we have user and password.");
+                        // aChannel.URI.userPass = encodeURIComponent(username) + ':' + encodeURIComponent(password);
                     }
                 }
             }
