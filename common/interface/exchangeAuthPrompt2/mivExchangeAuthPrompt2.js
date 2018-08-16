@@ -349,7 +349,7 @@ mivExchangeAuthPrompt2.prototype = {
                         error = true;
                     }
                     else {
-                        aChannel.URI.userPass = encodeURIComponent(username) + ':' + encodeURIComponent(password);
+                        aChannel.originalURI.userPass = encodeURIComponent(username) + ':' + encodeURIComponent(password);
                     }
                 }
             }
