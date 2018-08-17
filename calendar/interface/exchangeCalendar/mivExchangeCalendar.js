@@ -6986,7 +6986,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                     this.addItemToCache(item);
 
                     if ((this.useOfflineCache) && (!fromOfflineCache)) {
-                        let cacheItem = {};
+                        let cacheItem = [];
                         cacheItem[item.id] = {
                             calItem: item,
                             exchangeItemXML: xml2json.toString(aCalendarItem)
@@ -7021,7 +7021,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                     this.addItemToCache(item);
 
                     if ((this.useOfflineCache) && (!fromOfflineCache)) {
-                        let cacheItem = {};
+                        let cacheItem = [];
                         cacheItem[item.id] = {
                             calItem: item,
                             exchangeItemXML: xml2json.toString(aCalendarItem)
@@ -7167,7 +7167,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                 //this.observers.notify("onEndBatch");
 
                 if (!fromOfflineCache) {
-                    let cacheItem = {};
+                    let cacheItem = [];
                     cacheItem[item.id] = {
                         calItem: item,
                         exchangeItemXML: xml2json.toString(aCalendarItem)
@@ -7569,7 +7569,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
     updateCalendar2: function _updateCalendar2(erGetItemsRequest, aItems, doNotify, fromOfflineCache) {
         if (this.debug) this.logInfo("updateCalendar2: We have '" + aItems.length + "' items to update in calendar. fromOfflineCache:" + fromOfflineCache);
 
-        let cacheItem = {};
+        let cacheItem = [];
 
         for (var index = 0; index < aItems.length; index++) {
 

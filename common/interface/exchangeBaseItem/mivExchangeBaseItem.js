@@ -262,8 +262,8 @@ mivExchangeBaseItem.prototype = {
         this._newXMozSnoozeTime = undefined;
         this._nonPersonalDataChanged = false;
 
-        this._occurrences = {};
-        this._exceptions = {};
+        this._occurrences = [];
+        this._exceptions = [];
 
         this._isMutable = true;
 
@@ -459,7 +459,7 @@ mivExchangeBaseItem.prototype = {
                 this._recurrenceInfo = aItem._recurrenceInfo;
             }
 
-            this._occurrences = {};
+            this._occurrences = [];
             if (aItem._occurrences) {
                 for (var occurrence of aItem._occurrences) {
                     //dump("baseClone: aItem._ocurrences 1");
@@ -468,7 +468,7 @@ mivExchangeBaseItem.prototype = {
                 }
             }
 
-            this._exceptions = {};
+            this._exceptions = [];
             if (aItem._exceptions) {
                 for (var exception of aItem._exceptions) {
                     //this.removeException(exception);
@@ -482,7 +482,7 @@ mivExchangeBaseItem.prototype = {
             if (aItem._created) this._created = aItem._created.clone();
             this._legacyFreeBusyStatus = aItem._legacyFreeBusyStatus;
             this._isCancelled = aItem._isCancelled;
-            this._responseObjects = {};
+            this._responseObjects = [];
             if (aItem._responseObjects) {
                 for (var index in aItem._responseObjects) {
                     this._responseObjects[index] = aItem._responseObjects[index];
