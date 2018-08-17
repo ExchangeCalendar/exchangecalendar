@@ -10880,7 +10880,7 @@ ecObserver.prototype = {
         Services.prefs.addObserver("extensions.1st-setup.core.debuglevel", this, false);
 
 
-        getCalendarManager().addObserver(this.ecInvitationsCalendarManagerObserver);
+        cal.getCalendarManager().addObserver(this.ecInvitationsCalendarManagerObserver);
     },
 
     unregister: function () {
@@ -10894,7 +10894,7 @@ ecObserver.prototype = {
         observerService.removeObserver(this, "quit-application");
         observerService.removeObserver(this, "network:offline-status-changed");
 
-        getCalendarManager().removeObserver(this.ecInvitationsCalendarManagerObserver);
+        cal.getCalendarManager().removeObserver(this.ecInvitationsCalendarManagerObserver);
     }
 }
 
