@@ -59,7 +59,6 @@ mivExchangeAutoCompleteSearch.prototype = {
     classID: components.ID("{" + mivExchangeAutoCompleteSearchGUID + "}"),
     contractID: "@mozilla.org/autocomplete/search;1?name=exchangeAutoCompleteSearch",
     flags: Ci.nsIClassInfo.SINGLETON || Ci.nsIClassInfo.THREADSAFE,
-    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
     getInterfaces: function _getInterfaces(count) {
         var ifaces = [Ci.mivExchangeAutoCompleteSearch,
@@ -78,7 +77,7 @@ mivExchangeAutoCompleteSearch.prototype = {
     observe: function (subject, topic, data) {
         // Do your stuff here.
         var uuid;
-        for each(var search in this._searches) {
+        for (var search of this._searches) {
             if (search.query == data) {
                 uuid = search.uuid;
             }
@@ -183,7 +182,7 @@ mivExchangeAutoCompleteSearch.prototype = {
 
         if (item.QueryInterface(Ci.mivExchangeAbCard)) {
             // Check to which search it belongs
-            for each(var search in this._searches) {
+            for (var search of this._searches) {
                 if (rightDir.URI.indexOf(search.query) > -1) {
                     dump(" 1.@@@ displayName:" + item.displayName + ", localId:" + item.localId + "\n");
                     search.autoCompleteResult.addResult(item);
@@ -198,7 +197,7 @@ mivExchangeAutoCompleteSearch.prototype = {
     //void stopSearch();
     stopSearch: function _stopSearch() {
         //dump("mivExchangeAutoCompleteSearch: stopSearch\n");
-        for each(var search in this._searches) {
+        for (var search of this._searches) {
             // Clearing the results because it appears the are being reused.
             search.autoCompleteResult.clearResults();
         }

@@ -28,7 +28,7 @@ var Cr = Components.results;
 var components = Components;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource:///modules/Services.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://exchangecommoninterfaces/xml2jxon/mivIxml2jxon.js");
 Cu.import("resource://exchangecommoninterfaces/xml2json/xml2json.js");
@@ -59,7 +59,6 @@ mivFunctions.prototype = {
     classID: components.ID("{c7543f10-e2d1-44b3-ae37-9221e0d5b524}"),
     contractID: "@1st-setup.nl/global/functions;1",
     flags: Ci.nsIClassInfo.SINGLETON || Ci.nsIClassInfo.THREADSAFE,
-    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
     doEncodeFolderSpecialChars: function _doEncodeFolderSpecialChars(str, r1) {
         var result = str;
@@ -179,9 +178,9 @@ mivFunctions.prototype = {
     },
 
     splitUriGetParams: function _splitUriGetParams(aUri) {
-        if (aUri.path.indexOf("?") > -1) {
+        if (aUri.pathQueryRef.indexOf("?") > -1) {
             // We have get params.
-            let getParamsStr = aUri.path.substr(aUri.path.indexOf("?") + 1);
+            let getParamsStr = aUri.pathQueryRef.substr(aUri.pathQueryRef.indexOf("?") + 1);
             // Split is in the individual params.
             var getParams = {};
             while (getParamsStr.indexOf("&") > -1) {
@@ -450,7 +449,7 @@ mivFunctions.prototype = {
             //this.getConsoleService().logStringMessage(" >>>>>>>>>>>>>>>");
 
             var localFile = Cc["@mozilla.org/file/local;1"]
-                .createInstance(Ci.nsILocalFile);
+                .createInstance(Ci.nsIFile);
 
             try {
                 localFile.initWithPath(file);

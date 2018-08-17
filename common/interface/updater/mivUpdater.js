@@ -27,6 +27,8 @@ var components = Components;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
+Cu.importGlobalProperties(["XMLHttpRequest"]);
+
 function installListener(aUpdater) {
     this._updater = aUpdater;
 }
@@ -174,7 +176,6 @@ mivUpdater.prototype = {
     classID: components.ID("{" + mivUpdateGUID + "}"),
     contractID: "@1st-setup.nl/checkers/updater;1",
     flags: Ci.nsIClassInfo.SINGLETON || Ci.nsIClassInfo.THREADSAFE,
-    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
     // External methods
 
@@ -228,7 +229,7 @@ mivUpdater.prototype = {
             this._addon = aAddon;
             this._updateURL = this.safeGetCharPref(null, EXTENSION_MAINPART + this._extensionID, url, true);
             this._updateURL = url;
-            this.xmlReq = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance();
+            this.xmlReq = new XMLHttpRequest();
 
             this.preRelease = this.safeGetBoolPref(null, "extensions.1st-setup.others.warnAboutPrereleaseVersion", true, true);
             var tmp = this;

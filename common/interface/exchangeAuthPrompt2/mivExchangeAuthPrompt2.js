@@ -61,7 +61,6 @@ mivExchangeAuthPrompt2.prototype = {
     classID: components.ID("{" + mivExchangeAuthPrompt2GUID + "}"),
     contractID: "@1st-setup.nl/exchange/authprompt2;1",
     flags: Ci.nsIClassInfo.SINGLETON || Ci.nsIClassInfo.THREADSAFE,
-    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
     // External methods
 
@@ -350,7 +349,8 @@ mivExchangeAuthPrompt2.prototype = {
                         error = true;
                     }
                     else {
-                        aChannel.URI.userPass = encodeURIComponent(username) + ':' + encodeURIComponent(password);
+                        this.logInfo("asyncPromptAuthNotifyCallback: we have user and password.");
+                        // aChannel.URI.userPass = encodeURIComponent(username) + ':' + encodeURIComponent(password);
                     }
                 }
             }
@@ -455,7 +455,7 @@ mivExchangeAuthPrompt2.prototype = {
         }
         this.logInfo("asyncPromptAuth: authInfo.domain=" + authInfo.domain);
 
-        var URL = decodeURIComponent(aChannel.URI.scheme + "://" + aChannel.URI.hostPort + aChannel.URI.path);
+        var URL = decodeURIComponent(aChannel.URI.scheme + "://" + aChannel.URI.hostPort + aChannel.URI.pathQueryRef);
         if (this.showPassword) {
             this.logInfo("asyncPromptAuth: aChannel.URL=" + URL + ", username=" + decodeURIComponent(aChannel.URI.username) + ", password=" + decodeURIComponent(aChannel.URI.password));
         }
@@ -529,7 +529,7 @@ mivExchangeAuthPrompt2.prototype = {
 
         var error = false;
 
-        var URL = decodeURIComponent(aChannel.URI.scheme + aChannel.URI.hostPort + aChannel.URI.path);
+        var URL = decodeURIComponent(aChannel.URI.scheme + aChannel.URI.hostPort + aChannel.URI.pathQueryRef);
         var password;
         var username;
 

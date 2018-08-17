@@ -109,7 +109,7 @@ exchTaskDelegation.prototype = {
                 let dtFormat = Cc["@mozilla.org/calendar/datetime-formatter;1"]
                     .getService(Ci.calIDateTimeFormatter);
 
-                var tmpDate = cal.fromRFC3339(task.getProperty("exchWebService-PidLidTaskLastUpdate"), this.globalFunctions.ecTZService().UTC).getInTimezone(this.globalFunctions.ecDefaultTimeZone());
+                var tmpDate = cal.dtz.fromRFC3339(task.getProperty("exchWebService-PidLidTaskLastUpdate"), this.globalFunctions.ecTZService().UTC).getInTimezone(this.globalFunctions.ecDefaultTimeZone());
 
                 var lastChange = task.getProperty("exchWebService-PidLidTaskHistory");
                 switch (lastChange) {
@@ -147,7 +147,7 @@ exchTaskDelegation.prototype = {
         var task = this._document.getElementById("calendar-task-tree").currentTask;
         if (task) {
             var newTask = task.clone();
-            newTask.setProperty("exchWebService-PidLidTaskLastUpdate", cal.toRFC3339(cal.now()));
+            newTask.setProperty("exchWebService-PidLidTaskLastUpdate", cal.dtz.toRFC3339(cal.dtz.now()));
             newTask.setProperty("exchWebService-PidLidTaskHistory", "1")
             newTask.setProperty("exchWebService-PidLidTaskAccepted", "true")
             task.calendar.modifyItem(newTask, task, null);
@@ -159,7 +159,7 @@ exchTaskDelegation.prototype = {
         var task = this._document.getElementById("calendar-task-tree").currentTask;
         if (task) {
             var newTask = task.clone();
-            newTask.setProperty("exchWebService-PidLidTaskLastUpdate", cal.toRFC3339(cal.now()));
+            newTask.setProperty("exchWebService-PidLidTaskLastUpdate", cal.dtz.toRFC3339(cal.dtz.now()));
             newTask.setProperty("exchWebService-PidLidTaskHistory", "2")
             newTask.setProperty("exchWebService-PidLidTaskAccepted", "true")
             task.calendar.modifyItem(newTask, task, null);

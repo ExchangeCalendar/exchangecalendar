@@ -506,7 +506,7 @@ exchSettingsOverlay.prototype = {
         this.globalFunctions.LOG("checkUserAvailability");
         var self = this;
 
-        var start = cal.now();
+        var start = cal.dtz.now();
         var offset = cal.createDuration();
         offset.hours = 10;
         var end = start.clone();
@@ -519,8 +519,8 @@ exchSettingsOverlay.prototype = {
                 folderBase: "calendar",
                 email: this.exchWebServicesgMailbox,
                 attendeeType: 'Required',
-                start: cal.toRFC3339(start),
-                end: cal.toRFC3339(end)
+                start: cal.dtz.toRFC3339(start),
+                end: cal.dtz.toRFC3339(end)
             },
             function (erGetUserAvailabilityRequest, aEvents) {
                 self.checkUserAvailabilityOk(erGetUserAvailabilityRequest, aEvents);

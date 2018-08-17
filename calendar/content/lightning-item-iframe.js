@@ -51,7 +51,7 @@ exchangeEventDialog.prototype = {
      */
     onAcceptCallback: function _onAcceptCallback(aItem, aCalendar, aOriginalItem, aIsClosing) {
         if (aCalendar.type === "exchangecalendar") {
-            if (cal.isEvent(aItem)) {
+            if (cal.item.isEvent(aItem)) {
                 if (!aItem.className) {
                     var newItem = Cc["@1st-setup.nl/exchange/calendarevent;1"]
                         .createInstance(Ci.mivExchangeEvent);
@@ -154,7 +154,7 @@ exchangeEventDialog.prototype = {
             }
 
             // If not an event, add Exchange task extra informations
-            if (!cal.isEvent(item)) {
+            if (!cal.item.isEvent(item)) {
 
                 // Set and display task owner
 
@@ -213,7 +213,7 @@ exchangeEventDialog.prototype = {
         }
 
         // For events and other calendar type, hidde back all Exchange task details, display back standard items
-        if (cal.isEvent(item)
+        if (cal.item.isEvent(item)
             || cal.type !== "exchangecalendar") {
 
             // Hide Exchange task details

@@ -46,9 +46,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
-Cu.import("resource://calendar/modules/calAlarmUtils.jsm");
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
-Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecommon/ecFunctions.js");
 Cu.import("resource://exchangecommon/ecExchangeRequest.js");
@@ -288,7 +285,7 @@ erFindMasterOccurrencesRequest.prototype = {
 
         itemids = req.addChildTag("ItemIds", "nsMessages", null);
 
-        for each(var master in this.occurrences) {
+        for (var master of this.occurrences) {
             var reccMasterItemId = itemids.addChildTag("RecurringMasterItemId", "nsTypes", null);
             reccMasterItemId.setAttribute("OccurrenceId", master.Id);
             reccMasterItemId.setAttribute("ChangeKey", master.ChangeKey);
@@ -313,7 +310,7 @@ erFindMasterOccurrencesRequest.prototype = {
 
         var items = [];
 
-        for each(var e in rm) {
+        for (var e of rm) {
             var calendarItem = e.XPath("/m:Items/t:CalendarItem");
             if (calendarItem.length > 0) {
                 items.push(calendarItem[0]);

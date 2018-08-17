@@ -1,5 +1,3 @@
-Components.utils.import("resource:///modules/gloda/mimemsg.js");
-
 function showIconsAsInviteColumn() {}
 showIconsAsInviteColumn.prototype.execute = function () {
     var extrasObserver = {

@@ -40,9 +40,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
-Cu.import("resource://calendar/modules/calAlarmUtils.jsm");
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
-Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecommon/ecFunctions.js");
 Cu.import("resource://exchangecommon/ecExchangeRequest.js");
@@ -161,38 +158,38 @@ erSyncInboxRequest.prototype = {
             var lastItemInRange = xml2json.getTagValue(rm[0], "m:IncludesLastItemInRange");
 
             //	if (!this.getSyncState) {
-            for each(var creation in xml2json.XPath(rm[0], "/m:Changes/t:Create")) {
-                for each(var meetingrequest in xml2json.getTags(creation, "t:MeetingRequest")) {
+            for (var creation of xml2json.XPath(rm[0], "/m:Changes/t:Create")) {
+                for (var meetingrequest of xml2json.getTags(creation, "t:MeetingRequest")) {
                     this.creations.meetingrequests.push(meetingrequest);
                 }
-                for each(var meetingCancellation in xml2json.getTags(creation, "t:MeetingCancellation")) {
+                for (var meetingCancellation of xml2json.getTags(creation, "t:MeetingCancellation")) {
                     this.creations.meetingCancellations.push(meetingCancellation);
                 }
-                for each(var meetingResponse in xml2json.getTags(creation, "t:MeetingResponse")) {
+                for (var meetingResponse of xml2json.getTags(creation, "t:MeetingResponse")) {
                     this.creations.meetingResponses.push(meetingResponse);
                 }
             }
 
-            for each(var update in xml2json.XPath(rm[0], "/m:Changes/t:Update")) {
-                for each(var meetingrequest in xml2json.getTags(update, "t:MeetingRequest")) {
+            for (var update of xml2json.XPath(rm[0], "/m:Changes/t:Update")) {
+                for (var meetingrequest of xml2json.getTags(update, "t:MeetingRequest")) {
                     this.updates.meetingrequests.push(meetingrequest);
                 }
-                for each(var meetingCancellation in xml2json.getTags(update, "t:MeetingCancellation")) {
+                for (var meetingCancellation of xml2json.getTags(update, "t:MeetingCancellation")) {
                     this.updates.meetingCancellations.push(meetingCancellation);
                 }
-                for each(var meetingResponse in xml2json.getTags(update, "t:MeetingResponse")) {
+                for (var meetingResponse of xml2json.getTags(update, "t:MeetingResponse")) {
                     this.updates.meetingResponses.push(meetingResponse);
                 }
             }
 
-            for each(var deleted in xml2json.XPath(rm[0], "/m:Changes/t:Delete")) {
-                    for each(var meetingrequest in xml2json.getTags(deleted, "t:MeetingRequest")) {
+            for (var deleted of xml2json.XPath(rm[0], "/m:Changes/t:Delete")) {
+                    for (var meetingrequest of xml2json.getTags(deleted, "t:MeetingRequest")) {
                         this.deletions.meetingrequests.push(meetingrequest);
                     }
-                    for each(var meetingCancellation in xml2json.getTags(deleted, "t:MeetingCancellation")) {
+                    for (var meetingCancellation of xml2json.getTags(deleted, "t:MeetingCancellation")) {
                         this.deletions.meetingCancellations.push(meetingCancellation);
                     }
-                    for each(var meetingResponse in xml2json.getTags(deleted, "t:MeetingResponse")) {
+                    for (var meetingResponse of xml2json.getTags(deleted, "t:MeetingResponse")) {
                         this.deletions.meetingResponses.push(meetingResponse);
                     }
                 }

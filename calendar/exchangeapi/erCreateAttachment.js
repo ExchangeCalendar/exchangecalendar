@@ -44,9 +44,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
-Cu.import("resource://calendar/modules/calAlarmUtils.jsm");
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
-Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecommon/ecFunctions.js");
 Cu.import("resource://exchangecommon/ecExchangeRequest.js");
@@ -159,7 +156,7 @@ erCreateAttachmentRequest.prototype = {
         var errorCount = 0;
         var okCount = 0;
 
-        for each(var createAttachmentResponseMessage in createAttachmentResponseMessages) {
+        for (var createAttachmentResponseMessage of createAttachmentResponseMessages) {
             if (createAttachmentResponseMessage.getAttribute("ResponseClass") != "Success") {
                 weHaveAnError = true;
                 errorCount++;

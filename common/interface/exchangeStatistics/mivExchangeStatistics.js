@@ -64,7 +64,6 @@ mivExchangeStatistics.prototype = {
     classID: components.ID("{" + mivExchangeStatisticsGUID + "}"),
     contractID: "@1st-setup.nl/exchange/statistics;1",
     flags: Ci.nsIClassInfo.SINGLETON || Ci.nsIClassInfo.THREADSAFE,
-    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
     // void getInterfaces(out PRUint32 count, [array, size_is(count), retval] out nsIIDPtr array);
     getInterfaces: function _getInterfaces(count) {

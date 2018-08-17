@@ -50,6 +50,8 @@ Cu.import("resource://exchangecommon/ecFunctions.js");
 Cu.import("resource://exchangecommoninterfaces/xml2jxon/mivIxml2jxon.js");
 Cu.import("resource://exchangecommoninterfaces/xml2json/xml2json.js");
 
+Cu.importGlobalProperties(["XMLHttpRequest"]);
+
 var EXPORTED_SYMBOLS = ["ExchangeRequest", "nsSoapStr", "nsTypesStr", "nsMessagesStr", "nsAutodiscoverResponseStr1", "nsAutodiscoverResponseStr2", "nsAutodiscover2010Str", "nsErrors", "nsWSAStr", "nsXSIStr", "xml_tag"];
 
 var xml_tag = '<?xml version="1.0" encoding="utf-8"?>\n';
@@ -321,7 +323,7 @@ ExchangeRequest.prototype = {
         // http://dvcs.w3.org/hg/progress/raw-file/tip/Overview.html
         // https://developer.mozilla.org/en/XPCOM_Interface_Reference/nsIXMLHttpRequestEventTarget
 
-        this.xmlReq = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance();
+        this.xmlReq = new XMLHttpRequest();
         this.mXmlReq = this.xmlReq;
 
         var currentEcRequest = this;
@@ -1375,7 +1377,7 @@ ExchangeRequest.prototype = {
         var requestServerVersion = xml2json.addTag(header, "RequestServerVersion", "nsTypes", null);
         xml2json.setAttribute(requestServerVersion, "Version", this.version);
 
-        var exchTimeZone = this.timeZones.getExchangeTimeZoneByCalTimeZone(this.globalFunctions.ecDefaultTimeZone(), this.mArgument.serverUrl, cal.now());
+        var exchTimeZone = this.timeZones.getExchangeTimeZoneByCalTimeZone(this.globalFunctions.ecDefaultTimeZone(), this.mArgument.serverUrl, cal.dtz.now());
 
         if (exchTimeZone) {
             let timeZoneContext = xml2json.addTag(header, "TimeZoneContext", "nsTypes", null);
@@ -1405,14 +1407,16 @@ ExchangeRequest.prototype = {
     makeSoapMessage: function erMakeSoapMessage(aReq) {
         this.originalReq = aReq;
 
-        var msg = new mivIxml2jxon('<nsSoap:Envelope xmlns:nsSoap="' + nsSoapStr + '" xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>', 0, null);
+        var msg = new mivIxml2jxon('<nsSoap:Envelope xmlns:nsSoap="' + nsSoapStr + '"/>', 0, null);
+        msg.addNameSpace("nsMessages", nsMessagesStr);
+        msg.addNameSpace("nsTypes", nsTypesStr);
 
         this.version = this.exchangeStatistics.getServerVersion(this.mArgument.serverUrl);
 
         var header = msg.addChildTag("Header", "nsSoap", null);
         header.addChildTag("RequestServerVersion", "nsTypes", null).setAttribute("Version", this.version);
 
-        var exchTimeZone = this.timeZones.getExchangeTimeZoneByCalTimeZone(this.globalFunctions.ecDefaultTimeZone(), this.mArgument.serverUrl, cal.now());
+        var exchTimeZone = this.timeZones.getExchangeTimeZoneByCalTimeZone(this.globalFunctions.ecDefaultTimeZone(), this.mArgument.serverUrl, cal.dtz.now());
 
         if (exchTimeZone) {
             if (this.version.indexOf("2007") > -1) {

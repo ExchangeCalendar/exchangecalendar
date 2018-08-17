@@ -26,13 +26,9 @@ var components = Components;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
-
 Cu.import("resource://calendar/modules/calUtils.jsm");
-//Cu.import("resource://calendar/modules/calProviderUtils.jsm");
 
 function mivExchangeLightningNotifier() {
-    this.mObservers = new cal.ObserverBag(Ci.calIObserver);
-
     this.queue = [];
 
     this.timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
@@ -62,7 +58,6 @@ mivExchangeLightningNotifier.prototype = {
     classID: components.ID("{" + mivExchangeLightningNotifierGUID + "}"),
     contractID: "@1st-setup.nl/exchange/lightningnotifier;1",
     flags: Ci.nsIClassInfo.SINGLETON,
-    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
     // External methods
 
@@ -87,18 +82,18 @@ mivExchangeLightningNotifier.prototype = {
 
     processQueue: function _processQueue() {
         //dump("mivExchangeLightningNotifier: processQueue\n");
-        this.mObservers.notify("onStartBatch");
+        // FIXME
+        // cal.provider.BaseClass.startBatch();
 
         for (var counter = 0;
             ((counter < 100) && (this.queue.length > 0)); counter++) {
             var notification = this.queue.shift();
             notification.calendar.notifyObservers.notify(notification.cmd, notification.arg);
-            //this.mObservers.notify(notification.cmd, notification.arg);
         }
-        this.mObservers.notify("onEndBatch");
+        // FIXME
+        // cal.provider.BaseClass.endBatch();
 
         if (this.queue.length == 0) {
-            //dump("mivExchangeLightningNotifier: stop timer\n");
             this.timer.cancel();
             this.timerRunning = false;
         }

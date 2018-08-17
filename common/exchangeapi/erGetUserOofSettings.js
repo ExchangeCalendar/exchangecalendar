@@ -40,9 +40,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
-Cu.import("resource://calendar/modules/calAlarmUtils.jsm");
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
-Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecommon/ecExchangeRequest.js");
 Cu.import("resource://exchangecommon/soapFunctions.js");
@@ -132,8 +129,8 @@ erGetUserOofSettingsRequest.prototype = {
         var duration = oofSettingsXML.getTag("t:Duration");
 
         if (duration) {
-            oofSettings.startTime = cal.fromRFC3339(duration.getTagValue("t:StartTime"), exchWebService.commonFunctions.ecTZService().UTC).getInTimezone(exchWebService.commonFunctions.ecDefaultTimeZone());
-            oofSettings.endTime = cal.fromRFC3339(duration.getTagValue("t:EndTime"), exchWebService.commonFunctions.ecTZService().UTC).getInTimezone(exchWebService.commonFunctions.ecDefaultTimeZone());
+            oofSettings.startTime = cal.dtz.fromRFC3339(duration.getTagValue("t:StartTime"), exchWebService.commonFunctions.ecTZService().UTC).getInTimezone(exchWebService.commonFunctions.ecDefaultTimeZone());
+            oofSettings.endTime = cal.dtz.fromRFC3339(duration.getTagValue("t:EndTime"), exchWebService.commonFunctions.ecTZService().UTC).getInTimezone(exchWebService.commonFunctions.ecDefaultTimeZone());
         }
 
         oofSettings.internalReply = oofSettingsXML.getTag("t:InternalReply").getTagValue("t:Message", null);

@@ -142,8 +142,8 @@ exchAttachments.prototype = {
                 if (aAttachment.uri.spec.indexOf("file://") > -1) {
                     this.globalFunctions.LOG("Attachment is a local file:" + aAttachment.uri.spec);
                     // We have a local file url
-                    item.setAttribute("label", decodeURIComponent(aAttachment.uri.path));
-                    stringForExtension = decodeURIComponent(aAttachment.uri.path);
+                    item.setAttribute("label", decodeURIComponent(aAttachment.uri.pathQueryRef));
+                    stringForExtension = decodeURIComponent(aAttachment.uri.pathQueryRef);
                 }
                 else {
                     this.globalFunctions.LOG("It is not a valid local file spec");

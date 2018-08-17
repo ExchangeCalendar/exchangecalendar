@@ -81,7 +81,6 @@ mivExchangeItemsManager.prototype = {
     classID: components.ID("{" + mivExchangeItemsManagerGUID + "}"),
     contractID: "@1st-setup.nl/exchange/itemmanager;1",
     flags: Ci.nsIClassInfo.THREADSAFE,
-    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
     // methods from nsIClassInfo
 

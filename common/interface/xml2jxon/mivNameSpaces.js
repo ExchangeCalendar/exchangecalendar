@@ -68,7 +68,6 @@ mivNameSpaces.prototype = {
     classID: components.ID("{" + mivNameSpacesGUID + "}"),
     contractID: "@1st-setup.nl/conversion/namespaces;1",
     flags: Ci.nsIClassInfo.SINGLETON || Ci.nsIClassInfo.THREADSAFE,
-    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
     // void getInterfaces(out PRUint32 count, [array, size_is(count), retval] out nsIIDPtr array);
     getInterfaces: function _getInterfaces(count) {
@@ -114,7 +113,7 @@ mivNameSpaces.prototype = {
     },
 
     findNameSpaceByAlias: function _findNameSpaceByAlias(aAlias) {
-        for each(var record in this.nameSpaces) {
+        for (var record of this.nameSpaces) {
                 if (record.alias == aAlias) {
                     return record.value;
                 }

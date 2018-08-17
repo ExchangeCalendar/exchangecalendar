@@ -40,9 +40,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
-Cu.import("resource://calendar/modules/calAlarmUtils.jsm");
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
-Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecommon/ecFunctions.js");
 Cu.import("resource://exchangecommon/ecExchangeRequest.js");
@@ -138,7 +135,7 @@ erGetOccurrenceIndexRequest.prototype = {
 
         var rm = aResp.XPath("/s:Envelope/s:Body/m:GetItemResponse/m:ResponseMessages/m:GetItemResponseMessage");
 
-        for each(var e in rm) {
+        for (var e of rm) {
 
             var responseCode = e.getTagValue("m:ResponseCode");
             switch (responseCode) {
@@ -147,7 +144,7 @@ erGetOccurrenceIndexRequest.prototype = {
                 break;
             case "NoError":
                 var items = e.XPath("/m:Items/*");
-                for each(var item in items) {
+                for (var item of items) {
                     this.currentRealIndex++;
                     if (this.argument.item.id == item.getAttributeByTag("t:ItemId", "Id")) {
                         // We found our occurrence

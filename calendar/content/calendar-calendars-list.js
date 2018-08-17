@@ -165,7 +165,7 @@ exchCalPopUpMenu.prototype = {
                 }
                 this.globalFunctions.LOG("username:" + username);
                 this.globalFunctions.LOG("domainname:" + domainname);
-                this.globalFunctions.LOG("url:" + tmpURI.scheme + "://" + tmpURI.hostPort + tmpURI.path);
+                this.globalFunctions.LOG("url:" + tmpURI.scheme + "://" + tmpURI.hostPort + tmpURI.pathQueryRef);
 
                 var newPrefs = Cc["@mozilla.org/preferences-service;1"]
                     .getService(Ci.nsIPrefService)
@@ -182,7 +182,7 @@ exchCalPopUpMenu.prototype = {
                 newPrefs.setCharPref("ecFolderbase", "calendar");
                 newPrefs.setCharPref("ecFolderpath", "/");
                 newPrefs.setCharPref("ecMailbox", mailbox.value); // We have to ask this in a prompt
-                newPrefs.setCharPref("ecServer", tmpURI.scheme + "://" + tmpURI.hostPort + tmpURI.path);
+                newPrefs.setCharPref("ecServer", tmpURI.scheme + "://" + tmpURI.hostPort + tmpURI.pathQueryRef);
                 newPrefs.setCharPref("ecUser", username);
 
                 currentPrefs.setCharPref("type", "exchangecalendar");

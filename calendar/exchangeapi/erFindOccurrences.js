@@ -40,9 +40,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
-Cu.import("resource://calendar/modules/calAlarmUtils.jsm");
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
-Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecommon/ecFunctions.js");
 Cu.import("resource://exchangecommon/ecExchangeRequest.js");
@@ -81,14 +78,14 @@ function erFindOccurrencesRequest(aArgument, aCbOk, aCbError, aListener) {
         if (!this.startDate) {
             var monthBeforeDuration = cal.createDuration("-P4W");
 
-            this.startDate = cal.now();
+            this.startDate = cal.dtz.now();
             this.startDate.addDuration(monthBeforeDuration);
         }
         dump("  -------------->>> erFindOccurrences: this.startDate=" + this.startDate + "\n");
         if (!this.endDate) {
             var monthAfterDuration = cal.createDuration("P4W");
 
-            this.endDate = cal.now();
+            this.endDate = cal.dtz.now();
             this.endDate.addDuration(monthAfterDuration);
         }
         dump("  -------------->>> erFindOccurrences: this.endDate=" + this.endDate + "\n");
@@ -184,7 +181,7 @@ erFindOccurrencesRequest.prototype = {
 
         //var rm = aResp.XPath("/s:Envelope/s:Body/m:GetItemResponse/m:ResponseMessages/m:GetItemResponseMessage");
         var rm = xml2json.XPath(aResp, "/s:Envelope/s:Body/m:GetItemResponse/m:ResponseMessages/m:GetItemResponseMessage");
-        for each(var e in rm) {
+        for (var e of rm) {
             var responseCode = xml2json.getTagValue(e, "m:ResponseCode");
             switch (responseCode) {
             case "ErrorCalendarOccurrenceIsDeletedFromRecurrence":
@@ -192,10 +189,10 @@ erFindOccurrencesRequest.prototype = {
                 break;
             case "NoError":
                 var tmpItems = xml2json.XPath(e, "/m:Items/*");
-                for each(var tmpItem in tmpItems) {
+                for (var tmpItem of tmpItems) {
                     this.currentRealIndex++;
-                    var startDate = cal.fromRFC3339(xml2json.getTagValue(tmpItem, "t:Start"), cal.UTC()).getInTimezone(cal.UTC());
-                    var endDate = cal.fromRFC3339(xml2json.getTagValue(tmpItem, "t:End"), cal.UTC()).getInTimezone(cal.UTC());
+                    var startDate = cal.dtz.fromRFC3339(xml2json.getTagValue(tmpItem, "t:Start"), cal.dtz.UTC).getInTimezone(cal.dtz.UTC);
+                    var endDate = cal.dtz.fromRFC3339(xml2json.getTagValue(tmpItem, "t:End"), cal.dtz.UTC).getInTimezone(cal.dtz.UTC);
                     if ((this.startDate.compare(endDate) < 1)
                         && (this.endDate.compare(startDate) > -1)) {
                         // We found our occurrence

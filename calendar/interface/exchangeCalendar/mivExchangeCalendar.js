@@ -46,9 +46,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
-Cu.import("resource://calendar/modules/calAlarmUtils.jsm");
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
-Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecommon/ecFunctions.js");
 Cu.import("resource://exchangecommon/soapFunctions.js");
@@ -438,7 +435,7 @@ calExchangeCalendar.prototype = {
         return elapsed;
     },
 
-    __proto__: cal.ProviderBase.prototype,
+    __proto__: cal.provider.BaseClass.prototype,
 
     // Begin nsIClassInfo
     classID: components.ID("{" + calExchangeCalendarGUID + "}"),
@@ -467,7 +464,6 @@ calExchangeCalendar.prototype = {
         return null;
     },
 
-    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
     flags: 0,
     // End nsIClassInfo
 
@@ -495,7 +491,7 @@ calExchangeCalendar.prototype = {
 
     get displayName() {
         if (this.debug) this.logInfo("get displayName()");
-        return calGetString("calExchangeCalendar", "displayName", null, "exchangecommon");
+        return cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "displayName", null);
     },
 
     //  void createCalendar(in AUTF8String aName, in nsIURI aURL,
@@ -576,8 +572,7 @@ calExchangeCalendar.prototype = {
     },
 
     set uri(aUri) {
-        //if (this.debug) this.logInfo("set uri:"+aUri.path);
-        this.myId = aUri.path.substr(1);
+        this.myId = aUri.pathQueryRef.substr(1);
         this.mUri = aUri;
 
         this.mPrefs = Cc["@mozilla.org/preferences-service;1"]
@@ -910,13 +905,13 @@ calExchangeCalendar.prototype = {
         var newItem = aItem;
 
         // Make sure we have one of our own object types
-        if ((cal.isEvent(aItem)) && (!aItem.className)) {
+        if ((cal.item.isEvent(aItem)) && (!aItem.className)) {
             var newItem = Cc["@1st-setup.nl/exchange/calendarevent;1"]
                 .createInstance(Ci.mivExchangeEvent);
             newItem.cloneToCalEvent(aItem);
         }
 
-        if ((!cal.isEvent(aItem)) && (!aItem.className)) {
+        if ((!cal.item.isEvent(aItem)) && (!aItem.className)) {
             var newItem = Cc["@1st-setup.nl/exchange/calendartodo;1"]
                 .createInstance(Ci.mivExchangeTodo);
             newItem.cloneToCalEvent(aItem);
@@ -957,7 +952,7 @@ calExchangeCalendar.prototype = {
             // If I am invited. Remove myself.
             var attendees = newItem.getAttendees({});
             newItem.removeAllAttendees(); // Need to have this. When we add attendees when we create a new calendaritem we become organizer.
-            for each(var attendee in attendees) {
+            for (var attendee of attendees) {
                 if ((attendee.id.replace(/^mailto:/i, '').toLowerCase() == this.mailbox.toLowerCase())
                     || (attendee.id.replace(/^exchangecalendar:/, '').toLowerCase() == this.mailbox.toLowerCase())) {
                     if (this.debug) this.logInfo("addItem: FOUND myself as an attendee and we are going to remove myself:" + newItem.title);
@@ -996,7 +991,7 @@ calExchangeCalendar.prototype = {
             return;
         }
 
-        if (isEvent(aItem)) {
+        if (cal.item.isEvent(aItem)) {
             // michel123
 
             if (aItem.exchangeXML) {
@@ -1337,7 +1332,7 @@ calExchangeCalendar.prototype = {
         }
 
         // Master was modified so tell the chidlren they have a new parent.
-        for each(var item in this.itemCacheById) {
+        for (var item of this.itemCacheById) {
             //			if ((item) && (item.parentItem.id != item.id) && (item.uid == aModifiedMaster.uid)) {
             if ((item) && (item.uid == aModifiedMaster.uid)) {
                 //var newItem = item.clone();
@@ -1508,7 +1503,7 @@ calExchangeCalendar.prototype = {
         }
 
 
-        if (isEvent(aNewItem)) {
+        if (cal.item.isEvent(aNewItem)) {
             if (this.debug) this.logInfo("ModifyItem: it is an event.");
             var doSendMeetingRespons = false;
             var meOld = this.getInvitedAttendee(aOldItem);
@@ -2044,7 +2039,7 @@ calExchangeCalendar.prototype = {
         }
 
         var self = this;
-        if (isEvent(aItem)) {
+        if (cal.item.isEvent(aItem)) {
             if (this.debug) this.logInfo("deleteItem is calIEvent");
 
             var iAmOrganizer = ((aItem.organizer) && (aItem.organizer.id.replace(/^mailto:/i, '').toLowerCase() == this.mailbox.toLowerCase()));
@@ -2312,7 +2307,7 @@ calExchangeCalendar.prototype = {
         }
 
         var item_iid = null;
-        if (isEvent(item))
+        if (cal.item.isEvent(item))
             item_iid = Ci.calIEvent;
         else if (isToDo(item))
             item_iid = Ci.calITodo;
@@ -2597,7 +2592,7 @@ calExchangeCalendar.prototype = {
             let offset = cal.createDuration();
             offset.weeks = -5;
 
-            aRangeStart = cal.now()
+            aRangeStart = cal.dtz.now();
             aRangeStart.addDuration(offset);
 
             // If cache already contains a bigger range, use it
@@ -2615,7 +2610,7 @@ calExchangeCalendar.prototype = {
             let offset = cal.createDuration();
             offset.weeks = 5;
 
-            aRangeEnd = cal.now()
+            aRangeEnd = cal.dtz.now();
             aRangeEnd.addDuration(offset);
 
             // If cache already contains a bigger range, use it
@@ -2862,7 +2857,7 @@ calExchangeCalendar.prototype = {
             // Convert date from local timezone to UTC
             // Given range is in local timezone and cache save in UTC
             dayPos.isDate = false;
-            dayPos = dayPos.getInTimezone(cal.UTC());
+            dayPos = dayPos.getInTimezone(cal.dtz.UTC);
             dayPos.isDate = true;
 
             // Go through all days bewteen the range start day and the range end day
@@ -2882,7 +2877,7 @@ calExchangeCalendar.prototype = {
             // Check also if invitation should be cancelled
             for (let itemid in ids) {
                 if (this.itemCacheById[itemid]
-                    && cal.isEvent(this.itemCacheById[itemid])) {
+                    && cal.item.isEvent(this.itemCacheById[itemid])) {
                     events.push(this.itemCacheById[itemid]);
 
                     if (this.deleteCancelledInvitation
@@ -3151,7 +3146,7 @@ calExchangeCalendar.prototype = {
 
         // Parse through the attendees
         var attendees = aItem.getAttendees({});
-        for each(var attendee in attendees) {
+        for (var attendee of attendees) {
             if (this.debug) this.logInfo("getInvitedAttendee 2:" + attendee.id);
             if ((attendee.id.replace(/^mailto:/i, '').toLowerCase() == this.mailbox.toLowerCase())
                 || (attendee.id.replace(/^exchangecalendar:/, '').toLowerCase() == this.mailbox.toLowerCase())) {
@@ -3213,8 +3208,8 @@ calExchangeCalendar.prototype = {
                 serverUrl: this.serverUrl,
                 email: aCalId.replace(/^mailto:/i, ""),
                 attendeeType: 'Required',
-                start: cal.toRFC3339(tmpStartDate.getInTimezone(this.globalFunctions.ecUTC())),
-                end: cal.toRFC3339(tmpEndDate.getInTimezone(this.globalFunctions.ecUTC())),
+                start: cal.dtz.toRFC3339(tmpStartDate.getInTimezone(this.globalFunctions.ecUTC())),
+                end: cal.dtz.toRFC3339(tmpEndDate.getInTimezone(this.globalFunctions.ecUTC())),
                 calId: aCalId,
                 folderID: this.folderID,
                 changeKey: this.changeKey
@@ -3285,14 +3280,14 @@ calExchangeCalendar.prototype = {
     getExceptions: function _getExceptions(aRecurrenceItems) {
         var tmpCount = 0;
         var exceptions = {};
-        for each(var recurrenceItem in aRecurrenceItems) {
+        for (var recurrenceItem of aRecurrenceItems) {
             tmpCount++;
             if (this.debug) this.logInfo("getExceptions: nr:" + tmpCount + ", isNegative:" + recurrenceItem.isNegative);
             if (recurrenceItem.isNegative) {
                 // A deletion is an exception and therefore isNegative === true
                 var occurrences = recurrenceItem.getOccurrences(this.startDate, this.startDate, this.endDate, 0, {});
                 if (this.debug) this.logInfo("getExceptions: we have occurrences.length=" + occurrences.length);
-                for each(var occurrence in occurrences) {
+                for (var occurrence of occurrences) {
                     exceptions[occurrence.toString()] = occurrence;
                 }
             }
@@ -3315,9 +3310,9 @@ calExchangeCalendar.prototype = {
         if (newCount.value > oldCount.value) {
             if (this.debug) this.logInfo("getRemovedOccurrence: We have less occurrences than before.");
 
-            for each(var newOccurrence in newOccurrences) {
+            for (var newOccurrence of newOccurrences) {
                 var foundOld = false;
-                for each(var oldOccurrence in oldOccurrences) {
+                for (var oldOccurrence of oldOccurrences) {
                     if (oldOccurrence.id == newOccurrence.id) {
                         foundOld = true;
                         break;
@@ -3343,9 +3338,9 @@ calExchangeCalendar.prototype = {
         if (newCount.value > oldCount.value) {
             if (this.debug) this.logInfo("getRemovedOccurrence: We have less exceptions than before.");
 
-            for each(var newException in newExceptions) {
+            for (var newException of newExceptions) {
                 var foundOld = false;
-                for each(var oldException in oldExceptions) {
+                for (var oldException of oldExceptions) {
                     if (oldException.id == newException.id) {
                         foundOld = true;
                         break;
@@ -3387,8 +3382,8 @@ calExchangeCalendar.prototype = {
         if (this.firstrun) {
             this.firstrun = false;
 
-            //Add Prvider for busy free information for  invite attendees etc.
-            getFreeBusyService().addProvider(this);
+            //Add Provider for busy free information for  invite attendees etc.
+            cal.getFreeBusyService().addProvider(this);
 
             // The first thing we want to do is check the folderbase and folderpath for their id & changekey.
             // It might have changed between restarts.
@@ -3581,7 +3576,7 @@ calExchangeCalendar.prototype = {
     },
 
     get startCacheDate() {
-        var aDate = cal.now();
+        var aDate = cal.dtz.now();
         var tmpDur = cal.createDuration();
         tmpDur.hours = -1 * 24 * this.cacheStartupBefore;
         aDate.addDuration(tmpDur);
@@ -3590,7 +3585,7 @@ calExchangeCalendar.prototype = {
     },
 
     get endCacheDate() {
-        var aDate = cal.now();
+        var aDate = cal.dtz.now();
         var tmpDur = cal.createDuration();
         tmpDur.hours = 1 * 24 * this.cacheStartupAfter;
         aDate.addDuration(tmpDur);
@@ -3750,17 +3745,17 @@ calExchangeCalendar.prototype = {
         this.saveCredentials(erSyncFolderItemsRequest.argument);
 
         if ((creations.meetingrequests.length > 0) || (updates.meetingrequests.length > 0) || (deletions.meetingrequests.length > 0)) {
-            this.addActivity(calGetString("calExchangeCalendar", "syncInboxRequests", [creations.meetingrequests.length, updates.meetingrequests.length, deletions.meetingrequests.length, this.name], "exchangecommon"), "", erSyncInboxRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "syncInboxRequests", [creations.meetingrequests.length, updates.meetingrequests.length, deletions.meetingrequests.length, this.name]), "", erSyncInboxRequest.argument.actionStart, Date.now());
             this.refresh();
         }
 
         if ((creations.meetingCancellations.length > 0) || (updates.meetingCancellations.length > 0) || (deletions.meetingCancellations.length > 0)) {
-            this.addActivity(calGetString("calExchangeCalendar", "syncInboxCancelations", [creations.meetingCancellations.length, updates.meetingCancellations.length, deletions.meetingCancellations.length, this.name], "exchangecommon"), "", erSyncInboxRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "syncInboxCancelations", [creations.meetingCancellations.length, updates.meetingCancellations.length, deletions.meetingCancellations.length, this.name]), "", erSyncInboxRequest.argument.actionStart, Date.now());
             this.refresh();
         }
 
         if ((creations.meetingResponses.length > 0) || (updates.meetingResponses.length > 0) || (deletions.meetingResponses.length > 0)) {
-            this.addActivity(calGetString("calExchangeCalendar", "syncInboxResponses", [creations.meetingResponses.length, updates.meetingResponses.length, deletions.meetingResponses.length, this.name], "exchangecommon"), "", erSyncInboxRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "syncInboxResponses", [creations.meetingResponses.length, updates.meetingResponses.length, deletions.meetingResponses.length, this.name]), "", erSyncInboxRequest.argument.actionStart, Date.now());
             this.refresh();
         }
 
@@ -3789,7 +3784,7 @@ calExchangeCalendar.prototype = {
 
         // Save requests into cache.
         if (creations.meetingrequests.length > 0) {
-            for each(var request in creations.meetingrequests) {
+            for (var request of creations.meetingrequests) {
                 var meetingItem = this.convertExchangeAppointmentToCalAppointment(request, true);
                 if (meetingItem) {
                     if (this.debug) this.logInfo(" -- MeetingRequest creation:" + meetingItem.title + ", UID:" + meetingItem.uid + ",id:" + meetingItem.id + ",changeKey:" + meetingItem.changeKey);
@@ -3802,7 +3797,7 @@ calExchangeCalendar.prototype = {
         }
 
         if (updates.meetingrequests.length > 0) {
-            for each(var update in updates.meetingrequests) {
+            for (var update of updates.meetingrequests) {
                 var meetingItem = this.convertExchangeAppointmentToCalAppointment(update, true);
                 if (meetingItem) {
                     if (this.debug) this.logInfo(" -- MeetingRequest update:" + meetingItem.title + ", UID:" + meetingItem.uid + ",id:" + meetingItem.id + ",changeKey:" + meetingItem.changeKey);
@@ -3821,7 +3816,7 @@ calExchangeCalendar.prototype = {
         }
 
         if (deletions.meetingrequests.length > 0) {
-            for each(var deletion in deletions.meetingrequests) {
+            for (var deletion of deletions.meetingrequests) {
                 var meetingItem = this.convertExchangeAppointmentToCalAppointment(deletion, true);
                 if (meetingItem) {
                     if (this.debug) this.logInfo(" -- MeetingRequest deletion:" + meetingItem.title + ", UID:" + meetingItem.uid + ",id:" + meetingItem.id + ",changeKey:" + meetingItem.changeKey);
@@ -3834,7 +3829,7 @@ calExchangeCalendar.prototype = {
 
         // Save cancelations into cache and remove request for which we received a cancelation.
         if (creations.meetingCancellations.length > 0) {
-            for each(var request in creations.meetingCancellations) {
+            for (var request of creations.meetingCancellations) {
                 var cancelItem = this.convertExchangeAppointmentToCalAppointment(request, true);
                 if (cancelItem) {
                     if (this.debug) this.logInfo(" -- MeetingCancelation creation:" + cancelItem.title + ", UID:" + cancelItem.uid + ",id:" + cancelItem.id + ",changeKey:" + cancelItem.changeKey);
@@ -3845,7 +3840,7 @@ calExchangeCalendar.prototype = {
         }
 
         if (updates.meetingCancellations.length > 0) {
-            for each(var update in updates.meetingCancellations) {
+            for (var update of updates.meetingCancellations) {
                 var cancelItem = this.convertExchangeAppointmentToCalAppointment(update, true);
                 if (cancelItem) {
                     cancelItem.setProperty("X-MEETINGCANCELATION", true);
@@ -3860,7 +3855,7 @@ calExchangeCalendar.prototype = {
         }
 
         if (deletions.meetingCancellations.length > 0) {
-            for each(var deletion in deletions.meetingCancellations) {
+            for (var deletion of deletions.meetingCancellations) {
                 delete this.meetingCancelationsCache[deletion.id];
             }
         }
@@ -3868,7 +3863,7 @@ calExchangeCalendar.prototype = {
         var requestCount = 0;
         var cancelationCount = 0;
         var tmpInCalendarCache = {};
-        for each(var index in this.meetingRequestsCache) {
+        for (var index of this.meetingRequestsCache) {
             if (index) {
                 // Remove request for which we have an calendaritem which is confirmed
                 var tmpID = index.id;
@@ -3882,7 +3877,7 @@ calExchangeCalendar.prototype = {
 
                 // Check single items
                 if (!inCalendar) {
-                    for each(var item in this.itemCacheById) {
+                    for (var item of this.itemCacheById) {
                         if ((item) && (item.uid == tmpUID)) {
                             inCalendar = item;
                             break;
@@ -3922,7 +3917,7 @@ calExchangeCalendar.prototype = {
                         var bodyText = null;
                         if (this.sendAutoRespondMeetingRequestMessage) {
                             bodyText = this.autoRespondMeetingRequestMessage;
-                            this.addActivity(calGetString("calExchangeCalendar", "sendAutoRespondMeetingRequestMessage", [index.title, this.name], "exchangecommon"), "", Date.now(), Date.now());
+                            this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "sendAutoRespondMeetingRequestMessage", [index.title, this.name]), "", Date.now(), Date.now());
 
                         }
 
@@ -3951,7 +3946,7 @@ calExchangeCalendar.prototype = {
             }
         }
 
-        for each(var index in this.meetingCancelationsCache) {
+        for (var index of this.meetingCancelationsCache) {
             if (index) {
                 // Remove cancelation for which we do not have an calendaritem.
                 var tmpID = index.id;
@@ -3965,7 +3960,7 @@ calExchangeCalendar.prototype = {
 
                 // Check single items
                 if (!inCalendar) {
-                    for each(var item in this.itemCacheById) {
+                    for (var item of this.itemCacheById) {
                         if ((item) && (item.uid == tmpUID)) {
                             inCalendar = item;
                             break;
@@ -4034,7 +4029,7 @@ calExchangeCalendar.prototype = {
                                 // Remove calendar item and cancellation message
                                 // because user specified so in the EWS settings.
                                 // We remove it from the real calendar and in the inbox.
-                                this.addActivity(calGetString("calExchangeCalendar", "autoRemoveConfirmedInvitationOnCancellation", [inCalendar.title, this.name], "exchangecommon"), "", Date.now(), Date.now());
+                                this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "autoRemoveConfirmedInvitationOnCancellation", [inCalendar.title, this.name]), "", Date.now(), Date.now());
                                 inCalendar.setProperty("X-IsCancelled", true);
                                 this.deleteItem(inCalendar);
                                 this.removeMeetingItem(index);
@@ -4064,11 +4059,11 @@ calExchangeCalendar.prototype = {
 
         // Process Meetingresponses
         // Save responses into cache and remove request for which we received a cancelation.
-        for each(var response in creations.meetingResponses) {
+        for (var response of creations.meetingResponses) {
             this.meetingResponsesCache[xml2json.getAttributeByTag(response, "t:ItemId", "Id")] = response;
         }
 
-        for each(var response in updates.meetingResponses) {
+        for (var response of updates.meetingResponses) {
             if (this.meetingResponsesCache[xml2json.getAttributeByTag(response, "t:ItemId", "Id")]) {
                 this.meetingResponsesCache[xml2json.getAttributeByTag(response, "t:ItemId", "Id")] = response;
             }
@@ -4077,7 +4072,7 @@ calExchangeCalendar.prototype = {
             }
         }
 
-        for each(var response in deletions.meetingResponses) {
+        for (var response of deletions.meetingResponses) {
             if (this.meetingResponsesCache[xml2json.getAttributeByTag(response, "t:ItemId", "Id")]) {
                 delete this.meetingResponsesCache[xml2json.getAttributeByTag(response, "t:ItemId", "Id")];
             }
@@ -4085,7 +4080,7 @@ calExchangeCalendar.prototype = {
 
 
         if (this.doAutoRemoveInvitationResponse1) {
-            for each(var response in this.meetingResponsesCache) {
+            for (var response of this.meetingResponsesCache) {
                 // Check if we have this meeting 
                 var tmpUID = xml2json.getTagValue(response, "t:UID");
                 var inCalendar = false;
@@ -4097,7 +4092,7 @@ calExchangeCalendar.prototype = {
 
                 // Check single items
                 if (!inCalendar) {
-                    for each(var item in this.itemCacheById) {
+                    for (var item of this.itemCacheById) {
                         if ((item) && (item.uid == tmpUID)) {
                             inCalendar = item;
                             break;
@@ -4166,20 +4161,20 @@ calExchangeCalendar.prototype = {
         var start = null;
         if (xml2json.getTagValue(aCi, "t:StartTime", null)) {
             if (this.isVersion2007) {
-                start = cal.fromRFC3339(xml2json.getTagValue(aCi, "t:StartTime", null), this.globalFunctions.ecUTC());
+                start = cal.dtz.fromRFC3339(xml2json.getTagValue(aCi, "t:StartTime", null), this.globalFunctions.ecUTC());
             }
             else {
-                start = cal.fromRFC3339(xml2json.getTagValue(aCi, "t:StartTime", null), this.globalFunctions.ecDefaultTimeZone());
+                start = cal.dtz.fromRFC3339(xml2json.getTagValue(aCi, "t:StartTime", null), this.globalFunctions.ecDefaultTimeZone());
             }
         }
 
         var end = null;
         if (xml2json.getTagValue(aCi, "t:EndTime", null)) {
             if (this.isVersion2007) {
-                end = cal.fromRFC3339(xml2json.getTagValue(aCi, "t:EndTime", null), this.globalFunctions.ecUTC());
+                end = cal.dtz.fromRFC3339(xml2json.getTagValue(aCi, "t:EndTime", null), this.globalFunctions.ecUTC());
             }
             else {
-                end = cal.fromRFC3339(xml2json.getTagValue(aCi, "t:EndTime", null), this.globalFunctions.ecDefaultTimeZone());
+                end = cal.dtz.fromRFC3339(xml2json.getTagValue(aCi, "t:EndTime", null), this.globalFunctions.ecDefaultTimeZone());
             }
         }
 
@@ -4366,14 +4361,14 @@ calExchangeCalendar.prototype = {
         }
         else {
             if (this.debug) this.logInfo(" THIS IS STRANGE beginDate");
-            var oldBeginDate = now();
+            var oldBeginDate = cal.now();
         }
         if (this.endDate) {
             var oldEndDate = this.endDate.clone();
         }
         else {
             if (this.debug) this.logInfo(" THIS IS STRANGE endDate");
-            var oldEndDate = now();
+            var oldEndDate = cal.now();
         }
 
         this.startDate = null;
@@ -4411,7 +4406,7 @@ calExchangeCalendar.prototype = {
             + Ci.calICalendar.ITEM_FILTER_TYPE_EVENT, 0, oldBeginDate, oldEndDate, null);
 
         // Make an event for thistory.
-        this.addActivity(calGetString("calExchangeCalendar", "resetEventMessage", [this.name], "exchangecommon"), "", this.resetStart, Date.now());
+        this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "resetEventMessage", [this.name]), "", this.resetStart, Date.now());
         if (this.debug) this.logInfo(" performReset 2");
     },
 
@@ -4447,8 +4442,8 @@ calExchangeCalendar.prototype = {
         }
 
         var rrule = null;
-        for each(var ritem in aItem.recurrenceInfo.getRecurrenceItems({})) {
-            if (calInstanceOf(ritem, Ci.calIRecurrenceRule)) {
+        for (var ritem of aItem.recurrenceInfo.getRecurrenceItems({})) {
+            if (cal.wrapInstance(ritem, Ci.calIRecurrenceRule)) {
                 rrule = ritem;
                 if (this.debug) this.logInfo(" ;;;; rrule:" + rrule.icalProperty.icalString);
                 //break;
@@ -4465,14 +4460,14 @@ calExchangeCalendar.prototype = {
 
         /* can't get parameters of RRULEs... have to do it manually :/ */
         var prop = {};
-        for each(let ps in rrule.icalProperty.value.split(';')) {
+        for (let ps of rrule.icalProperty.value.split(';')) {
             let m = ps.split('=');
             prop[m[0]] = m[1];
         }
 
         var startDate;
         var originalDate;
-        if (isEvent(aItem)) {
+        if (cal.item.isEvent(aItem)) {
             startDate = aItem.startDate.clone();
             originalDate = aItem.startDate.clone();
         }
@@ -4488,7 +4483,7 @@ calExchangeCalendar.prototype = {
             var startDate = startDate.clone();
         }
         else {
-            var startDate = cal.now();
+            var startDate = cal.dtz.now();
         }
         startDate.isDate = true;
 
@@ -4529,7 +4524,7 @@ calExchangeCalendar.prototype = {
             wr.addChildTag("Interval", "nsTypes", rrule.interval);
             var days = [];
             var daystr = prop["BYDAY"] || dayIdxMap[startDate.weekday];
-            for each(let day in daystr.split(",")) {
+            for (let day of daystr.split(",")) {
                 days.push(dayRevMap[day]);
             }
             wr.addChildTag("DaysOfWeek", "nsTypes", days.join(' '));
@@ -4540,7 +4535,7 @@ calExchangeCalendar.prototype = {
                 wr.addChildTag("Interval", "nsTypes", rrule.interval);
                 var days = [];
                 var daystr = prop["BYDAY"];
-                for each(let day in daystr.split(",")) {
+                for (let day of daystr.split(",")) {
                     days.push(dayRevMap[day]);
                 }
                 wr.addChildTag("DaysOfWeek", "nsTypes", days.join(' '));
@@ -4552,15 +4547,15 @@ calExchangeCalendar.prototype = {
             break;
         }
 
-        if (isEvent(aItem)) {
-            var startDateStr = cal.toRFC3339(startDate.getInTimezone(this.globalFunctions.ecUTC()));
-            //			var startDateStr = cal.toRFC3339(originalDate.getInTimezone(this.globalFunctions.ecUTC()));
+        if (cal.item.isEvent(aItem)) {
+            var startDateStr = cal.dtz.toRFC3339(startDate.getInTimezone(this.globalFunctions.ecUTC()));
+            //			var startDateStr = cal.dtz.toRFC3339(originalDate.getInTimezone(this.globalFunctions.ecUTC()));
         }
         else {
             // We make a non-UTC datetime value for this.globalFunctions.
             // EWS will use the MeetingTimeZone or StartTimeZone and EndTimeZone to convert.
-            //LOG("  ==== tmpStart:"+cal.toRFC3339(tmpStart));
-            var startDateStr = cal.toRFC3339(startDate).substr(0, 19); //cal.toRFC3339(tmpStart).length-6);
+            //LOG("  ==== tmpStart:"+cal.dtz.toRFC3339(tmpStart));
+            var startDateStr = cal.dtz.toRFC3339(startDate).substr(0, 19); //cal.dtz.toRFC3339(tmpStart).length-6);
         }
 
         if (rrule.isByCount && rrule.count != -1) {
@@ -4571,9 +4566,9 @@ calExchangeCalendar.prototype = {
         else if (!rrule.isByCount && rrule.untilDate) {
 
             var endDate = rrule.untilDate.clone();
-            if (isEvent(aItem)) {
+            if (cal.item.isEvent(aItem)) {
                 endDate.isDate = true;
-                var endDateStr = cal.toRFC3339(endDate.getInTimezone(this.globalFunctions.ecUTC()));
+                var endDateStr = cal.dtz.toRFC3339(endDate.getInTimezone(this.globalFunctions.ecUTC()));
             }
             else {
                 if (!endDate.isDate) {
@@ -4585,7 +4580,7 @@ calExchangeCalendar.prototype = {
 
                     endDate.isDate = true;
                 }
-                var endDateStr = cal.toRFC3339(endDate).substr(0, 19); //cal.toRFC3339(tmpEnd).length-6);
+                var endDateStr = cal.dtz.toRFC3339(endDate).substr(0, 19); //cal.dtz.toRFC3339(tmpEnd).length-6);
             }
             var edr = r.addChildTag("EndDateRecurrence", "nsTypes", null);
             edr.addChildTag("StartDate", "nsTypes", startDateStr);
@@ -4615,7 +4610,7 @@ calExchangeCalendar.prototype = {
             var alarmTime = alarm.alarmDate;
             break;
         case Ci.calIAlarm.ALARM_RELATED_START:
-            if (isEvent(aItem)) {
+            if (cal.item.isEvent(aItem)) {
                 var alarmTime = aItem.startDate.clone();
             }
             else {
@@ -4624,7 +4619,7 @@ calExchangeCalendar.prototype = {
             alarmTime.addDuration(alarm.offset);
             break;
         case Ci.calIAlarm.ALARM_RELATED_END:
-            if (isEvent(aItem)) {
+            if (cal.item.isEvent(aItem)) {
                 var alarmTime = aItem.endDate.clone();
             }
             else {
@@ -4634,7 +4629,7 @@ calExchangeCalendar.prototype = {
             break;
         }
 
-        alarmTime = alarmTime.getInTimezone(cal.UTC());
+        alarmTime = alarmTime.getInTimezone(cal.dtz.UTC);
 
         return alarmTime;
     },
@@ -4695,8 +4690,8 @@ calExchangeCalendar.prototype = {
             extField.setAttribute("PropertyType", "SystemTime");
 
             var newSnoozeTime = cal.createDateTime(tmpStr);
-            newSnoozeTime = newSnoozeTime.getInTimezone(cal.UTC());
-            eprop.addChildTag("Value", "nsTypes", cal.toRFC3339(newSnoozeTime));
+            newSnoozeTime = newSnoozeTime.getInTimezone(cal.dtz.UTC);
+            eprop.addChildTag("Value", "nsTypes", cal.dtz.toRFC3339(newSnoozeTime));
         }
 
         if (this.debug) this.logInfo("getSingleSnoozeState END");
@@ -4749,7 +4744,7 @@ calExchangeCalendar.prototype = {
                     }
                     else {
                         if (this.debug) this.logInfo("Master has no alarmLastAck. We set the alarm to the first child with an alarm in the future.");
-                        var prevTime = cal.createDateTime().getInTimezone(cal.UTC());
+                        var prevTime = cal.createDateTime().getInTimezone(cal.dtz.UTC);
                     }
 
                     var childEvent = null;
@@ -4802,8 +4797,8 @@ calExchangeCalendar.prototype = {
             extField.setAttribute("PropertyType", "SystemTime");
 
             var newSnoozeTime = cal.createDateTime(tmpStr);
-            newSnoozeTime = newSnoozeTime.getInTimezone(cal.UTC());
-            eprop.addChildTag("Value", "nsTypes", cal.toRFC3339(newSnoozeTime));
+            newSnoozeTime = newSnoozeTime.getInTimezone(cal.dtz.UTC);
+            eprop.addChildTag("Value", "nsTypes", cal.dtz.toRFC3339(newSnoozeTime));
         }
         if (this.debug) this.logInfo("getMasterSnoozeStates END");
         return tmpStr;
@@ -4914,7 +4909,7 @@ calExchangeCalendar.prototype = {
 
         var categories = aItem.getCategories({});
         var categoriesTag = e.addChildTag("Categories", "nsTypes", null);
-        for each(var category in categories) {
+        for (var category of categories) {
             categoriesTag.addChildTag("String", "nsTypes", category);
         }
 
@@ -4957,13 +4952,13 @@ calExchangeCalendar.prototype = {
 
             // We make a non-UTC datetime value for this.globalFunctions.
             // EWS will use the MeetingTimeZone or StartTimeZone and EndTimeZone to convert.
-            var exchStart = cal.toRFC3339(tmpStart.getInTimezone(this.globalFunctions.ecUTC())).substr(0, 19) + "Z"; //cal.toRFC3339(tmpStart).length-6);
-            var exchEnd = cal.toRFC3339(tmpEnd.getInTimezone(this.globalFunctions.ecUTC())).substr(0, 19) + "Z"; //cal.toRFC3339(tmpEnd).length-6);
+            var exchStart = cal.dtz.toRFC3339(tmpStart.getInTimezone(this.globalFunctions.ecUTC())).substr(0, 19) + "Z"; //cal.dtz.toRFC3339(tmpStart).length-6);
+            var exchEnd = cal.dtz.toRFC3339(tmpEnd.getInTimezone(this.globalFunctions.ecUTC())).substr(0, 19) + "Z"; //cal.dtz.toRFC3339(tmpEnd).length-6);
         }
         else {
             // We set in bias advanced to UCT datetime values for this.globalFunctions.
-            var exchStart = cal.toRFC3339(tmpStart.getInTimezone(cal.UTC()));
-            var exchEnd = cal.toRFC3339(tmpEnd.getInTimezone(cal.UTC()));
+            var exchStart = cal.dtz.toRFC3339(tmpStart.getInTimezone(cal.dtz.UTC));
+            var exchEnd = cal.dtz.toRFC3339(tmpEnd.getInTimezone(cal.dtz.UTC));
         }
 
         var alarms = aItem.getAlarms({});
@@ -5010,7 +5005,7 @@ calExchangeCalendar.prototype = {
         if (aItem.hasProperty("X-MOZ-SNOOZE-TIME")) {
             //dump("Item is snoozed. Going to set the snooze time\n");
             var newSnoozeTime = cal.createDateTime(aItem.getProperty("X-MOZ-SNOOZE-TIME"));
-            newSnoozeTime = newSnoozeTime.getInTimezone(cal.UTC());
+            newSnoozeTime = newSnoozeTime.getInTimezone(cal.dtz.UTC);
             const MAPI_PidLidReminderSignalTime = "34144";
 
             var eprop = e.addChildTag("ExtendedProperty", "nsTypes", null);
@@ -5018,7 +5013,7 @@ calExchangeCalendar.prototype = {
             extField.setAttribute("DistinguishedPropertySetId", "Common");
             extField.setAttribute("PropertyId", MAPI_PidLidReminderSignalTime);
             extField.setAttribute("PropertyType", "SystemTime");
-            eprop.addChildTag("Value", "nsTypes", cal.toRFC3339(newSnoozeTime));
+            eprop.addChildTag("Value", "nsTypes", cal.dtz.toRFC3339(newSnoozeTime));
 
         }
 
@@ -5071,7 +5066,7 @@ calExchangeCalendar.prototype = {
             var attendees = aItem.getAttendees({});
             var ae;
 
-            for each(var attendee in attendees) {
+            for (var attendee of attendees) {
                 //dump("attendee.role:"+attendee.role+"\n");
                 switch (attendee.role) {
                 case "REQ-PARTICIPANT":
@@ -5208,7 +5203,7 @@ calExchangeCalendar.prototype = {
 
         var categories = aItem.getCategories({});
         var categoriesTag = null;
-        for each(var category in categories) {
+        for (var category of categories) {
             if (categoriesTag == null) {
                 categoriesTag = e.addChildTag("Categories", "nsTypes", null);
             }
@@ -5238,7 +5233,7 @@ calExchangeCalendar.prototype = {
             switch (alarms[0].related) {
             case Ci.calIAlarm.ALARM_RELATED_ABSOLUTE:
                 if (this.debug) this.logInfo("ALARM_RELATED_ABSOLUTE.");
-                var newAlarmTime = alarms[0].alarmDate.clone().getInTimezone(cal.UTC());
+                var newAlarmTime = alarms[0].alarmDate.clone().getInTimezone(cal.dtz.UTC);
                 break;
             case Ci.calIAlarm.ALARM_RELATED_START:
                 if (this.debug) this.logInfo("ALARM_RELATED_START we are going to calculate the absolute.");
@@ -5252,7 +5247,7 @@ calExchangeCalendar.prototype = {
                 break;
             }
 
-            e.addChildTag("ReminderDueBy", "nsTypes", cal.toRFC3339(newAlarmTime));
+            e.addChildTag("ReminderDueBy", "nsTypes", cal.dtz.toRFC3339(newAlarmTime));
             e.addChildTag("ReminderIsSet", "nsTypes", "true");
         }
         else {
@@ -5293,7 +5288,7 @@ calExchangeCalendar.prototype = {
         if (aItem.hasProperty("X-MOZ-SNOOZE-TIME")) {
             //dump("Item is snoozed. Going to set the snooze time\n");
             var newSnoozeTime = cal.createDateTime(aItem.getProperty("X-MOZ-SNOOZE-TIME"));
-            newSnoozeTime = newSnoozeTime.getInTimezone(cal.UTC());
+            newSnoozeTime = newSnoozeTime.getInTimezone(cal.dtz.UTC);
             const MAPI_PidLidReminderSignalTime = "34144";
 
             var eprop = e.addChildTag("ExtendedProperty", "nsTypes", null);
@@ -5301,7 +5296,7 @@ calExchangeCalendar.prototype = {
             extField.setAttribute("DistinguishedPropertySetId", "Common");
             extField.setAttribute("PropertyId", MAPI_PidLidReminderSignalTime);
             extField.setAttribute("PropertyType", "SystemTime");
-            eprop.addChildTag("Value", "nsTypes", cal.toRFC3339(newSnoozeTime));
+            eprop.addChildTag("Value", "nsTypes", cal.dtz.toRFC3339(newSnoozeTime));
 
         }
 
@@ -5317,7 +5312,7 @@ calExchangeCalendar.prototype = {
 
         var companies = aItem.getCompanies({});
         var first = true;
-        for each(var company in companies) {
+        for (var company of companies) {
             companiesTag.addChildTag("String", "nsTypes", company);
         }
 
@@ -5337,7 +5332,7 @@ calExchangeCalendar.prototype = {
             	tmpDuration.minutes = -1;
             	tmpStart.addDuration(tmpDuration);*/
 
-            e.addChildTag("CompleteDate", "nsTypes", cal.toRFC3339(tmpStart));
+            e.addChildTag("CompleteDate", "nsTypes", cal.dtz.toRFC3339(tmpStart));
         }
 
 
@@ -5348,7 +5343,7 @@ calExchangeCalendar.prototype = {
                 aItem.dueDate = aItem.dueDate.getInTimezone(this.globalFunctions.ecDefaultTimeZone());
             }
 
-            e.addChildTag("DueDate", "nsTypes", cal.toRFC3339(aItem.dueDate));
+            e.addChildTag("DueDate", "nsTypes", cal.dtz.toRFC3339(aItem.dueDate));
         }
 
         if (aItem.mileage) {
@@ -5370,7 +5365,7 @@ calExchangeCalendar.prototype = {
                 aItem.entryDate = aItem.entryDate.getInTimezone(this.globalFunctions.ecDefaultTimeZone());
             }
 
-            e.addChildTag("StartDate", "nsTypes", cal.toRFC3339(aItem.entryDate));
+            e.addChildTag("StartDate", "nsTypes", cal.dtz.toRFC3339(aItem.entryDate));
         }
         //		}
 
@@ -5440,12 +5435,12 @@ calExchangeCalendar.prototype = {
         }
 
         // Make an event for thistory.
-        if (isEvent(erCreateItemRequest.argument.item)) {
-            this.addActivity(calGetString("calExchangeCalendar", "addCalendarEventMessage", [erCreateItemRequest.argument.item.title, this.name], "exchangecommon"), "", erCreateItemRequest.argument.actionStart, Date.now());
+        if (cal.item.isEvent(erCreateItemRequest.argument.item)) {
+            this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "addCalendarEventMessage", [erCreateItemRequest.argument.item.title, this.name]), "", erCreateItemRequest.argument.actionStart, Date.now());
         }
         else {
             //this.notifyTheObservers("onAddItem", [newItem]);
-            this.addActivity(calGetString("calExchangeCalendar", "addTaskEventMessage", [erCreateItemRequest.argument.item.title, this.name], "exchangecommon"), "", erCreateItemRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "addTaskEventMessage", [erCreateItemRequest.argument.item.title, this.name]), "", erCreateItemRequest.argument.actionStart, Date.now());
         }
 
 
@@ -5686,9 +5681,9 @@ calExchangeCalendar.prototype = {
         var proposeNewTime = false;
 
         if (proposeStart)
-            input.proposeStart = cal.toRFC3339(proposeStart.getInTimezone(this.globalFunctions.ecUTC()));
+            input.proposeStart = cal.dtz.toRFC3339(proposeStart.getInTimezone(this.globalFunctions.ecUTC()));
         if (proposeEnd)
-            input.proposeEnd = cal.toRFC3339(proposeEnd.getInTimezone(this.globalFunctions.ecUTC()));
+            input.proposeEnd = cal.dtz.toRFC3339(proposeEnd.getInTimezone(this.globalFunctions.ecUTC()));
 
         if (input.proposeStart && input.proposeEnd) {
             proposeNewTime = true;
@@ -5747,7 +5742,7 @@ calExchangeCalendar.prototype = {
             //this.meetingrequestAnswered[erSendMeetingResponsRequest.argument.item.uid] = false;
         }
 
-        this.addActivity(calGetString("calExchangeCalendar", "ewsMeetingResponsEventMessage", [erSendMeetingResponsRequest.argument.item.title, erSendMeetingResponsRequest.argument.response, this.name], "exchangecommon"), erSendMeetingResponsRequest.argument.bodyText, erSendMeetingResponsRequest.argument.actionStart, Date.now());
+        this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "ewsMeetingResponsEventMessage", [erSendMeetingResponsRequest.argument.item.title, erSendMeetingResponsRequest.argument.response, this.name]), erSendMeetingResponsRequest.argument.bodyText, erSendMeetingResponsRequest.argument.actionStart, Date.now());
         this.refresh();
     },
 
@@ -5874,7 +5869,7 @@ calExchangeCalendar.prototype = {
             }
         }
         else {
-            this.addActivity(calGetString("calExchangeCalendar", "ewsErrorEventMessage", [this.name, aMsg, aCode], "exchangecommon"), aMsg, erGetOccurrenceIndexRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "ewsErrorEventMessage", [this.name, aMsg, aCode]), aMsg, erGetOccurrenceIndexRequest.argument.actionStart, Date.now());
 
             var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                 .getService(Components.interfaces.nsIPromptService);
@@ -6009,11 +6004,11 @@ calExchangeCalendar.prototype = {
         this.notConnected = false;
 
         // Make an event for thistory.
-        if (isEvent(erUpdateItemRequest.argument.newItem)) {
-            this.addActivity(calGetString("calExchangeCalendar", "updateCalendarEventMessage", [erUpdateItemRequest.argument.newItem.title, this.name], "exchangecommon"), "", erUpdateItemRequest.argument.actionStart, Date.now());
+        if (cal.item.isEvent(erUpdateItemRequest.argument.newItem)) {
+            this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "updateCalendarEventMessage", [erUpdateItemRequest.argument.newItem.title, this.name]), "", erUpdateItemRequest.argument.actionStart, Date.now());
         }
         else {
-            this.addActivity(calGetString("calExchangeCalendar", "updateTaskEventMessage", [erUpdateItemRequest.argument.newItem.title, this.name], "exchangecommon"), "", erUpdateItemRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "updateTaskEventMessage", [erUpdateItemRequest.argument.newItem.title, this.name]), "", erUpdateItemRequest.argument.actionStart, Date.now());
         }
 
         if (!this.doAttachmentUpdates(erUpdateItemRequest.argument.attachmentsUpdates, erUpdateItemRequest.argument.item, erUpdateItemRequest.argument.sendto, erUpdateItemRequest.listener)) {
@@ -6114,11 +6109,11 @@ calExchangeCalendar.prototype = {
         }
 
 
-        if (isEvent(erDeleteItemRequest.argument.item)) {
-            this.addActivity(calGetString("calExchangeCalendar", "deleteCalendarEventMessage", [erDeleteItemRequest.argument.item.title, this.name], "exchangecommon"), "", erDeleteItemRequest.argument.actionStart, Date.now());
+        if (cal.item.isEvent(erDeleteItemRequest.argument.item)) {
+            this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "deleteCalendarEventMessage", [erDeleteItemRequest.argument.item.title, this.name]), "", erDeleteItemRequest.argument.actionStart, Date.now());
         }
         else {
-            this.addActivity(calGetString("calExchangeCalendar", "deleteTaskEventMessage", [erDeleteItemRequest.argument.item.title, this.name], "exchangecommon"), "", erDeleteItemRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "deleteTaskEventMessage", [erDeleteItemRequest.argument.item.title, this.name]), "", erDeleteItemRequest.argument.actionStart, Date.now());
         }
 
         //delete erDeleteItemRequest.argument.item;
@@ -6186,7 +6181,7 @@ calExchangeCalendar.prototype = {
         // Removed Single/Master items in the lists which we already have in memory
         var newIdList = new Array();
         //dump("     findCalendarItemsOK: aIds.length:"+aIds.length+"\n");
-        for each(var item in aIds) {
+        for (var item of aIds) {
             if (!doNotCheckCache) {
                 var inItemCache = ((this.itemCacheById[item.Id]) && (this.itemCacheById[item.Id].changeKey == item.ChangeKey));
                 if ((!inItemCache) && (this.useOfflineCache)) {
@@ -6206,7 +6201,7 @@ calExchangeCalendar.prototype = {
         // Remove Occurrence/Exception items in the lists which we already have in memory
         var newOccurrenceList = new Array();
         //dump("     findCalendarItemsOK: aOccurrences.length:"+aOccurrences.length+"\n");
-        for each(var item in aOccurrences) {
+        for (var item of aOccurrences) {
                 if (!this.recurringMasterCache[item.uid]) {
                     newOccurrenceList.push(item);
                 }
@@ -6362,7 +6357,7 @@ calExchangeCalendar.prototype = {
         // Removed Single/Master items in the lists which we already have in memory
         var newIdList = new Array();
         //dump("     findCalendarItemsOK: aIds.length:"+aIds.length+"\n");
-        for each(var item in aIds) {
+        for (var item of aIds) {
             if (!doNotCheckCache) {
                 var inItemCache = ((this.itemCacheById[item.Id]) && (this.itemCacheById[item.Id].changeKey == item.ChangeKey));
                 if ((!inItemCache) && (this.useOfflineCache)) {
@@ -6408,7 +6403,7 @@ calExchangeCalendar.prototype = {
 
     tryToSetDateValue: function _TryToSetDateValue(ewsvalue, aDefault) {
         if ((ewsvalue) && (ewsvalue.toString().length)) {
-            return cal.fromRFC3339(ewsvalue, this.globalFunctions.ecTZService().UTC).getInTimezone(this.globalFunctions.ecDefaultTimeZone());
+            return cal.dtz.fromRFC3339(ewsvalue, this.globalFunctions.ecTZService().UTC).getInTimezone(this.globalFunctions.ecDefaultTimeZone());
         }
 
         return aDefault;
@@ -6642,7 +6637,7 @@ calExchangeCalendar.prototype = {
     removeChildrenFromMaster: function _removeChildrenFromMaster(aMaster) {
         if (this.debug) this.logInfo("removeChildrenFromMaster start. Title:" + aMaster.title);
         // Remove children of this master. They will be added later.
-        for each(var child in aMaster.getExceptions({})) {
+        for (var child of aMaster.getExceptions({})) {
             this.notifyTheObservers("onDeleteItem", [child]);
             aMaster.removeException(child);
             /*if (this.itemCacheById[child.id]) {
@@ -6655,7 +6650,7 @@ else { dump("Exception does not exist in cache anymore.\n");}
 
         }
 
-        for each(var child in aMaster.getOccurrences({})) {
+        for (var child of aMaster.getOccurrences({})) {
             this.notifyTheObservers("onDeleteItem", [child]);
             aMaster.removeOccurrence(child);
             /*if (this.itemCacheById[child.id]) {
@@ -6709,7 +6704,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         if (aExchangeItem.getTagValue("t:HasAttachments") == "true") {
             //			if (this.debug) this.logInfo("Title:"+aItem.title+"Attachments:"+aExchangeItem.getTagValue("Attachments"));
             var fileAttachments = aExchangeItem.XPath("/t:Attachments/t:FileAttachment");
-            for each(var fileAttachment in fileAttachments) {
+            for (var fileAttachment of fileAttachments) {
                 //				if (this.debug) this.logInfo(" -- Attachment: name="+fileAttachment.getTagValue("t:Name"));
 
                 var newAttachment = createAttachment();
@@ -6815,7 +6810,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                         for (var index in this.itemCacheById) {
 
                             if ((this.itemCacheById[index])
-                                && (isEvent(this.itemCacheById[index]))
+                                && (cal.item.isEvent(this.itemCacheById[index]))
                                 && ((this.itemCacheById[index].calendarItemType == "Occurrence")
                                     || (this.itemCacheById[index].calendarItemType == "Exception"))
                                 && (this.itemCacheById[index].uid == aMaster.uid)
@@ -6991,7 +6986,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                     this.addItemToCache(item);
 
                     if ((this.useOfflineCache) && (!fromOfflineCache)) {
-                        let cacheItem = {};
+                        let cacheItem = [];
                         cacheItem[item.id] = {
                             calItem: item,
                             exchangeItemXML: xml2json.toString(aCalendarItem)
@@ -7026,7 +7021,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                     this.addItemToCache(item);
 
                     if ((this.useOfflineCache) && (!fromOfflineCache)) {
-                        let cacheItem = {};
+                        let cacheItem = [];
                         cacheItem[item.id] = {
                             calItem: item,
                             exchangeItemXML: xml2json.toString(aCalendarItem)
@@ -7063,7 +7058,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
 
                     let ids = [];
                     let myExceptions = this.recurringMasterCache[item.uid].getExceptions({});
-                    for each(var tmpException in myExceptions) {
+                    for (var tmpException of myExceptions) {
                         ids.push({
                             Id: tmpException.id,
                             type: "Exception",
@@ -7073,7 +7068,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                         });
                     }
                     let myOccurrences = this.recurringMasterCache[item.uid].getOccurrences({});
-                    for each(var tmpOccurrence in myOccurrences) {
+                    for (var tmpOccurrence of myOccurrences) {
                         ids.push({
                             Id: tmpOccurrence.id,
                             type: "Occurrence",
@@ -7149,7 +7144,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                 for (var itemId in this.parentLessItems) {
                     parentLessCounter++;
                     if ((this.parentLessItems[itemId])
-                        && (isEvent(this.parentLessItems[itemId]))
+                        && (cal.item.isEvent(this.parentLessItems[itemId]))
                         && ((this.parentLessItems[itemId].calendarItemType == "Occurrence")
                             || (this.parentLessItems[itemId].calendarItemType == "Exception"))
                         && (this.parentLessItems[itemId].uid == item.uid)
@@ -7172,7 +7167,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                 //this.observers.notify("onEndBatch");
 
                 if (!fromOfflineCache) {
-                    let cacheItem = {};
+                    let cacheItem = [];
                     cacheItem[item.id] = {
                         calItem: item,
                         exchangeItemXML: xml2json.toString(aCalendarItem)
@@ -7329,7 +7324,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         // See if this is a delegated task.
         /*		var isNotAccepted = 0;
 
-        		for each (var extendedProperty in aTask.getTagValue("t:ExtendedProperty")) {
+        		for (var extendedProperty of aTask.getTagValue("t:ExtendedProperty")) {
 
         			if (extendedProperty.getAttributeByTag("t:ExtendedFieldURI","PropertyId") == "33032") {
         				item.setProperty("X-exchWebService-PidLidTaskAccepted",extendedProperty.getTagValue("t:Value"));
@@ -7420,10 +7415,10 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         item.startDate = null;
         if (xml2json.getTagValue(aCalendarEvent, "t:StartTime", null)) {
             if (this.isVersion2007) {
-                item.startDate = cal.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:StartTime", null), this.globalFunctions.ecUTC());
+                item.startDate = cal.dtz.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:StartTime", null), this.globalFunctions.ecUTC());
             }
             else {
-                item.startDate = cal.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:StartTime", null), this.globalFunctions.ecDefaultTimeZone());
+                item.startDate = cal.dtz.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:StartTime", null), this.globalFunctions.ecDefaultTimeZone());
             }
         }
 
@@ -7437,10 +7432,10 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         item.endDate = null;
         if (xml2json.getTagValue(aCalendarEvent, "t:EndTime", null)) {
             if (this.isVersion2007) {
-                item.endDate = cal.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:EndTime", null), this.globalFunctions.ecUTC());
+                item.endDate = cal.dtz.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:EndTime", null), this.globalFunctions.ecUTC());
             }
             else {
-                item.endDate = cal.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:EndTime", null), this.globalFunctions.ecDefaultTimeZone());
+                item.endDate = cal.dtz.fromRFC3339(xml2json.getTagValue(aCalendarEvent, "t:EndTime", null), this.globalFunctions.ecDefaultTimeZone());
             }
         }
 
@@ -7574,7 +7569,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
     updateCalendar2: function _updateCalendar2(erGetItemsRequest, aItems, doNotify, fromOfflineCache) {
         if (this.debug) this.logInfo("updateCalendar2: We have '" + aItems.length + "' items to update in calendar. fromOfflineCache:" + fromOfflineCache);
 
-        let cacheItem = {};
+        let cacheItem = [];
 
         for (var index = 0; index < aItems.length; index++) {
 
@@ -7603,7 +7598,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                         this.addItemToCache(item);
                         this.itemCount++;
 
-                        if (isEvent(item) && this.markEventasTentative) {
+                        if (cal.item.isEvent(item) && this.markEventasTentative) {
                             var isOldCacheItem = false;
                             var aItem = item.QueryInterface(Ci.mivExchangeEvent);
 
@@ -7822,7 +7817,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         }
 
 
-        if (isEvent(aNewItem)) {
+        if (cal.item.isEvent(aNewItem)) {
             if (this.debug) this.logInfo("modifyEventImmediate:  it is an event.");
             var doSendMeetingRespons = false;
             var meOld = this.getInvitedAttendee(aOldItem);
@@ -8274,7 +8269,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         if (this.debug) this.logInfo("syncFolderItemsOK: Folderbase: " + erSyncFolderItemsRequest.folderBase + ", Creation:" + creations.length + ", Updates:" + updates.length + ", Deletions:" + deletions.length + ", syncState:" + syncState);
 
         if ((creations.length > 0) || (updates.length > 0) || (deletions.length > 0)) {
-            this.addActivity(calGetString("calExchangeCalendar", "syncFolderEventMessage", [creations.length, updates.length, deletions.length, this.name], "exchangecommon"), "", erSyncFolderItemsRequest.argument.actionStart, Date.now());
+            this.addActivity(cal.l10n.getAnyString("exchangecommon", "calExchangeCalendar", "syncFolderEventMessage", [creations.length, updates.length, deletions.length, this.name]), "", erSyncFolderItemsRequest.argument.actionStart, Date.now());
         }
 
         if (syncState) {
@@ -8302,10 +8297,10 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         var self = this;
 
         var changes = [];
-        for each(var creation in creations) {
+        for (var creation of creations) {
             changes.push(creation);
         }
-        for each(var update in updates) {
+        for (var update of updates) {
             changes.push(update);
         }
         if (changes.length > 0) {
@@ -8343,7 +8338,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         if (!syncState) return;
 
         if (deletions.length > 0) {
-            for each(var deleted in deletions) {
+            for (var deleted of deletions) {
                 var item = this.itemCacheById[deleted.Id];
                 if ((!item) && (this.useOfflineCache)) {
                     // It could be that the item is not yet loaded from offlineCache. We do this now.
@@ -8721,12 +8716,12 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
             var offset = cal.createDuration();
             offset.days = -20;
             //offset.normalize();
-            aRangeStart = cal.now();
+            aRangeStart = cal.dtz.now();
             aRangeStart.addDuration(offset);
             var offset = cal.createDuration();
             offset.days = 20;
             //offset.normalize();
-            aRangeEnd = cal.now();
+            aRangeEnd = cal.dtz.now();
             aRangeEnd.addDuration(offset);
         }
 
@@ -8782,8 +8777,8 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                 serverUrl: this.serverUrl,
                 email: this.mailbox.replace(/^mailto:/i, ""),
                 attendeeType: 'Required',
-                start: cal.toRFC3339(tmpStartDate.getInTimezone(this.globalFunctions.ecUTC())),
-                end: cal.toRFC3339(tmpEndDate.getInTimezone(this.globalFunctions.ecUTC())),
+                start: cal.dtz.toRFC3339(tmpStartDate.getInTimezone(this.globalFunctions.ecUTC())),
+                end: cal.dtz.toRFC3339(tmpEndDate.getInTimezone(this.globalFunctions.ecUTC())),
                 folderID: this.folderID,
                 changeKey: this.changeKey
             },
@@ -9010,7 +9005,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
 
     findItemInListByDatesAndID: function _findItemInListByDates(aList, aItem) {
         var result = null;
-        for each(var listItem in aList) {
+        for (var listItem of aList) {
             if ((aItem.getProperty("UID") == listItem.uid)
                 && (listItem.startDate.compare(aItem.startDate) == 0)
                 && (listItem.endDate.compare(aItem.endDate) == 0)) {
@@ -9496,7 +9491,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
     },
 
     addAttachmentsToOfflineCache: function _addAttachmentsToOfflineCache(aList) {
-        for each(var item in aList) {
+        for (var item of aList) {
             var attachments = item.calItem.getAttachments({});
             this.removeAttachmentsFromOfflineCache(item.calItem);
             for (var index in attachments) {
@@ -9661,27 +9656,27 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         //dump(this.name+":addToOfflineCache 1\n");
         var sqlQueries = [];
 
-        for each(var item in aList) {
+        for (var item of aList) {
 
-            if (isEvent(item.calItem)) {
-                var startDate = cal.toRFC3339(item.calItem.startDate.getInTimezone(this.globalFunctions.ecUTC()));
-                var endDate = cal.toRFC3339(item.calItem.endDate.getInTimezone(this.globalFunctions.ecUTC()));
+            if (cal.item.isEvent(item.calItem)) {
+                var startDate = cal.dtz.toRFC3339(item.calItem.startDate.getInTimezone(this.globalFunctions.ecUTC()));
+                var endDate = cal.dtz.toRFC3339(item.calItem.endDate.getInTimezone(this.globalFunctions.ecUTC()));
                 var eventField = "y";
             }
             else {
                 if (item.calItem.entryDate) {
-                    var startDate = cal.toRFC3339(item.calItem.entryDate.getInTimezone(this.globalFunctions.ecUTC()));
+                    var startDate = cal.dtz.toRFC3339(item.calItem.entryDate.getInTimezone(this.globalFunctions.ecUTC()));
                 }
                 else {
                     var startDate = "";
                 };
 
                 if (((item.calItem.completedDate) && (item.calItem.dueDate) && (item.calItem.completedDate.compare(item.calItem.dueDate) == 1)) || ((item.calItem.completedDate) && (!item.calItem.dueDate))) {
-                    var endDate = cal.toRFC3339(item.calItem.completedDate.getInTimezone(this.globalFunctions.ecUTC()));
+                    var endDate = cal.dtz.toRFC3339(item.calItem.completedDate.getInTimezone(this.globalFunctions.ecUTC()));
                 }
                 else {
                     if (item.calItem.dueDate) {
-                        var endDate = cal.toRFC3339(item.calItem.dueDate.getInTimezone(this.globalFunctions.ecUTC()));
+                        var endDate = cal.dtz.toRFC3339(item.calItem.dueDate.getInTimezone(this.globalFunctions.ecUTC()));
                     }
                     else {
                         var endDate = "";
@@ -9777,27 +9772,27 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
             var sqlQueries = [];
             var mastersToBeUpdated = [];
 
-            for each(var item in aList) {
+            for (var item of aList) {
 
-                if (isEvent(item.calItem)) {
-                    var startDate = cal.toRFC3339(item.calItem.startDate.getInTimezone(this.globalFunctions.ecUTC()));
-                    var endDate = cal.toRFC3339(item.calItem.endDate.getInTimezone(this.globalFunctions.ecUTC()));
+                if (cal.item.isEvent(item.calItem)) {
+                    var startDate = cal.dtz.toRFC3339(item.calItem.startDate.getInTimezone(this.globalFunctions.ecUTC()));
+                    var endDate = cal.dtz.toRFC3339(item.calItem.endDate.getInTimezone(this.globalFunctions.ecUTC()));
                     var eventField = "y";
                 }
                 else {
                     if (item.calItem.entryDate) {
-                        var startDate = cal.toRFC3339(item.calItem.entryDate.getInTimezone(this.globalFunctions.ecUTC()));
+                        var startDate = cal.dtz.toRFC3339(item.calItem.entryDate.getInTimezone(this.globalFunctions.ecUTC()));
                     }
                     else {
                         var startDate = "";
                     };
 
                     if (((item.calItem.completedDate) && (item.calItem.dueDate) && (item.calItem.completedDate.compare(item.calItem.dueDate) == 1)) || ((item.calItem.completedDate) && (!item.calItem.dueDate))) {
-                        var endDate = cal.toRFC3339(item.calItem.completedDate.getInTimezone(this.globalFunctions.ecUTC()));
+                        var endDate = cal.dtz.toRFC3339(item.calItem.completedDate.getInTimezone(this.globalFunctions.ecUTC()));
                     }
                     else {
                         if (item.calItem.dueDate) {
-                            var endDate = cal.toRFC3339(item.calItem.dueDate.getInTimezone(this.globalFunctions.ecUTC()));
+                            var endDate = cal.dtz.toRFC3339(item.calItem.dueDate.getInTimezone(this.globalFunctions.ecUTC()));
                         }
                         else {
                             var endDate = "";
@@ -9806,12 +9801,12 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                     var eventField = "n";
                 }
 
-                if (isEvent(item.calItem)) {
+                if (cal.item.isEvent(item.calItem)) {
                     if (this.getItemType(item.calItem) == "M") {
                         // Lets find the real end date.
                         for (var childIndex in this.itemCacheById) {
                             if ((this.itemCacheById[childIndex]) && (item.calItem.uid == this.itemCacheById[childIndex].uid)) {
-                                var childEnd = cal.toRFC3339(this.itemCacheById[childIndex].endDate.getInTimezone(this.globalFunctions.ecUTC()));
+                                var childEnd = cal.dtz.toRFC3339(this.itemCacheById[childIndex].endDate.getInTimezone(this.globalFunctions.ecUTC()));
                                 if (childEnd > endDate) {
                                     endDate = childEnd;
                                 }
@@ -9881,27 +9876,27 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
             var sqlQueries = [];
             var mastersToBeUpdated = [];
 
-            for each(var item in aList) {
+            for (var item of aList) {
 
-                if (isEvent(item.calItem)) {
-                    var startDate = cal.toRFC3339(item.calItem.startDate.getInTimezone(this.globalFunctions.ecUTC()));
-                    var endDate = cal.toRFC3339(item.calItem.endDate.getInTimezone(this.globalFunctions.ecUTC()));
+                if (cal.item.isEvent(item.calItem)) {
+                    var startDate = cal.dtz.toRFC3339(item.calItem.startDate.getInTimezone(this.globalFunctions.ecUTC()));
+                    var endDate = cal.dtz.toRFC3339(item.calItem.endDate.getInTimezone(this.globalFunctions.ecUTC()));
                     var eventField = "y";
                 }
                 else {
                     if (item.calItem.entryDate) {
-                        var startDate = cal.toRFC3339(item.calItem.entryDate.getInTimezone(this.globalFunctions.ecUTC()));
+                        var startDate = cal.dtz.toRFC3339(item.calItem.entryDate.getInTimezone(this.globalFunctions.ecUTC()));
                     }
                     else {
                         var startDate = "";
                     };
 
                     if ((item.calItem.completedDate) && (item.calItem.completedDate.compare(item.calItem.dueDate) == 1)) {
-                        var endDate = cal.toRFC3339(item.calItem.completedDate.getInTimezone(this.globalFunctions.ecUTC()));
+                        var endDate = cal.dtz.toRFC3339(item.calItem.completedDate.getInTimezone(this.globalFunctions.ecUTC()));
                     }
                     else {
                         if (item.calItem.dueDate) {
-                            var endDate = cal.toRFC3339(item.calItem.dueDate.getInTimezone(this.globalFunctions.ecUTC()));
+                            var endDate = cal.dtz.toRFC3339(item.calItem.dueDate.getInTimezone(this.globalFunctions.ecUTC()));
                         }
                         else {
                             var endDate = "";
@@ -9910,7 +9905,7 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
                     var eventField = "n";
                 }
 
-                if (isEvent(item.calItem)) {
+                if (cal.item.isEvent(item.calItem)) {
                     if (this.getItemType(item.calItem) == "M") {
                         // Lets find the real end date.
                         if (this.noDB) return;
@@ -9992,16 +9987,16 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
             var sqlQueries = [];
             var mastersToBeUpdated = [];
 
-            for each(var item in aList) {
+            for (var item of aList) {
 
 
-                var endDate = cal.toRFC3339(item.endDate.getInTimezone(this.globalFunctions.ecUTC()));
+                var endDate = cal.dtz.toRFC3339(item.endDate.getInTimezone(this.globalFunctions.ecUTC()));
 
                 if (this.getItemType(item) == "M") {
                     // Lets find the real end date.
                     for (var childIndex in this.itemCacheById) {
                         if ((this.itemCacheById[childIndex]) && (item.uid == this.itemCacheById[childIndex].uid)) {
-                            var childEnd = cal.toRFC3339(this.itemCacheById[childIndex].endDate.getInTimezone(this.globalFunctions.ecUTC()));
+                            var childEnd = cal.dtz.toRFC3339(this.itemCacheById[childIndex].endDate.getInTimezone(this.globalFunctions.ecUTC()));
                             if (childEnd > endDate) {
                                 endDate = childEnd;
                             }
@@ -10104,8 +10099,8 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         var monthAfterDurarion = cal.createDuration("P" + monthsAfter + "D");
         var monthsBeforeDurarion = cal.createDuration("-P" + monthsBefore + "D");
 
-        var startDate = cal.now();
-        var endDate = cal.now();
+        var startDate = cal.dtz.now();
+        var endDate = cal.dtz.now();
         startDate.addDuration(monthsBeforeDurarion);
         endDate.addDuration(monthAfterDurarion);
 
@@ -10361,19 +10356,19 @@ else { dump("Occurrence does not exist in cache anymore.\n");}
         if (aStartDate) {
             utcStartDate = aStartDate.clone();
             utcStartDate.isDate = false;
-            utcStartDate = utcStartDate.getInTimezone(cal.UTC());
+            utcStartDate = utcStartDate.getInTimezone(cal.dtz.UTC);
             utcStartDate.isDate = true;
         }
 
         if (aEndDate) {
             utcEndDate = aEndDate.clone();
             utcEndDate.isDate = false;
-            utcEndDate = utcEndDate.getInTimezone(cal.UTC());
+            utcEndDate = utcEndDate.getInTimezone(cal.dtz.UTC);
             utcEndDate.isDate = true;
         }
 
-        let startDate = cal.toRFC3339(utcStartDate);
-        let endDate = cal.toRFC3339(utcEndDate);
+        let startDate = cal.dtz.toRFC3339(utcStartDate);
+        let endDate = cal.dtz.toRFC3339(utcEndDate);
 
         let sqlStr = "SELECT item FROM items";
         let whereStr = "";
@@ -10885,7 +10880,7 @@ ecObserver.prototype = {
         Services.prefs.addObserver("extensions.1st-setup.core.debuglevel", this, false);
 
 
-        getCalendarManager().addObserver(this.ecInvitationsCalendarManagerObserver);
+        cal.getCalendarManager().addObserver(this.ecInvitationsCalendarManagerObserver);
     },
 
     unregister: function () {
@@ -10899,7 +10894,7 @@ ecObserver.prototype = {
         observerService.removeObserver(this, "quit-application");
         observerService.removeObserver(this, "network:offline-status-changed");
 
-        getCalendarManager().removeObserver(this.ecInvitationsCalendarManagerObserver);
+        cal.getCalendarManager().removeObserver(this.ecInvitationsCalendarManagerObserver);
     }
 }
 
@@ -10953,11 +10948,6 @@ function convertToVersion1() {
 
 }
 
-/** Module Registration */
-const scriptLoadOrder = [
-    "calUtils.js"
-];
-
 if (!exchWebService) var exchWebService = {};
 
 exchWebService.check4addon = {
@@ -10972,7 +10962,7 @@ exchWebService.check4addon = {
         else {
             mivFunctions.LOG(aAddOn.name + " is installed.");
             try {
-                mivFunctions.LOG(aAddOn.name + " is installed from:" + aAddOn.sourceURI.prePath + aAddOn.sourceURI.path);
+                mivFunctions.LOG(aAddOn.name + " is installed from:" + aAddOn.sourceURI.prePath + aAddOn.sourceURI.pathQueryRef);
             }
             catch (err) {
                 mivFunctions.LOG(aAddOn.name + " unable to determine where installed from.");
@@ -11004,7 +10994,6 @@ function NSGetFactory(cid) {
             // Load main script from lightning that we need.
             convertToVersion1();
 
-            cal.loadScripts(scriptLoadOrder, Cu.getGlobalForObject(this));
             NSGetFactory.mainEC = XPCOMUtils.generateNSGetFactory([calExchangeCalendar]);
 
         }

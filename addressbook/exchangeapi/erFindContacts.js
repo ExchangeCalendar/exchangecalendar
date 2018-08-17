@@ -132,7 +132,7 @@ erFindContactsRequest.prototype = {
                 return;
             }
 
-            for each(var contact in rootFolder[0].XPath("/t:Items/t:Contact")) {
+            for (var contact of rootFolder[0].XPath("/t:Items/t:Contact")) {
                 exchWebService.commonAbFunctions.logInfo("erFindContactsRequest.contacts: id:" + contact.getAttributeByTag("t:ItemId", "Id") + ", changekey:" + contact.getAttributeByTag("t:ItemId", "ChangeKey"));
                 this.contacts.push({
                     Id: contact.getAttributeByTag("t:ItemId", "Id"),
@@ -142,7 +142,7 @@ erFindContactsRequest.prototype = {
                 });
             }
 
-            for each(var distlist in rootFolder[0].XPath("/t:Items/t:DistributionList")) {
+            for (var distlist of rootFolder[0].XPath("/t:Items/t:DistributionList")) {
                 this.distlists.push({
                     Id: distlist.getAttributeByTag("t:ItemId", "Id"),
                     ChangeKey: distlist.getAttributeByTag("t:ItemId", "ChangeKey"),

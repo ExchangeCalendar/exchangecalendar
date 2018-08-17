@@ -3,8 +3,6 @@
 var Cu = Components.utils;
 var Cc = Components.classes;
 var Ci = Components.interfaces;
-Components.utils.import("resource://app/modules/gloda/public.js");
-Components.utils.import("resource://app/modules/gloda/explattr.js");
 Components.utils.import("resource:///modules/iteratorUtils.jsm");
 
 var importantTag;

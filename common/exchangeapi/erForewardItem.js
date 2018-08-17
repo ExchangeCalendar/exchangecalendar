@@ -39,9 +39,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
-Cu.import("resource://calendar/modules/calAlarmUtils.jsm");
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
-Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecommon/ecFunctions.js");
 Cu.import("resource://exchangecommon/ecExchangeRequest.js");
@@ -86,7 +83,7 @@ erForewardItemRequest.prototype = {
         var forwardItem = req.addChildTag("Items", "nsMessages", null).addChildTag("ForwardItem", "nsTypes", null);
         var toRecipients = forwardItem.addChildTag("ToRecipients", "nsTypes", null);
 
-        for each(let emailId in this.argument.attendees) {
+        for (let emailId of this.argument.attendees) {
             var email = new String(emailId);
             var start = email.indexOf('<');
             if (start < 0) {

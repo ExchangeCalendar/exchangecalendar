@@ -264,7 +264,6 @@ mivIxml2jxon.prototype = {
     classID: components.ID("{" + xguid + "}"),
     contractID: cId,
     flags: Ci.nsIClassInfo.THREADSAFE,
-    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
     get closed() {
         return this._c1;
     },
@@ -326,7 +325,7 @@ mivIxml2jxon.prototype = {
             index = "_default_";
         }
         this.nameSpaces[index] = nameSpaceMgr.addNameSpace(index, b);
-        for each(var child in this.tags) {
+        for (var child in this.tags) {
             child.addNameSpace(index, b);
         }
     },
@@ -528,7 +527,7 @@ mivIxml2jxon.prototype = {
         for (let index in this.tags) {
             cc++;
             if (isArray(this.tags[index])) {
-                for each(let tag in this.tags[index]) {
+                for (let tag in this.tags[index]) {
                     r += tag.toString(nss);
                 }
             }
@@ -562,7 +561,7 @@ mivIxml2jxon.prototype = {
         else {
             r = "<" + ns + this.tagName + at + nss + ">" + r + "</" + ns + this.tagName + ">";
         }
-        for each(let s in this._siblings) {
+        for (let s of this._siblings) {
             r = r + s.toString();
         }
         return r;

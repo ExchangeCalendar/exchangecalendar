@@ -40,9 +40,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
-Cu.import("resource://calendar/modules/calAlarmUtils.jsm");
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
-Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecommon/ecFunctions.js");
 Cu.import("resource://exchangecommon/ecExchangeRequest.js");
@@ -149,7 +146,7 @@ erDeleteItemRequest.prototype = {
 
         var req = exchWebService.commonFunctions.xmlToJxon('<nsMessages:DeleteItem DeleteType="HardDelete" xmlns:nsMessages="' + nsMessagesStr + '" xmlns:nsTypes="' + nsTypesStr + '"/>');
 
-        if ((this.itemType != "meeting") && (cal.isEvent(this.argument.item))) {
+        if ((this.itemType != "meeting") && (cal.item.isEvent(this.argument.item))) {
             req.setAttribute("SendMeetingCancellations", sendMeetingCancellations);
         }
 

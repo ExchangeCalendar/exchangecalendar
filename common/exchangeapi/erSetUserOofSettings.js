@@ -40,9 +40,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
-Cu.import("resource://calendar/modules/calAlarmUtils.jsm");
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
-Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecommon/ecFunctions.js");
 Cu.import("resource://exchangecommon/ecExchangeRequest.js");
@@ -95,8 +92,8 @@ erSetUserOofSettingsRequest.prototype = {
         userOofSettings.addChildTag("ExternalAudience", "nsTypes", this.externalAudience);
 
         var duration = userOofSettings.addChildTag("Duration", "nsTypes", null);
-        duration.addChildTag("StartTime", "nsTypes", cal.toRFC3339(this.startTime));
-        duration.addChildTag("EndTime", "nsTypes", cal.toRFC3339(this.endTime));
+        duration.addChildTag("StartTime", "nsTypes", cal.dtz.toRFC3339(this.startTime));
+        duration.addChildTag("EndTime", "nsTypes", cal.dtz.toRFC3339(this.endTime));
 
         userOofSettings.addChildTag("InternalReply", "nsTypes", null).addChildTag("Message", "nsTypes", this.internalReply);
         userOofSettings.addChildTag("ExternalReply", "nsTypes", null).addChildTag("Message", "nsTypes", this.externalReply);

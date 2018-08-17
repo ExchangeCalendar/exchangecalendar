@@ -114,7 +114,7 @@ erGetAttachmentsRequest.prototype = {
         }
 
         var attachments = [];
-        for each(var e in rm) {
+        for (var e of rm) {
             attachments.push({
                 id: xml2json.getAttributeByTag(e, "t:AttachmentId", "Id"),
                 name: xml2json.getTagValue(e, "t:Name"),

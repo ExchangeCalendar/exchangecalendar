@@ -39,9 +39,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
-Cu.import("resource://calendar/modules/calAlarmUtils.jsm");
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
-Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecommon/ecFunctions.js");
 Cu.import("resource://exchangecommon/ecExchangeRequest.js");
@@ -56,7 +53,7 @@ function convDate(aDate) {
         var d = aDate.clone();
 
         d.isDate = false;
-        return cal.toRFC3339(d);
+        return cal.dtz.toRFC3339(d);
     }
 
     return null;
@@ -191,7 +188,7 @@ erFindCalendarItemsRequest.prototype = {
 
                     if (xml2json.getTagValue(calItem, "t:Start").substr(0, 10) == xml2json.getTagValue(calItem, "t:End").substr(0, 10)) {
                         var tmpDateStr = xml2json.getTagValue(calItem, "t:End");
-                        var tmpDateObj = cal.fromRFC3339(tmpDateStr, exchWebService.commonFunctions.ecTZService().UTC).getInTimezone(exchWebService.commonFunctions.ecDefaultTimeZone());
+                        var tmpDateObj = cal.dtz.fromRFC3339(tmpDateStr, exchWebService.commonFunctions.ecTZService().UTC).getInTimezone(exchWebService.commonFunctions.ecDefaultTimeZone());
                         var offset = cal.createDuration();
                         offset.seconds = 1;
                         tmpDateObj.addDuration(offset);

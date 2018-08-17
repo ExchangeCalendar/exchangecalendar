@@ -29,7 +29,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://exchangecommon/ecExchangeRequest.js");
 
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
+Cu.import("resource://calendar/modules/calUtils.jsm");
 
 Cu.import("resource://exchangecommoninterfaces/exchangeBaseItem/mivExchangeBaseItem.js");
 
@@ -76,7 +76,6 @@ mivExchangeTodo.prototype = {
     classID: components.ID("{" + mivExchangeTodoGUID + "}"),
     contractID: "@1st-setup.nl/exchange/calendartodo;1",
     flags: 0,
-    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
     getInterfaces: function _getInterfaces(count) {
         var ifaces = [Ci.mivExchangeTodo,
@@ -116,7 +115,7 @@ mivExchangeTodo.prototype = {
             this._billingInformation = aItem._billingInformation;
             this._companies = [];
             if (aItem._companies) {
-                for each(var company in aItem._companies) {
+                for (var company of aItem._companies) {
                     this._companies.push(company);
                 }
             }
@@ -734,7 +733,7 @@ mivExchangeTodo.prototype = {
                 .createInstance(Ci.mivIxml2jxon);
             var categories = this.getCategories({});
             var first = true;
-            for each(var category in categories) {
+            for (var category of categories) {
                 if (first) {
                     first = false;
                     categoriesXML.processXMLString("<t:String>" + category + "</t:String>", 0, null);
@@ -760,7 +759,7 @@ mivExchangeTodo.prototype = {
             var companies = this.getCompanies({});
             //var companies = this.companies;
             var first = true;
-            for each(var company in companies) {
+            for (var company of companies) {
                 if (first) {
                     first = false;
                     companiesXML.processXMLString("<t:String>" + company + "</t:String>", 0, null);
@@ -843,13 +842,13 @@ mivExchangeTodo.prototype = {
 
                 // We make a non-UTC datetime value for exchGlobalFunctions.
                 // EWS will use the MeetingTimeZone or StartTimeZone and EndTimeZone to convert.
-                //				var exchStart = cal.toRFC3339(tmpStart).substr(0, 19)+"Z"; //cal.toRFC3339(tmpStart).length-6);
-                var exchStart = cal.toRFC3339(tmpStart).substr(0, 19); //cal.toRFC3339(tmpStart).length-6);
+                //				var exchStart = cal.dtz.toRFC3339(tmpStart).substr(0, 19)+"Z"; //cal.dtz.toRFC3339(tmpStart).length-6);
+                var exchStart = cal.dtz.toRFC3339(tmpStart).substr(0, 19); //cal.dtz.toRFC3339(tmpStart).length-6);
             }
             else {
                 // We set in bias advanced to UCT datetime values for exchGlobalFunctions.
-                //				var exchStart = cal.toRFC3339(tmpStart).substr(0, 19)+"Z";
-                var exchStart = cal.toRFC3339(tmpStart).substr(0, 19);
+                //				var exchStart = cal.dtz.toRFC3339(tmpStart).substr(0, 19)+"Z";
+                var exchStart = cal.dtz.toRFC3339(tmpStart).substr(0, 19);
             }
             this._nonPersonalDataChanged = true;
             switch (this.itemClass) {
@@ -890,13 +889,13 @@ mivExchangeTodo.prototype = {
 
                 // We make a non-UTC datetime value for exchGlobalFunctions.
                 // EWS will use the MeetingTimeZone or StartTimeZone and EndTimeZone to convert.
-                //				var exchEnd = cal.toRFC3339(tmpEnd).substr(0, 19)+"Z"; //cal.toRFC3339(tmpEnd).length-6);
-                var exchEnd = cal.toRFC3339(tmpEnd).substr(0, 19);
+                //				var exchEnd = cal.dtz.toRFC3339(tmpEnd).substr(0, 19)+"Z"; //cal.dtz.toRFC3339(tmpEnd).length-6);
+                var exchEnd = cal.dtz.toRFC3339(tmpEnd).substr(0, 19);
             }
             else {
                 // We set in bias advanced to UCT datetime values for exchGlobalFunctions.
-                //				var exchEnd = cal.toRFC3339(tmpEnd).substr(0, 19)+"Z";
-                var exchEnd = cal.toRFC3339(tmpEnd).substr(0, 19);
+                //				var exchEnd = cal.dtz.toRFC3339(tmpEnd).substr(0, 19)+"Z";
+                var exchEnd = cal.dtz.toRFC3339(tmpEnd).substr(0, 19);
             }
             this._nonPersonalDataChanged = true;
             switch (this.itemClass) {
@@ -938,13 +937,13 @@ mivExchangeTodo.prototype = {
 
                 // We make a non-UTC datetime value for exchGlobalFunctions.
                 // EWS will use the MeetingTimeZone or StartTimeZone and EndTimeZone to convert.
-                //				var exchEnd = cal.toRFC3339(tmpEnd).substr(0, 19)+"Z"; //cal.toRFC3339(tmpEnd).length-6);
-                var exchEnd = cal.toRFC3339(tmpEnd).substr(0, 19);
+                //				var exchEnd = cal.dtz.toRFC3339(tmpEnd).substr(0, 19)+"Z"; //cal.dtz.toRFC3339(tmpEnd).length-6);
+                var exchEnd = cal.dtz.toRFC3339(tmpEnd).substr(0, 19);
             }
             else {
                 // We set in bias advanced to UCT datetime values for exchGlobalFunctions.
-                //				var exchEnd = cal.toRFC3339(tmpEnd).substr(0, 19)+"Z";
-                var exchEnd = cal.toRFC3339(tmpEnd).substr(0, 19);
+                //				var exchEnd = cal.dtz.toRFC3339(tmpEnd).substr(0, 19)+"Z";
+                var exchEnd = cal.dtz.toRFC3339(tmpEnd).substr(0, 19);
             }
             this._nonPersonalDataChanged = true;
             switch (this.itemClass) {
@@ -1148,7 +1147,7 @@ mivExchangeTodo.prototype = {
         this._companies = [];
         if (this._exchangeData) {
             var tmpStr = xml2json.XPath(this.exchangeData, "/t:Companies/t:String");
-            for each(var string in tmpStr) {
+            for (var string of tmpStr) {
                 this._companies.push(xml2json.getValue(string));
             }
             tmpStr = null;

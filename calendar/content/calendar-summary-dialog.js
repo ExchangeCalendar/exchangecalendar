@@ -154,7 +154,7 @@ exchEventSummaryDialog.prototype = {
         var attendees = item.getAttendees({});
         var optionalAttendeeList = new Array();
         var requiredAttendeeList = new Array();
-        for each(var attendee in attendees) {
+        for (var attendee of attendees) {
             if (attendee.role == "OPT-PARTICIPANT") {
                 optionalAttendeeList.push(attendee);
             }
@@ -201,7 +201,7 @@ exchEventSummaryDialog.prototype = {
         var list = listbox.getElementsByTagName("listitem");
         var page = 0;
         var line = 0;
-        for each(var attendee in attendees) {
+        for (var attendee of attendees) {
                 var itemNode = list[line];
                 var listcell = itemNode.getElementsByTagName("listcell")[page];
                 if (attendee.commonName && attendee.commonName.length) {
@@ -683,7 +683,7 @@ exchEventSummaryDialog.prototype = {
 
     unLoad: function _unLoad(aEvent) {
         //dump("unLoading window:"+aEvent.type+"\n");
-        for each(var cachedImage in this.imageCache) {
+        for (var cachedImage of this.imageCache) {
             cachedImage.remove(false);
         }
     },

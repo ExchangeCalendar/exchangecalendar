@@ -42,9 +42,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
-Cu.import("resource://calendar/modules/calAlarmUtils.jsm");
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
-Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecommon/ecFunctions.js");
 Cu.import("resource://exchangecommon/ecExchangeRequest.js");
@@ -146,9 +143,9 @@ erSyncFolderItemsRequest.prototype = {
 
                 if (this.getSyncState === false) {
                     var createItems = xml2json.XPath(rm[0], "/m:Changes/t:Create");
-                    for each(var creation in createItems) {
+                    for (var creation of createItems) {
                         var calendarItems = xml2json.XPath(creation, "/t:CalendarItem/t:ItemId");
-                        for each(var calendarItem in calendarItems) {
+                        for (var calendarItem of calendarItems) {
                             this.creations.push({
                                 Id: xml2json.getAttribute(calendarItem, "Id").toString(),
                                 ChangeKey: xml2json.getAttribute(calendarItem, "ChangeKey").toString()
@@ -167,7 +164,7 @@ erSyncFolderItemsRequest.prototype = {
                         default:
                         }
 
-                        for each(var task in tasks) {
+                        for (var task of tasks) {
                             this.creations.push({
                                 Id: xml2json.getAttribute(task, "Id").toString(),
                                 ChangeKey: xml2json.getAttribute(task, "ChangeKey").toString()
@@ -178,9 +175,9 @@ erSyncFolderItemsRequest.prototype = {
                     createItems = null;
 
                     var updateItems = xml2json.XPath(rm[0], "/m:Changes/t:Update");
-                    for each(var update in updateItems) {
+                    for (var update of updateItems) {
                         var calendarItems = xml2json.XPath(update, "/t:CalendarItem/t:ItemId");
-                        for each(var calendarItem in calendarItems) {
+                        for (var calendarItem of calendarItems) {
                             this.updates.push({
                                 Id: xml2json.getAttribute(calendarItem, "Id").toString(),
                                 ChangeKey: xml2json.getAttribute(calendarItem, "ChangeKey").toString()
@@ -198,7 +195,7 @@ erSyncFolderItemsRequest.prototype = {
                             break;
                         default:
                         }
-                        for each(var task in tasks) {
+                        for (var task of tasks) {
                             this.updates.push({
                                 Id: xml2json.getAttribute(task, "Id").toString(),
                                 ChangeKey: xml2json.getAttribute(task, "ChangeKey").toString()
@@ -209,7 +206,7 @@ erSyncFolderItemsRequest.prototype = {
                     updateItems = null;
 
                     var deleteItems = xml2json.XPath(rm[0], "/m:Changes/t:Delete/t:ItemId");
-                    for each(var deleted in deleteItems) {
+                    for (var deleted of deleteItems) {
                         this.deletions.push({
                             Id: xml2json.getAttribute(deleted, "Id").toString(),
                             ChangeKey: xml2json.getAttribute(deleted, "ChangeKey").toString()

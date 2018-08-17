@@ -40,9 +40,6 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
-Cu.import("resource://calendar/modules/calAlarmUtils.jsm");
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
-Cu.import("resource://calendar/modules/calAuthUtils.jsm");
 
 Cu.import("resource://exchangecommon/ecFunctions.js");
 Cu.import("resource://exchangecommon/ecExchangeRequest.js");
@@ -92,7 +89,7 @@ erFindFollowupItemsRequest.prototype = {
         var Restriction = req.addChildTag("Restriction", "nsMessages", null);
         var Or = Restriction.addChildTag("Or", "nsTypes", null);
 
-        for each(var i in ["1", "2"]) {
+        for (var i of ["1", "2"]) {
             var IsEqualTo = Or.addChildTag("IsEqualTo", "nsTypes", null);
             var ExtendedFieldURI = IsEqualTo.addChildTag("ExtendedFieldURI", "nsTypes", null);
             ExtendedFieldURI.setAttribute("PropertyTag", "0x1090");
@@ -120,7 +117,7 @@ erFindFollowupItemsRequest.prototype = {
 
         var rm = aResp.XPath("/s:Envelope/s:Body/m:FindItemResponse/m:ResponseMessages/m:FindItemResponseMessage[@ResponseClass='Success' and m:ResponseCode='NoError']/m:RootFolder/t:Items/t:Message");
 
-        for each(var e in rm) {
+        for (var e of rm) {
             ids.push({
                 Id: e.getAttributeByTag("t:ItemId", "Id"),
                 ChangeKey: e.getAttributeByTag("t:ItemId", "ChangeKey")

@@ -125,7 +125,7 @@ exchCheck4Lightning.prototype = {
         else {
             // Ligntning is installed check if it is enabled.
             try {
-                this.globalFunctions.LOG("Lightning was installed from:" + aAddOn.sourceURI.prePath + aAddOn.sourceURI.path);
+                this.globalFunctions.LOG("Lightning was installed from:" + aAddOn.sourceURI.prePath + aAddOn.sourceURI.pathQueryRef);
             }
             catch (er) {
                 this.globalFunctions.LOG("Lightning was installed from unknown source. Probably manualy outside the AddOnManager.");

@@ -63,7 +63,6 @@ mivExchangeAbCard.prototype = {
     classID: components.ID("{" + mivExchangeAbCardGUID + "}"),
     contractID: "@1st-setup.nl/exchange/abcard;1",
     flags: Ci.nsIClassInfo.THREADSAFE,
-    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
     // External methods
 

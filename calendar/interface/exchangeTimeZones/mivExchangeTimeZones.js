@@ -27,7 +27,7 @@ var components = Components;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
-Cu.import("resource://calendar/modules/calProviderUtils.jsm");
+Cu.import("resource://calendar/modules/calUtils.jsm");
 
 Cu.import("resource://exchangecalendar/erGetTimeZones.js");
 
@@ -36,7 +36,7 @@ Cu.import("resource://exchangecalendar/erGetTimeZones.js");
 Cu.import("resource://exchangecommoninterfaces/xml2json/xml2json.js");
 
 function mivExchangeTimeZones() {
-    this._timeZones = {};
+    this._timeZones = [];
 
     this.globalFunctions = Cc["@1st-setup.nl/global/functions;1"]
         .getService(Ci.mivFunctions);
@@ -79,7 +79,6 @@ mivExchangeTimeZones.prototype = {
     classID: components.ID("{" + mivExchangeTimeZonesGUID + "}"),
     contractID: "@1st-setup.nl/exchange/timezones;1",
     flags: Ci.nsIClassInfo.SINGLETON,
-    implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
 
     // void getInterfaces(out PRUint32 count, [array, size_is(count), retval] out nsIIDPtr array);
     getInterfaces: function _getInterfaces(count) {
@@ -146,14 +145,14 @@ mivExchangeTimeZones.prototype = {
             var weHaveAMatch = null;
 
             var finalScore = -1;
-            for each(var timeZoneDefinition in this._timeZones[version]) {
+            for (var timeZoneDefinition of this._timeZones[version]) {
 
                 // First we match on values.
                 var exchangeTimeZone = this.getTimeZone(timeZoneDefinition, aIndexDate);
                 if (exchangeTimeZone.equal(calTimeZone)) {
                     // Now we see if we have also a match on name.
                     var tmpScore = 0;
-                    for each(var zonePart in tmpArray) {
+                    for (var zonePart of tmpArray) {
                         if ((exchangeTimeZone.id) && (exchangeTimeZone.id.indexOf(zonePart) > -1)) {
                             tmpScore = tmpScore + 1;
                         }
@@ -249,7 +248,7 @@ mivExchangeTimeZones.prototype = {
         var tmpResult = null;
         while (timezones.hasMore()) {
             var tmpZoneId = timezones.getNext();
-            for each(var cname in names) {
+            for (var cname of names) {
                 if (tmpZoneId.toLowerCase().indexOf(cname) > -1) {
                     return this.timezoneService.getTimezone(tmpZoneId);
                 }
@@ -292,7 +291,7 @@ mivExchangeTimeZones.prototype = {
                 var tmpArray = calTimeZone.id.split("/");
 
                 var tmpScore = 0;
-                for each(var zonePart in tmpArray) {
+                for (var zonePart of tmpArray) {
 
                     if ((exchangeTimeZone.id) && (exchangeTimeZone.id.indexOf(zonePart) > -1)) {
                         tmpScore = tmpScore + 1;
@@ -410,7 +409,7 @@ mivExchangeTimeZones.prototype = {
     addExchangeTimeZones: function _addExchangeTimeZones(aTimeZoneDefinitions, aVersion) {
         var rm = xml2json.XPath(aTimeZoneDefinitions, "/s:Envelope/s:Body/m:GetServerTimeZonesResponse/m:ResponseMessages/m:GetServerTimeZonesResponseMessage");
         if (rm.length == 0) return null;
-        this._timeZones[aVersion] = {};
+        this._timeZones[aVersion] = [];
 
         var timeZoneDefinitionArray = xml2json.XPath(rm[0], "/m:TimeZoneDefinitions/t:TimeZoneDefinition");
         for (var index in timeZoneDefinitionArray) {
@@ -421,35 +420,35 @@ mivExchangeTimeZones.prototype = {
     },
 
     load_timezonedefinitions_file: function _load_timezonedefinitions_file() {
-        var somefile = this.globalFunctions.chromeToPath("chrome://exchangeTimeZones/content/ewsTimesZoneDefinitions_2007.xml");
-        var file = Components.classes["@mozilla.org/file/local;1"]
-            .createInstance(Components.interfaces.nsILocalFile);
+        // var somefile = this.globalFunctions.chromeToPath("chrome://exchangeTimeZones/content/ewsTimesZoneDefinitions_2007.xml");
+        // var file = Components.classes["@mozilla.org/file/local;1"]
+        //     .createInstance(Components.interfaces.nsIFile);
 
-        file.initWithPath(somefile);
+        // file.initWithPath(somefile);
 
-        var istream = Components.classes["@mozilla.org/network/file-input-stream;1"].
-        createInstance(Components.interfaces.nsIFileInputStream);
-        istream.init(file, -1, -1, 0);
-        istream.QueryInterface(Components.interfaces.nsILineInputStream);
+        // var istream = Components.classes["@mozilla.org/network/file-input-stream;1"].
+        // createInstance(Components.interfaces.nsIFileInputStream);
+        // istream.init(file, -1, -1, 0);
+        // istream.QueryInterface(Components.interfaces.nsILineInputStream);
 
-        // read lines into array  
-        var line = {},
-            lines = "",
-            hasmore;
-        do {
-            hasmore = istream.readLine(line);
-            lines += line.value;
-        } while (hasmore);
+        // // read lines into array  
+        // var line = {},
+        //     lines = "",
+        //     hasmore;
+        // do {
+        //     hasmore = istream.readLine(line);
+        //     lines += line.value;
+        // } while (hasmore);
 
-        istream.close();
+        // istream.close();
         var root = xml2json.newJSON();
-        xml2json.parseXML(root, lines);
-        var timezonedefinitions = root[telements][0];
+        // xml2json.parseXML(root, lines);
+        // var timezonedefinitions = root[telements][0];
         this.addExchangeTimeZones(root, "Exchange2007_SP1");
 
-        timezonedefinitions = null;
-        lines = null;
-        line = null;
+        // timezonedefinitions = null;
+        // lines = null;
+        // line = null;
     },
 
 }

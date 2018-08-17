@@ -107,13 +107,13 @@ erExpandDLRequest.prototype = {
         rm = null;
 
         var allMailboxes = new Array();
-        for each(var expansion in dlExpansion) {
+        for (var expansion of dlExpansion) {
 
             var totalItemsInView = expansion.getAttribute("TotalItemsInView", 0);
             var includesLastItem = expansion.getAttribute("IncludesLastItemInRange", "false");
 
             var mailboxes = expansion.getTags("t:Mailbox");
-            for each(var mailbox in mailboxes) {
+            for (var mailbox of mailboxes) {
                 allMailboxes.push(mailbox);
             }
             mailboxes = null;
