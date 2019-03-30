@@ -8341,6 +8341,8 @@ calExchangeCalendar.prototype = {
                 this.findFollowupTaskItemsOK(erSyncFolderItemsRequest, changes);
                 break;
             default:
+                if (erSyncFolderItemsRequest.folderBase == "publicfoldersroot")
+                    this.findCalendarItemsOK(erSyncFolderItemsRequest, changes, []);
                 this.logError("Changes could not be made." + erSyncFolderItemsRequest.folderBase);
             }
 
