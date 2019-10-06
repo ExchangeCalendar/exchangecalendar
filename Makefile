@@ -1,19 +1,16 @@
-version = $(shell cat VERSION)
-excludefromxpi = .\* \*/.gitignore \*.xpi \*.sh update\*.txt Makefile VERSION install.rdf.template
+version = $(shell jq -r '.version' manifest.json)
+excludefromxpi = .\* \*/.gitignore \*.xpi \*.sh update\*.txt Makefile
 update = disable
 xpi = exchangecalendar-v$(version).xpi
 
-.PHONY: build release l10n-get l10n-auto-commit l10n-push dev beautify beautify-xml beautify-js defaults/preferences/update.js install.rdf $(xpi)
+.PHONY: build release l10n-get l10n-auto-commit l10n-push dev beautify beautify-xml beautify-js defaults/preferences/update.js $(xpi)
 
 # Default target is build package
 build: $(xpi)
 
-$(xpi): install.rdf defaults/preferences/update.js
+$(xpi): defaults/preferences/update.js
 	rm -f $@
 	zip -r $@ -x $(excludefromxpi) -- .
-
-install.rdf: install.rdf.template
-	sed 's/@VERSION@/$(version)/g' $< > $@
 
 defaults/preferences/update.js:
 	cp defaults/preferences/update_$(update).txt $@
@@ -21,7 +18,7 @@ defaults/preferences/update.js:
 # Target to publish a new release:
 release: build
 	git tag "v$(version)"
-	@echo 'Build done, tag localy added.'
+	@echo 'Build done, tag locally added.'
 	@echo 'If the release is well done, please run "git push origin v$(version)" to publish the new tag.'
 
 # Targets to update translations
