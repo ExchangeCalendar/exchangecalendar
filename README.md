@@ -37,7 +37,7 @@ There is no active development at this time.
 
 Currently not implemented. See issue [#277](https://github.com/ExchangeCalendar/exchangecalendar/issues/277).
 
-A [financial bounty](https://www.bountysource.com/issues/84017522-exchange-calendar-is-incompatible-with-thunderbird-68-2-2) 
+A [financial bounty](https://www.bountysource.com/issues/74122217-compatibility-with-thunderbird-67-and-newer-versions) 
 is available for anyone who implements this support. For details and 
 rules see the linked page.
 
